@@ -66,6 +66,20 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         </div>`;
     }).join('');
 
+    const nut = MB.pregNutrition ? MB.pregNutrition(viewWeek) : null;
+    const nutHtml = nut ? `
+      <div class="section-title">${nut.emoji} โภชนาการ <span class="more">${nut.weeks}</span></div>
+      <div class="card">
+        <p style="margin:0 0 8px"><b>สารอาหารเด่นช่วงนี้:</b> ${nut.focus}</p>
+        <div style="font-weight:700;color:var(--brown);margin-bottom:2px">🍽️ ควรกิน</div>
+        <ul style="margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.65">${nut.foods.map(f => '<li>' + f + '</li>').join('')}</ul>
+        <div style="font-weight:700;color:var(--brown);margin-bottom:2px">💡 เคล็ดลับ</div>
+        <ul style="margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.65">${nut.tips.map(t => '<li>' + t + '</li>').join('')}</ul>
+        <div style="font-weight:700;color:#C45a61;margin-bottom:2px">🚫 ควรเลี่ยง</div>
+        <ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.65;color:#7a5a52">${nut.avoid.map(a => '<li>' + a + '</li>').join('')}</ul>
+        <div class="disclaimer" style="margin-top:10px">คำแนะนำทั่วไป ปรึกษาแพทย์/นักโภชนาการสำหรับแผนเฉพาะบุคคล</div>
+      </div>` : '';
+
     root.innerHTML = `
       <div class="hero">
         <div class="emoji">${wk.fruit}</div>
@@ -90,6 +104,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           <button class="btn ghost sm" id="wk-next">ถัดไป ›</button>
         </div>
       </div>
+
+      ${nutHtml}
 
       <div class="section-title">🧰 เครื่องมือคนท้อง</div>
       <div class="quick-grid">
