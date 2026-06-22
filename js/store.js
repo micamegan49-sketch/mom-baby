@@ -40,6 +40,7 @@ window.MB = window.MB || {};
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); }
     catch (e) { console.warn('save failed', e); }
+    if (store._onSave) { try { store._onSave(); } catch (e) {} }   // hook คลาวด์ซิงค์
   }
   function uid() {
     return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -174,7 +175,17 @@ window.MB = window.MB || {};
       state = Object.assign(structuredClone(DEFAULT), s);
       save();
     },
-    reset() { state = structuredClone(DEFAULT); save(); }
+    reset() { state = structuredClone(DEFAULT); save(); },
+
+    // ---------- คลาวด์ซิงค์ (ใช้โดย js/cloud.js) ----------
+    _onSave: null,
+    loadFrom(obj) { state = Object.assign(structuredClone(DEFAULT), obj || {}); save(); },
+    isEmpty() {
+      return state.children.length === 0 && !state.pregnancy.active &&
+        (state.pregnancy.weights || []).length === 0 && state.appointments.length === 0 &&
+        state.deliveryPkgs.length === 0 && state.vaxPricePkgs.length === 0 &&
+        Object.keys(state.logsByChild).length === 0 && Object.keys(state.measByChild).length === 0;
+    }
   };
 
   function todayISO() {

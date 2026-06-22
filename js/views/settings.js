@@ -97,6 +97,9 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <button class="btn ghost" id="install" style="margin-top:12px;display:none">📲 ติดตั้งแอพลงเครื่อง</button>
       </div>
 
+      <div class="section-title">☁️ บัญชี & ซิงค์ข้ามเครื่อง</div>
+      <div class="card" id="cloud-card"></div>
+
       <div class="section-title">💾 ข้อมูลของฉัน</div>
       <div class="card">
         <button class="btn ghost" id="exp" style="margin-bottom:10px">📤 สำรองข้อมูล (ส่งออกไฟล์)</button>
@@ -143,5 +146,103 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelector('#rst').onclick = () => {
       if (confirm('ล้างข้อมูลทั้งหมดในเครื่อง? ลบแล้วกู้คืนไม่ได้')) { S.reset(); MB.toast('ล้างข้อมูลแล้ว'); MB.go('home'); }
     };
+
+    /* ---------- การ์ดคลาวด์ & ซิงค์ ---------- */
+    if (MB.views._cloudUnsub) { try { MB.views._cloudUnsub(); } catch (e) {} MB.views._cloudUnsub = null; }
+
+    function inputRow(id, label, ph, type) {
+      return `<div class="field"><label>${label}</label>
+        <input id="${id}" type="${type || 'text'}" placeholder="${U.esc(ph || '')}"
+          autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" /></div>`;
+    }
+    function errTH(e) {
+      const m = (e && e.message) || '';
+      if (/Invalid login/i.test(m)) return 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+      if (/already registered/i.test(m)) return 'อีเมลนี้สมัครไว้แล้ว ลองเข้าสู่ระบบ';
+      if (/at least 6|Password should/i.test(m)) return 'รหัสผ่านอย่างน้อย 6 ตัว';
+      if (/valid email|invalid.*email/i.test(m)) return 'อีเมลไม่ถูกต้อง';
+      if (/Email not confirmed/i.test(m)) return 'ยังไม่ได้ยืนยันอีเมล ตรวจสอบกล่องจดหมาย';
+      return m || 'เกิดข้อผิดพลาด';
+    }
+    function cloudInner(st) {
+      if (!st.configured) {
+        return `<p class="muted" style="font-size:13px;margin:0 0 12px">
+            เชื่อมต่อ Supabase เพื่อสำรองข้อมูลออนไลน์และซิงค์ข้ามเครื่อง (มือถือ+คอม) — ฟรี ตั้งค่าครั้งเดียว
+            วิธีสร้างโปรเจกต์ดูใน README</p>
+          ${inputRow('su-url', 'Project URL', 'https://xxxx.supabase.co')}
+          ${inputRow('su-key', 'anon public key', 'eyJhbGci...')}
+          <button class="btn" id="su-save">บันทึกการตั้งค่า</button>`;
+      }
+      const editKeys = `<button class="btn ghost sm" id="su-edit" style="margin-top:10px">⚙️ แก้คีย์ Supabase</button>`;
+      if (!st.ready) {
+        return `<p class="muted" style="font-size:13px">กำลังเชื่อมต่อคลาวด์... ถ้าค้างอาจกำลังออฟไลน์ (แอพยังใช้งานได้ปกติ)</p>${editKeys}`;
+      }
+      if (!st.signedIn) {
+        return `<p class="muted" style="font-size:13px;margin:0 0 12px">เข้าสู่ระบบเพื่อซิงค์ข้อมูลข้ามเครื่อง</p>
+          ${inputRow('su-email', 'อีเมล', 'you@email.com', 'email')}
+          ${inputRow('su-pw', 'รหัสผ่าน', 'อย่างน้อย 6 ตัว', 'password')}
+          <div style="display:flex;gap:10px">
+            <button class="btn" id="su-login" style="flex:1">เข้าสู่ระบบ</button>
+            <button class="btn ghost" id="su-signup" style="flex:1">สมัครใหม่</button>
+          </div>
+          ${st.error ? `<p style="color:#C45a61;font-size:12px;margin:10px 0 0">${U.esc(st.error)}</p>` : ''}
+          ${editKeys}`;
+      }
+      const synced = st.lastSyncedAt ? 'ซิงค์ล่าสุด ' + U.relTime(st.lastSyncedAt) : 'ยังไม่ได้ซิงค์';
+      const line = st.syncing ? '⏳ กำลังซิงค์...' : (st.error ? '⚠️ ' + U.esc(st.error) : '✅ ' + synced);
+      const conflictBlock = st.conflict ? `
+        <div class="disclaimer" style="margin:12px 0;background:#FCEAEB;border-color:#F4C9CC">
+          ⚠️ พบข้อมูลทั้งบนคลาวด์และในเครื่องนี้ และไม่ตรงกัน — เลือกว่าจะเก็บชุดไหน (อีกชุดจะถูกเขียนทับ):
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button class="btn sm" id="su-pull" style="flex:1">ใช้ข้อมูลคลาวด์</button>
+            <button class="btn ghost sm" id="su-push" style="flex:1">ใช้ข้อมูลเครื่องนี้</button>
+          </div>
+        </div>` : '';
+      return `<div class="list-item" style="padding:6px 0">
+          <div class="ic">☁️</div>
+          <div class="body"><div class="t">${U.esc(st.email)}</div><div class="s">${line}</div></div>
+        </div>
+        ${conflictBlock}
+        <button class="btn ghost" id="su-sync" style="margin-top:8px">🔄 ซิงค์เดี๋ยวนี้</button>
+        <button class="btn ghost" id="su-logout" style="margin-top:10px;color:#D9737A">ออกจากระบบ</button>`;
+    }
+    function wireCloud(card) {
+      const $ = id => card.querySelector('#' + id);
+      if ($('su-save')) $('su-save').onclick = async () => {
+        const url = $('su-url').value.trim(), key = $('su-key').value.trim();
+        if (!url || !key) return MB.toast('กรอก URL และคีย์ให้ครบ');
+        await MB.cloud.saveConfig(url, key); MB.toast('บันทึกแล้ว'); paintCloud();
+      };
+      if ($('su-edit')) $('su-edit').onclick = () => { MB.cloud.clearConfig(); paintCloud(); };
+      if ($('su-login')) $('su-login').onclick = async () => {
+        try { await MB.cloud.signIn($('su-email').value.trim(), $('su-pw').value); MB.toast('เข้าสู่ระบบแล้ว 🎉'); }
+        catch (e) { MB.toast(errTH(e)); }
+        paintCloud();
+      };
+      if ($('su-signup')) $('su-signup').onclick = async () => {
+        try {
+          const r = await MB.cloud.signUp($('su-email').value.trim(), $('su-pw').value);
+          MB.toast(r && r.session ? 'สมัครและเข้าสู่ระบบแล้ว 🎉' : 'สมัครแล้ว — ตรวจสอบอีเมลเพื่อยืนยันก่อนเข้าสู่ระบบ');
+        } catch (e) { MB.toast(errTH(e)); }
+        paintCloud();
+      };
+      if ($('su-sync')) $('su-sync').onclick = () => MB.cloud.syncNow();
+      if ($('su-pull')) $('su-pull').onclick = () => MB.cloud.pullForce();
+      if ($('su-push')) $('su-push').onclick = () => MB.cloud.pushForce();
+      if ($('su-logout')) $('su-logout').onclick = async () => { await MB.cloud.signOut(); MB.toast('ออกจากระบบแล้ว'); paintCloud(); };
+    }
+    function paintCloud() {
+      const card = root.querySelector('#cloud-card');
+      if (!card || !MB.cloud) return;
+      card.innerHTML = cloudInner(MB.cloud.status());
+      wireCloud(card);
+    }
+    if (MB.cloud) {
+      paintCloud();
+      MB.views._cloudUnsub = MB.cloud.onChange(() => paintCloud());
+    } else {
+      root.querySelector('#cloud-card').innerHTML =
+        '<p class="muted" style="font-size:13px;margin:0">ระบบคลาวด์ยังไม่พร้อม (อาจกำลังออฟไลน์) — แอพใช้งานออฟไลน์ได้ตามปกติ</p>';
+    }
   };
 })();
