@@ -13,5 +13,5 @@
 window.MB = window.MB || {};
 MB.SUPA = {
   url: 'https://gmjbpenvncesgbglcolb.supabase.co',
-  anonKey: ''   // ← วาง anon public key ที่นี่ หรือกรอกในแอพ: ตั้งค่า → ☁️ บัญชี & ซิงค์
+  anonKey: 'sb_publishable_RFB2fNLfZiDhP8Ojb7Thqg_L3TT4ZT0'   // publishable key (ปลอดภัยฝั่งหน้าเว็บ มี RLS กัน)
 };
