@@ -12,6 +12,6 @@
  */
 window.MB = window.MB || {};
 MB.SUPA = {
-  url: '',
-  anonKey: ''
+  url: 'https://gmjbpenvncesgbglcolb.supabase.co',
+  anonKey: ''   // ← วาง anon public key ที่นี่ หรือกรอกในแอพ: ตั้งค่า → ☁️ บัญชี & ซิงค์
 };
