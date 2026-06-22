@@ -100,14 +100,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="section-title">☁️ บัญชี & ซิงค์ข้ามเครื่อง</div>
       <div class="card" id="cloud-card"></div>
 
-      <div class="section-title">💾 ข้อมูลของฉัน</div>
-      <div class="card">
-        <button class="btn ghost" id="exp" style="margin-bottom:10px">📤 สำรองข้อมูล (ส่งออกไฟล์)</button>
-        <button class="btn ghost" id="imp" style="margin-bottom:10px">📥 นำเข้าข้อมูลจากไฟล์</button>
-        <button class="btn ghost" id="rst" style="color:#D9737A">🗑️ ล้างข้อมูลทั้งหมด</button>
-        <input type="file" id="impfile" accept="application/json" hidden />
-      </div>
-
       <div class="section-title">ℹ️ เกี่ยวกับ</div>
       <div class="card">
         <p style="margin:0 0 8px;font-weight:700">ตัวจิ๋ว 👣 v1.0</p>
@@ -129,21 +121,26 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       installBtn.onclick = async () => { MB._installPrompt.prompt(); MB._installPrompt = null; installBtn.style.display = 'none'; };
     }
 
-    root.querySelector('#exp').onclick = () => {
+    // ส่วน "ข้อมูลของฉัน" (สำรอง/นำเข้า/ล้าง) ถูกซ่อนจากผู้ใช้แล้ว — guard ไว้กันพังถ้านำกลับมาภายหลัง
+    const expBtn = root.querySelector('#exp');
+    if (expBtn) expBtn.onclick = () => {
       const blob = new Blob([S.exportJSON()], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'tuajiw-backup-' + S.todayISO() + '.json';
       a.click(); MB.toast('ส่งออกไฟล์แล้ว');
     };
-    root.querySelector('#imp').onclick = () => root.querySelector('#impfile').click();
-    root.querySelector('#impfile').onchange = (e) => {
+    const impBtn = root.querySelector('#imp');
+    if (impBtn) impBtn.onclick = () => root.querySelector('#impfile').click();
+    const impFile = root.querySelector('#impfile');
+    if (impFile) impFile.onchange = (e) => {
       const file = e.target.files[0]; if (!file) return;
       const r = new FileReader();
       r.onload = () => { try { S.importJSON(r.result); MB.toast('นำเข้าสำเร็จ'); MB.go('home'); } catch { MB.toast('ไฟล์ไม่ถูกต้อง'); } };
       r.readAsText(file);
     };
-    root.querySelector('#rst').onclick = () => {
+    const rstBtn = root.querySelector('#rst');
+    if (rstBtn) rstBtn.onclick = () => {
       if (confirm('ล้างข้อมูลทั้งหมดในเครื่อง? ลบแล้วกู้คืนไม่ได้')) { S.reset(); MB.toast('ล้างข้อมูลแล้ว'); MB.go('home'); }
     };
 
