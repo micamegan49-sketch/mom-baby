@@ -50,6 +50,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     viewWeek = Math.max(4, Math.min(40, viewWeek));
     const wk = MB.PREG_WEEKS.find(x => x.w === viewWeek) || MB.PREG_WEEKS[0];
     const pct = Math.min(100, Math.round((p ? p.daysPreg : 0) / 280 * 100));
+    const triKey = viewWeek < 14 ? 't1' : viewWeek < 28 ? 't2' : 't3';
 
     // เช็กลิสต์
     const checked = preg.checklist || {};
@@ -93,8 +94,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
       <div class="section-title">🍎 สัปดาห์ที่ ${viewWeek} – ลูกตอนนี้</div>
       <div class="card">
-        <div class="fruit">${wk.fruit}</div>
-        <div class="center" style="margin-bottom:8px"><b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
+        <div class="center"><img src="icons/baby-${triKey}.png" alt="ลูกในครรภ์สัปดาห์ที่ ${viewWeek}" style="width:172px;height:172px;display:block;margin:0 auto" loading="lazy" /></div>
+        <div class="center" style="margin-bottom:8px">ขนาดเทียบ ${wk.fruit} <b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
         <div class="divider"></div>
         <p style="margin:0 0 8px"><b>👶 พัฒนาการลูก:</b> ${wk.baby}</p>
         <p style="margin:0"><b>🤰 ร่างกายคุณแม่:</b> ${wk.mom}</p>
