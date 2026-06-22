@@ -198,12 +198,27 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
             <button class="btn ghost sm" id="su-push" style="flex:1">ใช้ข้อมูลเครื่องนี้</button>
           </div>
         </div>` : '';
+      const roleBadge = st.role === 'owner' ? '👑 เจ้าของ' : st.role === 'viewer' ? '👁 ดูอย่างเดียว' : '✏️ บันทึกได้';
+      const switcher = (st.homes && st.homes.length > 1) ? `
+        <div class="field" style="margin-top:10px"><label>บ้านที่กำลังดู</label>
+          <select id="su-home" style="width:100%;padding:11px;border-radius:12px;border:1px solid #E7D5C8;background:#fff;font-size:15px">
+            ${st.homes.map(h => `<option value="${h.id}" ${h.id === st.homeId ? 'selected' : ''}>${U.esc(h.name)}${h.role === 'owner' ? '' : ' · ร่วมดูแล'}</option>`).join('')}
+          </select>
+        </div>` : '';
       return `<div class="list-item" style="padding:6px 0">
           <div class="ic">☁️</div>
           <div class="body"><div class="t">${U.esc(st.email)}</div><div class="s">${line}</div></div>
         </div>
         ${conflictBlock}
-        <button class="btn ghost" id="su-sync" style="margin-top:8px">🔄 ซิงค์เดี๋ยวนี้</button>
+        <div class="disclaimer" style="background:#F6EEE8;border-color:#E7D5C8;margin:10px 0">
+          🏠 บ้าน: <b>${U.esc(st.homeName || '-')}</b> · สิทธิ์คุณ: ${roleBadge}
+        </div>
+        ${switcher}
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="btn ghost sm" id="su-members" style="flex:1">👥 สมาชิก & เชิญ</button>
+          <button class="btn ghost sm" id="su-join" style="flex:1">➕ ใส่รหัสเชิญ</button>
+        </div>
+        <button class="btn ghost" id="su-sync" style="margin-top:10px">🔄 ซิงค์เดี๋ยวนี้</button>
         <button class="btn ghost" id="su-logout" style="margin-top:10px;color:#D9737A">ออกจากระบบ</button>`;
     }
     function wireCloud(card) {
@@ -230,6 +245,103 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       if ($('su-pull')) $('su-pull').onclick = () => MB.cloud.pullForce();
       if ($('su-push')) $('su-push').onclick = () => MB.cloud.pushForce();
       if ($('su-logout')) $('su-logout').onclick = async () => { await MB.cloud.signOut(); MB.toast('ออกจากระบบแล้ว'); paintCloud(); };
+      if ($('su-home')) $('su-home').onchange = async () => { await MB.cloud.switchHome($('su-home').value); MB.toast('สลับบ้านแล้ว'); paintCloud(); };
+      if ($('su-members')) $('su-members').onclick = openMembers;
+      if ($('su-join')) $('su-join').onclick = openJoin;
+    }
+    function openMembers() {
+      const st = MB.cloud.status();
+      MB.sheet({
+        title: '👥 สมาชิกในบ้าน',
+        html: `${st.isOwner ? `<button class="btn ghost sm" id="mem-rename" style="margin-bottom:10px">✏️ เปลี่ยนชื่อบ้าน (${U.esc(st.homeName || '')})</button>` : ''}
+          <div id="mem-list"><p class="muted center">กำลังโหลด...</p></div>
+          ${st.isOwner ? `
+            <div class="section-title" style="margin-top:6px">เชิญคนช่วยดูแล</div>
+            <div class="chips" id="inv-role">
+              <div class="chip active" data-v="editor">✏️ บันทึกได้</div>
+              <div class="chip" data-v="viewer">👁 ดูอย่างเดียว</div>
+            </div>
+            <button class="btn" id="inv-gen" style="margin-top:8px">สร้างรหัสเชิญ</button>
+            <div id="inv-out" style="margin-top:10px"></div>`
+          : '<p class="muted" style="font-size:12px;margin-top:10px">เฉพาะเจ้าของบ้านเชิญ/ลบสมาชิกได้</p>'}`,
+        onMount(sheetEl) {
+          let role = 'editor';
+          const reload = async () => {
+            let mem = [];
+            try { mem = await MB.cloud.listMembers(); } catch (e) {}
+            const box = sheetEl.querySelector('#mem-list');
+            if (!box) return;
+            box.innerHTML = mem.length ? mem.map(m => {
+              const rb = m.role === 'owner' ? '👑' : m.role === 'viewer' ? '👁' : '✏️';
+              const me = m.email === st.email;
+              const canRm = st.isOwner && m.role !== 'owner';
+              return `<div class="list-item">
+                <div class="ic">${rb}</div>
+                <div class="body"><div class="t">${U.esc(m.email || (m.user_id || '').slice(0, 8))}${me ? ' (คุณ)' : ''}</div>
+                  <div class="s">${m.role === 'owner' ? 'เจ้าของ' : m.role === 'viewer' ? 'ดูอย่างเดียว' : 'บันทึกได้'}</div></div>
+                ${canRm ? `<button class="btn ghost sm" data-rm="${m.user_id}" style="color:#D9737A;width:auto;padding:6px 12px">ลบ</button>` : ''}
+              </div>`;
+            }).join('') : '<p class="muted center">ยังไม่มีสมาชิก</p>';
+            box.querySelectorAll('[data-rm]').forEach(b => b.onclick = async () => {
+              if (confirm('ลบสมาชิกคนนี้ออกจากบ้าน?')) { try { await MB.cloud.removeMember(b.dataset.rm); } catch (e) { MB.toast('ลบไม่สำเร็จ'); } reload(); }
+            });
+          };
+          reload();
+          const rn = sheetEl.querySelector('#mem-rename');
+          if (rn) rn.onclick = async () => {
+            const name = prompt('ตั้งชื่อบ้านใหม่', st.homeName || '');
+            if (name && name.trim()) { try { await MB.cloud.renameHome(name.trim()); MB.toast('เปลี่ยนชื่อแล้ว'); MB.closeSheet(); paintCloud(); } catch (e) { MB.toast('เปลี่ยนไม่สำเร็จ'); } }
+          };
+          const chips = sheetEl.querySelectorAll('#inv-role .chip');
+          chips.forEach(c => c.onclick = () => { chips.forEach(x => x.classList.remove('active')); c.classList.add('active'); role = c.dataset.v; });
+          const gen = sheetEl.querySelector('#inv-gen');
+          if (gen) gen.onclick = async () => {
+            gen.disabled = true; gen.textContent = 'กำลังสร้าง...';
+            try {
+              const code = await MB.cloud.createInvite(role);
+              const url = location.origin + location.pathname;
+              sheetEl.querySelector('#inv-out').innerHTML = `
+                <div class="disclaimer" style="background:#EAF5EC;border-color:#BFE3C6">
+                  ✅ รหัสเชิญ (ใช้ได้ 14 วัน):<br><b style="font-size:22px;letter-spacing:2px">${code}</b>
+                  <p style="font-size:12px;margin:8px 0 0">ให้พี่เลี้ยงเปิดแอพ → สมัคร/เข้าสู่ระบบ → ตั้งค่า → ☁️ → "ใส่รหัสเชิญ" → กรอกรหัสนี้</p>
+                  <button class="btn ghost sm" id="inv-copy" style="margin-top:8px">📋 ก๊อปข้อความเชิญ</button>
+                </div>`;
+              const cp = sheetEl.querySelector('#inv-copy');
+              if (cp) cp.onclick = () => {
+                const txt = `ชวนช่วยดูแลลูกในแอพตัวจิ๋ว 👣\nเปิด: ${url}\nสมัคร/เข้าสู่ระบบ แล้วไป ตั้งค่า → ☁️ → ใส่รหัสเชิญ\nรหัส: ${code}`;
+                if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => MB.toast('ก๊อปข้อความแล้ว'), () => MB.toast('ก๊อปไม่ได้'));
+                else MB.toast('ก๊อปด้วยมือนะ');
+              };
+            } catch (e) { MB.toast('สร้างรหัสไม่สำเร็จ'); }
+            gen.disabled = false; gen.textContent = 'สร้างรหัสเชิญ';
+            reload();
+          };
+        }
+      });
+    }
+    function openJoin() {
+      MB.sheet({
+        title: '➕ เข้าร่วมด้วยรหัสเชิญ',
+        html: `<p class="muted" style="font-size:13px">กรอกรหัสที่เจ้าของบ้านส่งให้ เพื่อเข้าไปช่วยดูแล/บันทึกข้อมูลลูกของเขา</p>
+          <div class="field"><label>รหัสเชิญ</label>
+            <input id="jn-code" placeholder="เช่น A1B2C3D4" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:1px" /></div>
+          <button class="btn" id="jn-go">เข้าร่วม</button>`,
+        onMount(sheetEl) {
+          sheetEl.querySelector('#jn-go').onclick = async () => {
+            const code = sheetEl.querySelector('#jn-code').value.trim();
+            if (!code) return MB.toast('กรอกรหัสก่อน');
+            const btn = sheetEl.querySelector('#jn-go'); btn.disabled = true; btn.textContent = 'กำลังเข้าร่วม...';
+            try {
+              await MB.cloud.redeemInvite(code);
+              MB.closeSheet(); MB.toast('เข้าร่วมบ้านสำเร็จ 🎉'); MB.go('home');
+            } catch (e) {
+              const m = (e && e.message) || '';
+              MB.toast(/not_found/.test(m) ? 'ไม่พบรหัสนี้' : /expired/.test(m) ? 'รหัสหมดอายุแล้ว' : 'เข้าร่วมไม่สำเร็จ');
+              btn.disabled = false; btn.textContent = 'เข้าร่วม';
+            }
+          };
+        }
+      });
     }
     function paintCloud() {
       const card = root.querySelector('#cloud-card');

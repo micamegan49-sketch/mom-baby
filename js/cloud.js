@@ -1,17 +1,19 @@
-/* ตัวจิ๋ว – คลาวด์ซิงค์ผ่าน Supabase
- * - ทางเลือก: ถ้าไม่ตั้งค่า แอพยังทำงานออฟไลน์ 100% เหมือนเดิม
- * - เก็บ state ทั้งก้อนเป็น JSON 1 แถวต่อ 1 บัญชี (ตาราง app_state)
- * - localStorage เป็นหลัก → push ขึ้นคลาวด์อัตโนมัติ (debounce) + realtime ดึงข้ามเครื่อง
+/* ตัวจิ๋ว – คลาวด์ซิงค์ + แชร์หลายบัญชี (บ้าน/ครัวเรือน) ผ่าน Supabase
+ * - ทางเลือก: ถ้าไม่ตั้งค่า แอพยังทำงานออฟไลน์ 100%
+ * - ข้อมูลเก็บเป็น JSON ต่อ "บ้าน" (homes) ที่มีสมาชิกหลายคนได้
+ * - เจ้าของสร้างรหัสเชิญ → คนอื่นเข้าร่วมช่วยบันทึก (สิทธิ์ owner/editor/viewer)
  */
 window.MB = window.MB || {};
 (function () {
   const S = MB.store;
-  const TABLE = 'app_state';
-  const LS_CFG = 'tuajiw.supa';        // {url, anonKey} ที่ผู้ใช้กรอกในแอพ
+  const LS_CFG = 'tuajiw.supa';
   const LS_SYNC = 'tuajiw.lastSync';
+  const LS_HOME = 'tuajiw.homeId';
 
   let client = null;
   let user = null;
+  let homeId = null;
+  let homes = [];          // [{id,name,role,owner_id}]
   let pushTimer = null;
   let channel = null;
   let syncing = false;
@@ -20,7 +22,6 @@ window.MB = window.MB || {};
   let lastSyncedAt = Number(localStorage.getItem(LS_SYNC) || 0) || null;
   const subs = [];
 
-  /* ---- รหัสประจำเครื่อง (กันเสียงสะท้อนของ realtime) ---- */
   function clientId() {
     let id = localStorage.getItem('tuajiw.clientId');
     if (!id) { id = 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); localStorage.setItem('tuajiw.clientId', id); }
@@ -37,14 +38,24 @@ window.MB = window.MB || {};
   function emit() { subs.forEach(fn => { try { fn(status()); } catch (e) {} }); }
   function setSync(ts) { lastSyncedAt = ts; if (ts) localStorage.setItem(LS_SYNC, String(ts)); }
 
+  function curHome() { return homes.find(h => h.id === homeId) || null; }
+  function canEdit() { const h = curHome(); return !!h && (h.role === 'owner' || h.role === 'editor'); }
+
   function status() {
+    const h = curHome();
     return {
       libLoaded: !!window.supabase,
       configured: !!cfg(),
       ready: !!client,
       signedIn: !!user,
       email: user ? user.email : null,
-      syncing, conflict, lastSyncedAt, error: lastError
+      syncing, conflict, lastSyncedAt, error: lastError,
+      homeId,
+      homeName: h ? h.name : null,
+      role: h ? h.role : null,
+      isOwner: h ? h.role === 'owner' : false,
+      canEdit: canEdit(),
+      homes: homes.slice()
     };
   }
 
@@ -59,7 +70,6 @@ window.MB = window.MB || {};
       (d.vaxPricePkgs && d.vaxPricePkgs.length));
   }
 
-  /* รับข้อมูลจากคลาวด์มาเขียนทับ state โดยไม่ push ย้อนกลับ */
   function adoptRemote(data) {
     const hook = S._onSave; S._onSave = null;
     try { S.loadFrom(data || {}); } finally { S._onSave = hook; }
@@ -67,18 +77,20 @@ window.MB = window.MB || {};
   }
 
   async function fetchRemote() {
-    const { data, error } = await client.from(TABLE)
-      .select('data, updated_at, client_id').eq('user_id', user.id).maybeSingle();
+    if (!homeId) return null;
+    const { data, error } = await client.from('app_state')
+      .select('data, updated_at, client_id').eq('home_id', homeId).maybeSingle();
     if (error) throw error;
-    return data;  // null ถ้ายังไม่มีแถว
+    return data;
   }
 
   async function pushNow() {
-    if (!client || !user) return;
+    if (!client || !user || !homeId) return;
+    if (!canEdit()) { lastError = 'บัญชีนี้ดูได้อย่างเดียว (ไม่มีสิทธิ์บันทึก)'; emit(); return; }
     syncing = true; lastError = null; emit();
     try {
-      const row = { user_id: user.id, data: S.state, client_id: CID, updated_at: new Date().toISOString() };
-      const { error } = await client.from(TABLE).upsert(row, { onConflict: 'user_id' });
+      const row = { home_id: homeId, data: S.state, client_id: CID, updated_at: new Date().toISOString() };
+      const { error } = await client.from('app_state').upsert(row, { onConflict: 'home_id' });
       if (error) throw error;
       conflict = false; setSync(Date.now());
     } catch (e) { lastError = msg(e); }
@@ -86,45 +98,65 @@ window.MB = window.MB || {};
   }
 
   function schedulePush() {
-    if (!client || !user) return;
+    if (!client || !user || !homeId || !canEdit()) return;
     clearTimeout(pushTimer);
     pushTimer = setTimeout(pushNow, 1500);
   }
 
-  /* รวมข้อมูลตอนเข้าสู่ระบบ — ไม่ทำลายข้อมูลเงียบ ๆ ถ้าทั้งสองฝั่งมีของ */
+  /* หาบ้านของผู้ใช้ (สร้างบ้านตัวเองถ้ายังไม่มี) แล้วเลือกบ้านปัจจุบัน */
+  async function resolveHomes() {
+    const { data: ownId, error: e1 } = await client.rpc('ensure_home');
+    if (e1) throw e1;
+    const { data: mem, error: e2 } = await client.from('home_members')
+      .select('home_id, role, homes(name, owner_id)').eq('user_id', user.id);
+    if (e2) throw e2;
+    homes = (mem || []).map(m => ({
+      id: m.home_id, role: m.role,
+      name: m.homes ? m.homes.name : 'บ้าน',
+      owner_id: m.homes ? m.homes.owner_id : null
+    }));
+    const stored = localStorage.getItem(LS_HOME);
+    if (stored && homes.some(h => h.id === stored)) homeId = stored;
+    else homeId = (homes.find(h => h.id === ownId) || homes[0] || {}).id || ownId;
+    if (homeId) localStorage.setItem(LS_HOME, homeId);
+  }
+
   async function reconcile() {
     if (!client || !user) return;
     syncing = true; conflict = false; lastError = null; emit();
     try {
+      await resolveHomes();
       const remote = await fetchRemote();
       const remoteHas = remote && hasData(remote.data);
       const localHas = !S.isEmpty();
-      if (remoteHas && !localHas) {
-        adoptRemote(remote.data); setSync(Date.now());
-      } else if (!remoteHas && localHas) {
-        await pushNow();
-      } else if (remoteHas && localHas) {
+      if (remoteHas && !localHas) { adoptRemote(remote.data); setSync(Date.now()); }
+      else if (!remoteHas && localHas) { await pushNow(); }
+      else if (remoteHas && localHas) {
         if (JSON.stringify(remote.data) === JSON.stringify(S.state)) setSync(Date.now());
-        else conflict = true;   // ให้ผู้ใช้เลือกเองในหน้าตั้งค่า
-      } else {
-        setSync(Date.now());
-      }
+        else conflict = true;
+      } else setSync(Date.now());
       subscribe();
     } catch (e) { lastError = msg(e); }
     finally { syncing = false; emit(); }
   }
 
+  async function pullCurrent() {
+    const remote = await fetchRemote();
+    adoptRemote(remote ? remote.data : {});
+    conflict = false; setSync(Date.now());
+  }
+
   function subscribe() {
-    if (!client || !user || channel) return;
+    if (!client || !user || !homeId || channel) return;
     try {
-      channel = client.channel('app_state_' + user.id)
+      channel = client.channel('as_' + homeId)
         .on('postgres_changes',
-          { event: '*', schema: 'public', table: TABLE, filter: 'user_id=eq.' + user.id },
+          { event: '*', schema: 'public', table: 'app_state', filter: 'home_id=eq.' + homeId },
           (payload) => {
             const row = payload.new;
-            if (!row || row.client_id === CID) return;  // การเปลี่ยนของเราเอง
+            if (!row || row.client_id === CID) return;
             adoptRemote(row.data); setSync(Date.now()); emit();
-            if (MB.toast) MB.toast('ซิงค์ข้อมูลใหม่จากอีกเครื่อง ☁️');
+            if (MB.toast) MB.toast('ซิงค์ข้อมูลใหม่จากสมาชิกในบ้าน ☁️');
           })
         .subscribe();
     } catch (e) {}
@@ -144,7 +176,7 @@ window.MB = window.MB || {};
     },
     clearConfig() {
       localStorage.removeItem(LS_CFG);
-      unsubscribe(); client = null; user = null; lastError = null; emit();
+      unsubscribe(); client = null; user = null; homes = []; homeId = null; lastError = null; emit();
     },
 
     async init(reinit) {
@@ -164,7 +196,7 @@ window.MB = window.MB || {};
           const was = !!user;
           user = session ? session.user : null;
           if (user && !was) reconcile();
-          if (!user) unsubscribe();
+          if (!user) { unsubscribe(); homes = []; homeId = null; }
           emit();
         });
         if (user) reconcile(); else emit();
@@ -192,7 +224,9 @@ window.MB = window.MB || {};
       if (!client) return;
       unsubscribe();
       try { await client.auth.signOut(); } catch (e) {}
-      user = null; conflict = false; emit();
+      user = null; homes = []; homeId = null; conflict = false;
+      localStorage.removeItem(LS_HOME);
+      emit();
     },
 
     async syncNow() { if (user) await reconcile(); },
@@ -200,14 +234,71 @@ window.MB = window.MB || {};
     async pullForce() {
       if (!client || !user) return;
       syncing = true; emit();
+      try { await pullCurrent(); subscribe(); if (MB.toast) MB.toast('ดึงข้อมูลจากคลาวด์มาแล้ว'); }
+      catch (e) { lastError = msg(e); }
+      finally { syncing = false; emit(); }
+    },
+
+    /* ---------- บ้าน & การแชร์ ---------- */
+    homes() { return homes.slice(); },
+    currentHomeId() { return homeId; },
+
+    async switchHome(id) {
+      if (!client || !user || id === homeId) return;
+      syncing = true; emit();
       try {
-        const remote = await fetchRemote();
-        adoptRemote(remote ? remote.data : {});
-        conflict = false; setSync(Date.now());
+        if (canEdit()) await pushNow();          // เซฟบ้านเดิมก่อน
+        unsubscribe();
+        homeId = id; localStorage.setItem(LS_HOME, id);
+        await pullCurrent();                      // ดึงข้อมูลบ้านใหม่มาแสดง
         subscribe();
-        if (MB.toast) MB.toast('ดึงข้อมูลจากคลาวด์มาแล้ว');
       } catch (e) { lastError = msg(e); }
       finally { syncing = false; emit(); }
+    },
+
+    async renameHome(name) {
+      if (!client || !homeId) return;
+      const { error } = await client.from('homes').update({ name: (name || '').trim() || 'ครอบครัวของฉัน' }).eq('id', homeId);
+      if (error) throw error;
+      const h = curHome(); if (h) h.name = (name || '').trim() || 'ครอบครัวของฉัน';
+      emit();
+    },
+
+    async createInvite(role) {
+      if (!client || !homeId) throw new Error('ยังไม่ได้เลือกบ้าน');
+      const { data, error } = await client.rpc('create_invite', { h: homeId, r: role === 'viewer' ? 'viewer' : 'editor' });
+      if (error) throw error;
+      return data; // รหัสเชิญ
+    },
+
+    async redeemInvite(code) {
+      if (!client || !user) throw new Error('ต้องเข้าสู่ระบบก่อน');
+      const { data: hid, error } = await client.rpc('redeem_invite', { invite_code: (code || '').trim() });
+      if (error) throw error;
+      await resolveHomes();
+      await MB.cloud.switchHome(hid);
+      return hid;
+    },
+
+    async listMembers() {
+      if (!client || !homeId) return [];
+      const { data, error } = await client.from('home_members')
+        .select('user_id, role, email, joined_at').eq('home_id', homeId).order('joined_at');
+      if (error) throw error;
+      return data || [];
+    },
+    async removeMember(uid) {
+      if (!client || !homeId) return;
+      const { error } = await client.from('home_members').delete().eq('home_id', homeId).eq('user_id', uid);
+      if (error) throw error;
+      emit();
+    },
+    async leaveHome(id) {
+      if (!client || !user) return;
+      await client.from('home_members').delete().eq('home_id', id).eq('user_id', user.id);
+      localStorage.removeItem(LS_HOME);
+      await resolveHomes();
+      await pullCurrent(); subscribe(); emit();
     }
   };
 
