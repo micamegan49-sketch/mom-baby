@@ -1,0 +1,26 @@
+{
+  "name": "ตัวจิ๋ว – ดูแลแม่และลูกน้อย",
+  "short_name": "ตัวจิ๋ว",
+  "description": "แอพดูแลคุณแม่ตั้งครรภ์และลูกน้อย ติดตามครรภ์ พัฒนาการ วัคซีน และการเจริญเติบโต",
+  "lang": "th",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF2EB",
+  "theme_color": "#8B5E4B",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

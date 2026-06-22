@@ -1,0 +1,170 @@
+/* หน้า: หน้าหลัก (แดชบอร์ด) + ออนบอร์ดดิ้ง */
+window.MB = window.MB || {}; MB.views = MB.views || {};
+(function () {
+  const S = MB.store, U = MB.util;
+
+  function stageOf(months) { return months < 12 ? 'baby' : 'toddler'; }
+  function sameDay(ts, ref) {
+    const d = new Date(ts), r = ref;
+    return d.getFullYear() === r.getFullYear() && d.getMonth() === r.getMonth() && d.getDate() === r.getDate();
+  }
+
+  MB.views.home = function (root) {
+    const child = S.activeChild();
+    const preg = S.preg();
+
+    // ---------- ออนบอร์ดดิ้ง ----------
+    if (!child && !preg.active) {
+      root.innerHTML = `
+        <div style="text-align:center;padding:24px 8px 8px">
+          <div style="font-size:64px">👣</div>
+          <h2 style="margin:8px 0 4px;color:var(--brown-deep)">ยินดีต้อนรับสู่ ตัวจิ๋ว</h2>
+          <p class="muted" style="margin:0 0 22px">ผู้ช่วยดูแลคุณแม่และลูกน้อย<br/>ตั้งแต่ในครรภ์จนถึงวัยเตาะแตะ</p>
+        </div>
+        <div class="card tint" id="start-preg" style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:40px">🤰</div>
+          <div style="flex:1"><div style="font-weight:800;font-size:17px">กำลังตั้งครรภ์</div>
+          <div class="muted" style="font-size:13px">ติดตามครรภ์รายสัปดาห์ เทียบขนาดลูก นับลูกดิ้น</div></div>
+          <div style="font-size:22px;color:var(--pink-deep)">›</div>
+        </div>
+        <div class="card tint" id="start-baby" style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:40px">👶</div>
+          <div style="flex:1"><div style="font-weight:800;font-size:17px">มีลูกแล้ว</div>
+          <div class="muted" style="font-size:13px">บันทึกประจำวัน วัคซีน กราฟเติบโต พัฒนาการ</div></div>
+          <div style="font-size:22px;color:var(--pink-deep)">›</div>
+        </div>
+        <div class="disclaimer" style="margin-top:18px">ข้อมูลทั้งหมดเก็บในเครื่องของคุณ ใช้งานออฟไลน์ได้ 100% และเป็นความรู้ทั่วไป ไม่ใช่คำวินิจฉัยทางการแพทย์</div>
+      `;
+      root.querySelector('#start-preg').onclick = () => MB.go('preg');
+      root.querySelector('#start-baby').onclick = () => MB.views.editChild(null);
+      return;
+    }
+
+    // ---------- ไม่มีลูก แต่กำลังตั้งครรภ์ → สรุปครรภ์ ----------
+    if (!child && preg.active) {
+      const p = U.pregInfo(preg);
+      const wk = (MB.PREG_WEEKS.find(x => x.w === (p ? p.week : 0))) || MB.PREG_WEEKS[0];
+      root.innerHTML = `
+        <div class="hero" id="open-preg">
+          <div class="emoji">${wk.fruit}</div>
+          <div style="flex:1">
+            <div class="tag-week">ไตรมาส ${p ? p.trimester : 1}</div>
+            <div class="bigweek"><b>${p ? p.week : '-'}</b><small>สัปดาห์ ${p ? '+' + p.day + ' วัน' : ''}</small></div>
+            <p>เหลืออีก ${p && p.daysLeft >= 0 ? p.daysLeft + ' วัน' : 'ถึงกำหนดแล้ว'} · ลูกตอนนี้ ≈ ${wk.fruitName}</p>
+          </div>
+        </div>
+        <div class="card"><b>👶 ลูกตอนนี้</b><p style="margin:6px 0 0;font-size:14px">${wk.baby}</p></div>
+        <button class="btn pink" id="full-preg">เปิดหน้าตั้งครรภ์แบบเต็ม 🤰</button>
+        <button class="btn ghost" id="add-baby2" style="margin-top:10px">คลอดแล้ว? เพิ่มข้อมูลลูก 👶</button>
+      `;
+      root.querySelector('#open-preg').onclick = root.querySelector('#full-preg').onclick = () => MB.go('preg');
+      root.querySelector('#add-baby2').onclick = () => MB.views.editChild(null);
+      return;
+    }
+
+    // ---------- แดชบอร์ดลูก ----------
+    const a = U.ageInfo(child.birthDate);
+    const logs = S.logs(child.id);
+    const now = new Date();
+    const todayLogs = logs.filter(l => sameDay(l.ts, now));
+    const feeds = todayLogs.filter(l => l.type === 'feed').length;
+    const diapers = todayLogs.filter(l => l.type === 'diaper').length;
+    const sleepMin = todayLogs.filter(l => l.type === 'sleep').reduce((s, l) => s + (l.minutes || 0), 0);
+    const sleepH = sleepMin ? (Math.round(sleepMin / 6) / 10) : 0;
+    const lastFeed = logs.find(l => l.type === 'feed');
+
+    // วัคซีนถัดไป
+    const vx = MB.vaxNext ? MB.vaxNext(child) : null;
+    // พัฒนาการรอบตัว
+    const msInfo = MB.msProgress ? MB.msProgress(child) : null;
+    // เติบโตล่าสุด
+    const meas = S.measurements(child.id);
+    const lastM = meas[meas.length - 1];
+    // บทความ
+    const stage = stageOf(a.totalMonths);
+    const arts = MB.ARTICLES.filter(x => x.stage === stage || x.stage === 'all').slice(0, 6);
+    // ตัวจับเวลา & นัดหมาย
+    const timer = S.getTimer();
+    const timerOn = timer && timer.childId === child.id;
+    const appts = MB.upcomingAppts ? MB.upcomingAppts(3) : [];
+    const apptRow = ap => {
+      const d = U.daysBetween(S.todayISO(), ap.date);
+      const lbl = d < 0 ? 'เลยกำหนด' : d === 0 ? 'วันนี้' : d === 1 ? 'พรุ่งนี้' : 'อีก ' + d + ' วัน';
+      const cls = d <= 1 ? 'due' : d <= 7 ? 'soon' : 'upcoming';
+      const em = ap.kind === 'vaccine' ? '💉' : ap.kind === 'anc' ? '🤰' : ap.kind === 'checkup' ? '🩺' : '🔔';
+      return `<div class="list-item" style="border-bottom:none;padding:8px 0"><div class="ic">${em}</div>
+        <div class="body"><div class="t">${U.esc(ap.title)}</div><div class="s">${U.fmtDateTH(ap.date)}${ap.time ? ' · ' + ap.time + ' น.' : ''}</div></div>
+        <span class="badge ${cls}">${lbl}</span></div>`;
+    };
+
+    root.innerHTML = `
+      <div class="hero">
+        <div class="emoji">${child.emoji || '👶'}</div>
+        <div style="flex:1">
+          <h2>${U.esc(child.name)}</h2>
+          <p>อายุ ${a.label} · ${child.sex === 'M' ? 'ชาย 👦' : 'หญิง 👧'}</p>
+          ${lastFeed ? `<p style="margin-top:2px">🍼 ให้นมล่าสุด ${U.relTime(lastFeed.ts)}</p>` : ''}
+        </div>
+      </div>
+
+      ${timerOn ? `<div class="card tint" data-go="log" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+        <div style="font-size:26px">⏱️</div>
+        <div style="flex:1"><b>กำลังจับเวลา${timer.type === 'sleep' ? 'การนอน 😴' : 'ให้นม 🍼'}</b><div class="muted" style="font-size:12.5px">แตะเพื่อหยุดและบันทึก</div></div>
+        <div style="color:var(--pink-deep);font-size:20px">›</div></div>` : ''}
+
+      <div class="section-title">⚡ บันทึกด่วน</div>
+      <div class="quick-grid">
+        <button class="quick" data-q="feed"><span class="ic">🍼</span><span class="lb">ให้นม</span></button>
+        <button class="quick" data-q="sleep"><span class="ic">😴</span><span class="lb">การนอน</span></button>
+        <button class="quick" data-q="diaper"><span class="ic">🧷</span><span class="lb">ผ้าอ้อม</span></button>
+        <button class="quick" data-q="note"><span class="ic">📝</span><span class="lb">บันทึก</span></button>
+      </div>
+
+      <div class="section-title">📊 วันนี้</div>
+      <div class="stat-row">
+        <div class="stat"><div class="v">${feeds}</div><div class="l">🍼 มื้อนม</div></div>
+        <div class="stat"><div class="v">${sleepH || '0'}</div><div class="l">😴 ชม.นอน</div></div>
+        <div class="stat"><div class="v">${diapers}</div><div class="l">🧷 ผ้าอ้อม</div></div>
+      </div>
+
+      ${vx ? `<div class="section-title">💉 วัคซีนถัดไป <span class="more" data-go="vax">ดูทั้งหมด</span></div>
+      <div class="card" data-go="vax">
+        <div class="list-item" style="border:none;padding:2px 0">
+          <div class="ic">💉</div>
+          <div class="body"><div class="t">${U.esc(vx.name)}</div><div class="s">กำหนด ${U.fmtDateTH(vx.due)} · ช่วงอายุ ${vx.ageLabel}</div></div>
+          <span class="badge ${vx.cls}">${vx.text}</span>
+        </div>
+      </div>` : ''}
+
+      <div class="section-title">📈 การเจริญเติบโต <span class="more" data-go="growth">ดูกราฟ</span></div>
+      <div class="card" data-go="growth">
+        ${lastM ? `<div style="display:flex;gap:16px;text-align:center">
+          <div style="flex:1"><div style="font-size:22px;font-weight:800;color:var(--brown)">${lastM.weight || '-'}</div><div class="muted" style="font-size:12px">น้ำหนัก (กก.)</div></div>
+          <div style="flex:1"><div style="font-size:22px;font-weight:800;color:var(--brown)">${lastM.height || '-'}</div><div class="muted" style="font-size:12px">ส่วนสูง (ซม.)</div></div>
+          <div style="flex:1"><div style="font-size:13px;color:var(--muted);margin-top:6px">วัดเมื่อ<br/>${U.fmtDateTH(lastM.date)}</div></div>
+        </div>` : '<p class="muted center" style="margin:6px 0">ยังไม่มีข้อมูล แตะเพื่อเริ่มบันทึกน้ำหนัก/ส่วนสูง</p>'}
+      </div>
+
+      ${msInfo ? `<div class="section-title">🌱 พัฒนาการช่วงนี้ <span class="more" data-go="develop">ดูทั้งหมด</span></div>
+      <div class="card" data-go="develop">
+        <div style="display:flex;justify-content:space-between;align-items:center"><b>ทำได้แล้ว ${msInfo.done}/${msInfo.total} ข้อ</b><span class="muted" style="font-size:12px">ช่วง ${msInfo.bandLabel}</span></div>
+        <div class="progress"><span style="width:${msInfo.total ? Math.round(msInfo.done / msInfo.total * 100) : 0}%"></span></div>
+      </div>` : ''}
+
+      <div class="section-title">🔔 นัดหมาย <span class="more" data-go="appt">${appts.length ? 'ดูทั้งหมด' : 'เพิ่มนัด'}</span></div>
+      <div class="card" data-go="appt">
+        ${appts.length ? appts.map(apptRow).join('') : '<p class="muted center" style="margin:4px 0;font-size:13.5px">ยังไม่มีนัดหมาย แตะเพื่อเพิ่มนัดฝากครรภ์/วัคซีน/หมอเด็ก</p>'}
+      </div>
+
+      <div class="section-title">📚 ความรู้สำหรับคุณ <span class="more" data-go="develop">เพิ่มเติม</span></div>
+      <div class="scroll-x">
+        ${arts.map(x => `<div class="mini-card" data-art="${x.id}"><div class="em">${x.em}</div><div class="t">${U.esc(x.title)}</div><div class="s">${MB.CATS[x.cat] ? MB.CATS[x.cat].label : ''}</div></div>`).join('')}
+      </div>
+      <div style="height:8px"></div>
+    `;
+
+    root.querySelectorAll('[data-q]').forEach(b => b.onclick = () => MB.views.quickLog(b.dataset.q));
+    root.querySelectorAll('[data-go]').forEach(n => n.onclick = () => MB.go(n.dataset.go));
+    root.querySelectorAll('[data-art]').forEach(n => n.onclick = () => MB.openArticle(n.dataset.art));
+  };
+})();

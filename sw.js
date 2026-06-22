@@ -1,0 +1,58 @@
+/* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
+const CACHE = 'tuajiw-v3';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './css/styles.css',
+  './js/store.js',
+  './js/app.js',
+  './js/data/vaccines.js',
+  './js/data/growth.js',
+  './js/data/milestones.js',
+  './js/data/content.js',
+  './js/data/pregnancy.js',
+  './js/data/checklists.js',
+  './js/data/provinces.js',
+  './js/data/prices.js',
+  './js/views/home.js',
+  './js/views/pregnancy.js',
+  './js/views/log.js',
+  './js/views/vaccines.js',
+  './js/views/growth.js',
+  './js/views/develop.js',
+  './js/views/settings.js',
+  './js/views/appt.js',
+  './js/views/prices.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
+];
+
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  // network-first: ออนไลน์ได้ของใหม่เสมอ, ออฟไลน์ค่อยใช้แคช
+  e.respondWith(
+    fetch(req)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
+  );
+});
