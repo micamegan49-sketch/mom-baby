@@ -1,0 +1,9 @@
+{
+  "appId": "app.tuajiw.mombaby",
+  "appName": "ตัวจิ๋ว",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#FBF2EB"
+  }
+}

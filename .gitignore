@@ -6,3 +6,15 @@ tuajiw-backup-*.json
 
 # logs
 *.log
+
+# Node / Capacitor
+node_modules/
+www/
+
+# Xcode / iOS build artifacts (โปรเจกต์ ios/ เก็บไว้ แต่ไม่เก็บไฟล์ build)
+ios/App/build/
+ios/App/App/public/
+ios/DerivedData/
+DerivedData/
+**/xcuserdata/
+*.xcuserstate
