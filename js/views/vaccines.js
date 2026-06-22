@@ -93,7 +93,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelector('#vax-price').onclick = () => MB.go('prices', { tab: 'vaccine' });
     root.querySelectorAll('[data-tog]').forEach(n => n.onclick = () => {
       S.toggleVax(child.id, n.dataset.tog);
-      MB.go('vax', { filter });
+      MB.rerender({ filter });
     });
   };
 })();

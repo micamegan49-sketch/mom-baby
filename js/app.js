@@ -105,7 +105,8 @@ window.MB = window.MB || {};
       const active = c.id === (S.activeChild() || {}).id;
       return `<div class="list-item" data-pick="${c.id}">
         <div class="ic">${c.emoji || '👶'}</div>
-        <div class="body"><div class="t">${esc(c.name)} ${active ? '✓' : ''}</div><div class="s">${a.label}</div></div>
+        <div class="body"><div class="t">${esc(c.name)} ${active ? '✓' : ''}</div><div class="s">${a.label} · เกิด ${fmtDateTH(c.birthDate)}</div></div>
+        <button class="btn ghost sm" data-edit-kid="${c.id}" style="width:auto;padding:6px 10px">✏️ แก้</button>
       </div>`;
     }).join('');
     if (preg.active) {
@@ -120,6 +121,7 @@ window.MB = window.MB || {};
            <button class="btn ghost" data-add-preg>🤰 ตั้งครรภ์</button>
          </div>`,
       onMount(root) {
+        root.querySelectorAll('[data-edit-kid]').forEach(n => n.onclick = (e) => { e.stopPropagation(); closeSheet(); MB.views.editChild(kids.find(k => k.id === n.dataset.editKid)); });
         root.querySelectorAll('[data-pick]').forEach(n => n.onclick = () => { S.setActiveChild(n.dataset.pick); closeSheet(); render(); });
         root.querySelectorAll('[data-goto]').forEach(n => n.onclick = () => { closeSheet(); go(n.dataset.goto); });
         root.querySelector('[data-add-baby]').onclick = () => { closeSheet(); MB.views.editChild(null); };
@@ -189,6 +191,7 @@ window.MB = window.MB || {};
   MB.closeSheet = closeSheet;
   MB.go = go;
   MB.render = render;
+  MB.rerender = function (params) { render(params); };   // เรนเดอร์ซ้ำหน้าเดิมโดยไม่เลื่อนจอขึ้นบน
   MB.openChildSwitcher = openChildSwitcher;
 
   /* ============ เริ่มต้น ============ */

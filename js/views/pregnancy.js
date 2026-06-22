@@ -125,7 +125,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
     renderWeightCard(root.querySelector('#weight-card'));
 
-    root.querySelectorAll('[data-check]').forEach(n => n.onclick = () => { S.toggleCheck(n.dataset.check); MB.go('preg', { week: viewWeek }); });
+    root.querySelectorAll('[data-check]').forEach(n => n.onclick = () => { S.toggleCheck(n.dataset.check); MB.rerender({ week: viewWeek }); });
 
     root.querySelector('#born').onclick = () => {
       if (confirm('ยินดีด้วย! เพิ่มข้อมูลลูกและปิดโหมดตั้งครรภ์ใช่ไหม?')) {

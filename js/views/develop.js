@@ -51,7 +51,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelectorAll('[data-tab]').forEach(c => c.onclick = () => MB.go('develop', { tab: c.dataset.tab }));
 
     if (tab === 'ms' && child) {
-      root.querySelectorAll('[data-ms]').forEach(n => n.onclick = () => { S.toggleMs(child.id, n.dataset.ms); MB.go('develop', { tab: 'ms' }); });
+      root.querySelectorAll('[data-ms]').forEach(n => n.onclick = () => { S.toggleMs(child.id, n.dataset.ms); MB.rerender({ tab: 'ms' }); });
     }
     if (tab === 'articles') {
       root.querySelectorAll('[data-cat]').forEach(n => n.onclick = () => MB.go('develop', { tab: 'articles', cat: n.dataset.cat }));

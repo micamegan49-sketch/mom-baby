@@ -9,6 +9,29 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     return d.getFullYear() === r.getFullYear() && d.getMonth() === r.getMonth() && d.getDate() === r.getDate();
   }
 
+  /* การ์ดเกร็ดความรู้ (สุ่ม/รายวัน) */
+  function tipCardHtml(stage) {
+    const arr = MB.tipsFor ? MB.tipsFor(stage) : [];
+    const tip = MB.tipOfDay ? MB.tipOfDay(arr) : (arr[0] || null);
+    if (!tip) return '';
+    return `<div class="section-title">💡 เกร็ดความรู้</div>
+      <div class="card" style="background:linear-gradient(135deg,#FFF4F6,#FBF2EB);border-color:#F3D9DE">
+        <p id="tip-text" style="margin:0;font-size:14.5px;line-height:1.65;color:#5a463c">${U.esc(tip.text)}</p>
+        <button class="btn ghost sm" id="tip-more" style="margin-top:12px">🔄 อีกเรื่อง</button>
+      </div>`;
+  }
+  function wireTip(root, stage) {
+    const arr = MB.tipsFor ? MB.tipsFor(stage) : [];
+    const btn = root.querySelector('#tip-more'), txt = root.querySelector('#tip-text');
+    if (!btn || !txt) return;
+    if (arr.length < 2) { btn.style.display = 'none'; return; }
+    let cur = MB.tipOfDay ? arr.indexOf(MB.tipOfDay(arr)) : 0;
+    btn.onclick = () => {
+      let i; do { i = Math.floor(Math.random() * arr.length); } while (i === cur);
+      cur = i; txt.textContent = arr[i].text;
+    };
+  }
+
   MB.views.home = function (root) {
     const child = S.activeChild();
     const preg = S.preg();
@@ -54,11 +77,13 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           </div>
         </div>
         <div class="card"><b>👶 ลูกตอนนี้</b><p style="margin:6px 0 0;font-size:14px">${wk.baby}</p></div>
+        ${tipCardHtml('preg')}
         <button class="btn pink" id="full-preg">เปิดหน้าตั้งครรภ์แบบเต็ม 🤰</button>
         <button class="btn ghost" id="add-baby2" style="margin-top:10px">คลอดแล้ว? เพิ่มข้อมูลลูก 👶</button>
       `;
       root.querySelector('#open-preg').onclick = root.querySelector('#full-preg').onclick = () => MB.go('preg');
       root.querySelector('#add-baby2').onclick = () => MB.views.editChild(null);
+      wireTip(root, 'preg');
       return;
     }
 
@@ -120,12 +145,14 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <button class="quick" data-q="note"><span class="ic">📝</span><span class="lb">บันทึก</span></button>
       </div>
 
-      <div class="section-title">📊 วันนี้</div>
+      <div class="section-title">📊 วันนี้ <span class="more" data-go="log">ดูประวัติ ›</span></div>
       <div class="stat-row">
-        <div class="stat"><div class="v">${feeds}</div><div class="l">🍼 มื้อนม</div></div>
-        <div class="stat"><div class="v">${sleepH || '0'}</div><div class="l">😴 ชม.นอน</div></div>
-        <div class="stat"><div class="v">${diapers}</div><div class="l">🧷 ผ้าอ้อม</div></div>
+        <div class="stat" data-go="log" style="cursor:pointer"><div class="v">${feeds}</div><div class="l">🍼 มื้อนม</div></div>
+        <div class="stat" data-go="log" style="cursor:pointer"><div class="v">${sleepH || '0'}</div><div class="l">😴 ชม.นอน</div></div>
+        <div class="stat" data-go="log" style="cursor:pointer"><div class="v">${diapers}</div><div class="l">🧷 ผ้าอ้อม</div></div>
       </div>
+
+      ${tipCardHtml(stage)}
 
       ${vx ? `<div class="section-title">💉 วัคซีนถัดไป <span class="more" data-go="vax">ดูทั้งหมด</span></div>
       <div class="card" data-go="vax">
@@ -166,5 +193,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelectorAll('[data-q]').forEach(b => b.onclick = () => MB.views.quickLog(b.dataset.q));
     root.querySelectorAll('[data-go]').forEach(n => n.onclick = () => MB.go(n.dataset.go));
     root.querySelectorAll('[data-art]').forEach(n => n.onclick = () => MB.openArticle(n.dataset.art));
+    wireTip(root, stage);
   };
 })();

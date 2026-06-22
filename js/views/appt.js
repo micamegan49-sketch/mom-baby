@@ -64,8 +64,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       const vx = MB.vaxNext(S.activeChild());
       openApptForm({ title: vx.name, date: vx.due, kind: 'vaccine', childId: S.activeChild().id });
     };
-    root.querySelectorAll('[data-tog]').forEach(n => n.onclick = () => { S.toggleAppt(n.dataset.tog); MB.go('appt'); });
-    root.querySelectorAll('[data-del]').forEach(n => n.onclick = () => { if (confirm('ลบนัดหมายนี้?')) { S.removeAppt(n.dataset.del); MB.go('appt'); } });
+    root.querySelectorAll('[data-tog]').forEach(n => n.onclick = () => { S.toggleAppt(n.dataset.tog); MB.rerender(); });
+    root.querySelectorAll('[data-del]').forEach(n => n.onclick = () => { if (confirm('ลบนัดหมายนี้?')) { S.removeAppt(n.dataset.del); MB.rerender(); } });
   };
 
   function openApptForm(pre) {

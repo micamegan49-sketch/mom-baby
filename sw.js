@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v5';
+const CACHE = 'tuajiw-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const ASSETS = [
   './js/data/content.js',
   './js/data/pregnancy.js',
   './js/data/checklists.js',
+  './js/data/tips.js',
   './js/data/provinces.js',
   './js/data/prices.js',
   './js/data/supabase-config.js',
