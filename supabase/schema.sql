@@ -82,7 +82,7 @@ declare c text;
 begin
   if not public.is_home_owner(h) then raise exception 'not_owner'; end if;
   if r not in ('editor','viewer') then r := 'editor'; end if;
-  c := upper(substring(encode(gen_random_bytes(6), 'hex') from 1 for 8));
+  c := upper(replace(substring(gen_random_uuid()::text from 1 for 8), '-', ''));
   insert into public.invites(code, home_id, role, created_by) values (c, h, r, auth.uid());
   return c;
 end $$;
