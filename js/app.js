@@ -116,9 +116,10 @@ window.MB = window.MB || {};
     sheet({
       title: 'เลือกโปรไฟล์',
       html: (rows || '<p class="muted center">ยังไม่มีข้อมูล</p>') +
-        `<div style="margin-top:14px;display:flex;gap:10px">
-           <button class="btn ghost" data-add-baby>+ เพิ่มลูก</button>
-           <button class="btn ghost" data-add-preg>🤰 ตั้งครรภ์</button>
+        `<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+           <button class="btn ghost" data-add-baby style="flex:1">+ เพิ่มลูก</button>
+           <button class="btn ghost" data-add-preg style="flex:1">🤰 ตั้งครรภ์</button>
+           <button class="btn ghost" data-plan style="flex:1">🌷 วางแผน</button>
          </div>`,
       onMount(root) {
         root.querySelectorAll('[data-edit-kid]').forEach(n => n.onclick = (e) => { e.stopPropagation(); closeSheet(); MB.views.editChild(kids.find(k => k.id === n.dataset.editKid)); });
@@ -126,6 +127,7 @@ window.MB = window.MB || {};
         root.querySelectorAll('[data-goto]').forEach(n => n.onclick = () => { closeSheet(); go(n.dataset.goto); });
         root.querySelector('[data-add-baby]').onclick = () => { closeSheet(); MB.views.editChild(null); };
         root.querySelector('[data-add-preg]').onclick = () => { closeSheet(); go('preg'); };
+        root.querySelector('[data-plan]').onclick = () => { closeSheet(); go('plan'); };
       }
     });
   }
