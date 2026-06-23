@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v8';
+const CACHE = 'tuajiw-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,8 @@ const ASSETS = [
   './css/styles.css',
   './js/store.js',
   './js/app.js',
+  './js/diary.js',
+  './js/views/diary.js',
   './js/data/vaccines.js',
   './js/data/growth.js',
   './js/data/milestones.js',

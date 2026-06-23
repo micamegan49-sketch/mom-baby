@@ -202,6 +202,11 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="scroll-x">
         ${arts.map(x => `<div class="mini-card" data-art="${x.id}"><div class="em">${x.em}</div><div class="t">${U.esc(x.title)}</div><div class="s">${MB.CATS[x.cat] ? MB.CATS[x.cat].label : ''}</div></div>`).join('')}
       </div>
+      <div class="card" data-go="diary" style="display:flex;align-items:center;gap:12px;cursor:pointer;margin-top:12px">
+        <div style="font-size:30px">📸</div>
+        <div style="flex:1"><div style="font-weight:700">ไดอารี่ความทรงจำ</div><div class="muted" style="font-size:12.5px">เก็บภาพช่วงเวลาน่ารักของลูกไว้ย้อนดู</div></div>
+        <div style="color:var(--pink-deep);font-size:20px">›</div>
+      </div>
       <div style="height:8px"></div>
     `;
 

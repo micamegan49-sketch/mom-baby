@@ -94,6 +94,11 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           <div class="body"><div class="t">ราคาคลอด & วัคซีน</div><div class="s">เทียบราคา รพ. ทุกจังหวัด</div></div>
           <div class="meta">›</div>
         </div>
+        <div class="list-item" id="go-diary">
+          <div class="ic">📸</div>
+          <div class="body"><div class="t">ไดอารี่ความทรงจำ</div><div class="s">เก็บภาพช่วงเวลาน่ารักของลูก</div></div>
+          <div class="meta">›</div>
+        </div>
         <button class="btn ghost" id="install" style="margin-top:12px;display:none">📲 ติดตั้งแอพลงเครื่อง</button>
       </div>
 
@@ -115,6 +120,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelector('#go-preg').onclick = () => MB.go('preg');
     root.querySelector('#go-appt').onclick = () => MB.go('appt');
     root.querySelector('#go-prices').onclick = () => MB.go('prices');
+    root.querySelector('#go-diary').onclick = () => MB.go('diary');
     const installBtn = root.querySelector('#install');
     if (MB._installPrompt) {
       installBtn.style.display = 'block';
