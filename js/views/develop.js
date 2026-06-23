@@ -11,6 +11,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       { k: 'articles',  em: '📖', label: 'บทความ' },
       { k: 'faq',       em: '💬', label: 'ถาม-ตอบ' },
       { k: 'prices',    em: '🏥', label: 'ค่าคลอด' },
+      { k: 'vaccine',   em: '💉', label: 'ค่าวัคซีน' },
       { k: 'insurance', em: '🛡️', label: 'ประกัน' }
     ];
     return `<div class="chips" style="margin-bottom:14px">
@@ -20,7 +21,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   MB.wireKnowledgeChips = function (root) {
     root.querySelectorAll('[data-knav]').forEach(c => c.onclick = () => {
       const k = c.dataset.knav;
-      if (k === 'prices') MB.go('prices');
+      if (k === 'prices') MB.go('prices', { tab: 'delivery' });
+      else if (k === 'vaccine') MB.go('prices', { tab: 'vaccine' });
       else if (k === 'insurance') MB.go('insurance');
       else MB.go('develop', { tab: k });
     });

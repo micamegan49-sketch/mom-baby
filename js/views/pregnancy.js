@@ -332,14 +332,35 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       title: 'แก้ไขการตั้งครรภ์',
       html: `
         <div class="field"><label>ชื่อเล่น</label><input id="e-name" value="${U.esc(preg.name || '')}" /></div>
-        <div class="field"><label>LMP</label><input id="e-lmp" type="date" value="${preg.lmp || ''}" max="${S.todayISO()}" /></div>
+        <div class="field"><label>วันแรกของประจำเดือนครั้งสุดท้าย (LMP)</label><input id="e-lmp" type="date" value="${preg.lmp || ''}" max="${S.todayISO()}" /></div>
+        <p class="muted center" style="font-size:12px;margin:-6px 0 8px">— หรือระบุกำหนดคลอดที่หมอแจ้ง (อัลตราซาวด์) —</p>
         <div class="field"><label>กำหนดคลอด (EDD)</label><input id="e-edd" type="date" value="${preg.edd || ''}" /></div>
+        <div class="card tint" id="e-preview" style="text-align:center;font-size:13.5px;padding:10px"></div>
         <button class="btn pink" id="e-save">บันทึก</button>
         <button class="btn ghost" id="e-off" style="margin-top:10px;color:#D9737A">ปิดโหมดตั้งครรภ์</button>
       `,
       onMount(rt) {
+        const lmpEl = rt.querySelector('#e-lmp'), eddEl = rt.querySelector('#e-edd'), prev = rt.querySelector('#e-preview');
+        // ช่องที่ผู้ใช้แก้ล่าสุดเป็นตัวตัดสิน: แก้ LMP → คำนวณ EDD จาก LMP, แก้ EDD → ใช้ EDD ที่หมอแจ้ง
+        let mode = preg.edd ? 'edd' : 'lmp';
+        function effective() {
+          if (mode === 'edd' && eddEl.value) return { lmp: lmpEl.value || null, edd: eddEl.value };
+          if (lmpEl.value) return { lmp: lmpEl.value, edd: null };   // edd=null → pregInfo คำนวณจาก LMP
+          return { lmp: null, edd: eddEl.value || null };
+        }
+        function refresh() {
+          const info = U.pregInfo(effective());
+          prev.innerHTML = info
+            ? `ตอนนี้ ~สัปดาห์ที่ <b>${info.week}</b>${info.day ? ' +' + info.day + ' วัน' : ''} · กำหนดคลอด <b>${U.fmtDateTH(info.edd)}</b>`
+            : 'กรอก LMP หรือกำหนดคลอด เพื่อคำนวณอายุครรภ์';
+        }
+        lmpEl.onchange = () => { mode = 'lmp'; refresh(); };
+        eddEl.onchange = () => { mode = 'edd'; refresh(); };
+        refresh();
         rt.querySelector('#e-save').onclick = () => {
-          S.setPreg({ name: rt.querySelector('#e-name').value.trim(), lmp: rt.querySelector('#e-lmp').value || null, edd: rt.querySelector('#e-edd').value || null });
+          const eff = effective();
+          if (!eff.lmp && !eff.edd) return MB.toast('กรอก LMP หรือกำหนดคลอดอย่างน้อย 1 อย่าง');
+          S.setPreg({ name: rt.querySelector('#e-name').value.trim(), lmp: eff.lmp, edd: eff.edd });
           MB.closeSheet(); MB.toast('บันทึกแล้ว'); MB.go('preg');
         };
         rt.querySelector('#e-off').onclick = () => {

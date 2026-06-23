@@ -69,14 +69,9 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       </div>`;
 
     root.innerHTML = `
-      ${MB.knowledgeChips('prices')}
+      ${MB.knowledgeChips(isVax ? 'vaccine' : 'prices')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">${isVax ? '💉' : '🤱'}</div>
         <div style="flex:1"><h2 style="font-size:18px">ราคา${isVax ? 'แพ็กเกจวัคซีน' : 'คลอด'}</h2><p>ดูได้ทุกจังหวัด · ข้อมูลจริงพร้อมแหล่งอ้างอิง</p></div></div>
-
-      <div class="chips" style="margin-bottom:12px">
-        <div class="chip ${!isVax ? 'active' : ''}" data-tab="delivery">🤱 ค่าคลอด</div>
-        <div class="chip ${isVax ? 'active' : ''}" data-tab="vaccine">💉 วัคซีน</div>
-      </div>
 
       ${guideHtml}
 
@@ -95,7 +90,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     `;
 
     MB.wireKnowledgeChips(root);
-    root.querySelectorAll('[data-tab]').forEach(c => c.onclick = () => MB.go('prices', { tab: c.dataset.tab, province }));
     root.querySelector('#prov-sel').onchange = (e) => MB.go('prices', { tab, province: e.target.value });
     root.querySelector('#add-pkg').onclick = () => openForm(tab, province);
     root.querySelectorAll('[data-del]').forEach(n => n.onclick = () => {
