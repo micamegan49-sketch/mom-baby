@@ -7,9 +7,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const cls = t === 'พรีเมียม' ? 'soon' : t === 'ประหยัด' ? 'upcoming' : 'due';
     return `<span class="badge ${cls}">${U.esc(t)}</span>`;
   }
-  function srcRow(url) {
-    return url ? `<div style="margin-top:6px"><a href="${U.esc(url)}" target="_blank" rel="noopener" style="font-size:12.5px;color:var(--pink-deep)">🔗 ดูแหล่งข้อมูล/ราคา</a></div>` : '';
-  }
   function searchBox(ph) {
     return `<div class="field"><input id="bc-search" placeholder="🔍 ${ph}" /></div>`;
   }
@@ -33,7 +30,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <span class="badge upcoming">${U.esc(x.type)}</span></div>
       <div style="margin-top:6px;font-weight:700;color:var(--pink-deep)">💵 ${U.esc(x.price)}</div>
       <div style="font-size:13.5px;color:#4f3d33;margin-top:4px">${U.esc(x.note)}</div>
-      ${srcRow(x.url)}
     </div>`).join('');
     root.innerHTML = `${MB.knowledgeChips('pump')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">🍼</div>
@@ -56,7 +52,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div style="flex:1;background:var(--cream-2);border-radius:10px;padding:8px;text-align:center"><div class="muted" style="font-size:11px">${U.esc(x.pack)}</div><b style="color:var(--brown)">${U.esc(x.price)}</b></div>
         <div style="flex:1;background:var(--cream-2);border-radius:10px;padding:8px;text-align:center"><div class="muted" style="font-size:11px">ราคาต่อชิ้น</div><b style="color:var(--pink-deep)">${U.esc(x.perPiece)}</b></div>
       </div>
-      ${srcRow(x.url)}
     </div>`).join('');
     root.innerHTML = `${MB.knowledgeChips('diaper')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">🧷</div>
@@ -81,7 +76,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div style="flex:1;background:var(--cream-2);border-radius:10px;padding:8px;text-align:center"><div class="muted" style="font-size:11px">ราคา</div><b style="color:var(--brown)">${U.esc(x.price)}</b></div>
         <div style="flex:1;background:var(--cream-2);border-radius:10px;padding:8px;text-align:center"><div class="muted" style="font-size:11px">ต่อ 100 ก.</div><b style="color:var(--pink-deep)">${U.esc(x.per100g)}</b></div>
       </div>
-      ${srcRow(x.url)}
     </div>`).join('');
     root.innerHTML = `${MB.knowledgeChips('formula')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">🥛</div>

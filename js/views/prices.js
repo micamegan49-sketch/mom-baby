@@ -75,7 +75,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         ${N.ranges.map(r => `<div style="font-size:13px;display:flex;justify-content:space-between;gap:10px;padding:3px 0"><span class="muted">${U.esc(r.tier)}</span><b style="white-space:nowrap">${U.esc(r.range)}</b></div>`).join('')}
         <div class="divider"></div>
         <div style="font-weight:700;font-size:13.5px;margin-bottom:4px">แพ็กเกจยอดนิยม</div>
-        ${N.packages.map(p => `<div style="margin-top:6px"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:13.5px">${U.esc(p.name)}</b><span style="color:var(--pink-deep);font-weight:700;white-space:nowrap">${U.esc(p.price)}</span></div><div class="muted" style="font-size:12px">${U.esc(p.screens)} · <a href="${U.esc(p.url)}" target="_blank" rel="noopener" style="color:var(--pink-deep)">แหล่งข้อมูล</a></div></div>`).join('')}
+        ${N.packages.map(p => `<div style="margin-top:6px"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:13.5px">${U.esc(p.name)}</b><span style="color:var(--pink-deep);font-weight:700;white-space:nowrap">${U.esc(p.price)}</span></div><div class="muted" style="font-size:12px">${U.esc(p.screens)}</div></div>`).join('')}
         <div class="disclaimer" style="margin-top:10px">${N.notes.map(n => '• ' + U.esc(n)).join('<br>')}</div>
       </div>` : '';
 
