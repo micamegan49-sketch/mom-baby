@@ -3,6 +3,29 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 (function () {
   const S = MB.store, U = MB.util;
 
+  /* แถบหัวข้อหลักของ "ความรู้" — ใช้ร่วมกันทั้ง พัฒนาการ/บทความ/ถาม-ตอบ/ค่าคลอด/ประกัน
+     (ค่าคลอด & ประกัน เป็นเราต์ของตัวเอง จึงนำทางออกไปหน้าเต็มแทนการเรนเดอร์ในหน้านี้) */
+  MB.knowledgeChips = function (active) {
+    const items = [
+      { k: 'ms',        em: '🌱', label: 'พัฒนาการ' },
+      { k: 'articles',  em: '📖', label: 'บทความ' },
+      { k: 'faq',       em: '💬', label: 'ถาม-ตอบ' },
+      { k: 'prices',    em: '🏥', label: 'ค่าคลอด' },
+      { k: 'insurance', em: '🛡️', label: 'ประกัน' }
+    ];
+    return `<div class="chips" style="margin-bottom:14px">
+      ${items.map(i => `<div class="chip ${active === i.k ? 'active' : ''}" data-knav="${i.k}">${i.em} ${i.label}</div>`).join('')}
+    </div>`;
+  };
+  MB.wireKnowledgeChips = function (root) {
+    root.querySelectorAll('[data-knav]').forEach(c => c.onclick = () => {
+      const k = c.dataset.knav;
+      if (k === 'prices') MB.go('prices');
+      else if (k === 'insurance') MB.go('insurance');
+      else MB.go('develop', { tab: k });
+    });
+  };
+
   function mLabel(m) {
     if (m === 0) return 'แรกเกิด';
     if (m < 12) return m + ' เดือน';
@@ -38,17 +61,13 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const child = S.activeChild();
     const tab = (params && params.tab) || (params && params.cat ? 'articles' : (child ? 'ms' : 'articles'));
 
-    const seg = `<div class="chips" style="margin-bottom:14px">
-      <div class="chip ${tab === 'ms' ? 'active' : ''}" data-tab="ms">🌱 พัฒนาการ</div>
-      <div class="chip ${tab === 'articles' ? 'active' : ''}" data-tab="articles">📖 บทความ</div>
-      <div class="chip ${tab === 'faq' ? 'active' : ''}" data-tab="faq">💬 ถาม-ตอบ</div>
-    </div>`;
+    const seg = MB.knowledgeChips(tab);
 
     if (tab === 'ms') root.innerHTML = seg + renderMs(child);
     else if (tab === 'faq') root.innerHTML = seg + renderFaq();
     else root.innerHTML = seg + renderArticles(params && params.cat);
 
-    root.querySelectorAll('[data-tab]').forEach(c => c.onclick = () => MB.go('develop', { tab: c.dataset.tab }));
+    MB.wireKnowledgeChips(root);
 
     if (tab === 'ms' && child) {
       root.querySelectorAll('[data-ms]').forEach(n => n.onclick = () => { S.toggleMs(child.id, n.dataset.ms); MB.rerender({ tab: 'ms' }); });

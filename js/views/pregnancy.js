@@ -3,6 +3,43 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 (function () {
   const S = MB.store, U = MB.util;
 
+  /* วาดเบบี๋ในครรภ์แบบพารามิเตอร์ — ค่อย ๆ โต/เปลี่ยนท่า/ขึ้นแขนขา-ใบหน้า ตามอายุครรภ์ (สัปดาห์ + วัน)
+     gw รับเป็นทศนิยมได้ (เช่น 24.43) จึงเปลี่ยนทีละนิดทุกวัน */
+  MB.fetusSVG = function (gw) {
+    const lerp = (a, b, k) => a + (b - a) * k;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    gw = clamp(gw, 4, 40);
+    const t = (gw - 4) / 36;               // ความคืบหน้า 0..1 (ต่อเนื่องรายวัน)
+    const ease = t * (2 - t);              // easeOutQuad
+    const fat = clamp((gw - 28) / 12, 0, 1);
+    const scale = lerp(0.50, 1.05, ease);
+    const headR = lerp(26, 30, t);                  // หัวโตช้า
+    const bRX = lerp(15, 35, t) + fat * 5;          // ตัวโตเร็ว + อ้วนช่วงท้าย
+    const bRY = lerp(15, 33, t) + fat * 4;
+    const rot = lerp(-12, 6, ease);                 // ท่าค่อย ๆ เปลี่ยน
+    const limb = clamp((gw - 8) / 3.5, 0, 1);       // แขนขาเริ่มเห็นราวสัปดาห์ 8-11
+    const face = clamp((gw - 9) / 2.5, 0, 1);       // ใบหน้าเริ่มชัดราวสัปดาห์ 9-11
+    const body = '#8b6f62', bodyD = '#7c6155', cheek = '#cf8b86', line = '#5a463c';
+    return `<svg viewBox="0 0 200 210" width="172" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ลูกในครรภ์ราวสัปดาห์ที่ ${Math.floor(gw)}">
+      <circle cx="100" cy="104" r="95" fill="#c9a89d" opacity="0.15"/>
+      <circle cx="100" cy="104" r="71" fill="#c9a89d" opacity="0.15"/>
+      <g transform="translate(100,110) rotate(${rot.toFixed(1)}) scale(${scale.toFixed(3)}) translate(-100,-110)">
+        <ellipse cx="90" cy="128" rx="${bRX.toFixed(1)}" ry="${bRY.toFixed(1)}" fill="${body}"/>
+        <g opacity="${limb.toFixed(2)}">
+          <ellipse cx="96" cy="156" rx="13" ry="9" fill="${bodyD}"/>
+          <ellipse cx="72" cy="150" rx="10" ry="8" fill="${bodyD}"/>
+        </g>
+        <circle cx="115" cy="90" r="${headR.toFixed(1)}" fill="${body}"/>
+        <g opacity="${limb.toFixed(2)}"><ellipse cx="95" cy="116" rx="7" ry="14" fill="${bodyD}" transform="rotate(30 95 116)"/></g>
+        <g opacity="${face.toFixed(2)}">
+          <path d="M100 86 q5 5 10 0" fill="none" stroke="${line}" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="118" cy="96" r="4.6" fill="${cheek}" opacity="0.5"/>
+          <path d="M104 99 q4 3.5 8 0.5" fill="none" stroke="${line}" stroke-width="1.9" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>`;
+  };
+
   function bmiCat(bmi) {
     return MB.PREG_WEIGHT_GAIN.find(c => bmi < c.max) || MB.PREG_WEIGHT_GAIN[MB.PREG_WEIGHT_GAIN.length - 1];
   }
@@ -50,7 +87,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     viewWeek = Math.max(4, Math.min(40, viewWeek));
     const wk = MB.PREG_WEEKS.find(x => x.w === viewWeek) || MB.PREG_WEEKS[0];
     const pct = Math.min(100, Math.round((p ? p.daysPreg : 0) / 280 * 100));
-    const triKey = viewWeek < 14 ? 't1' : viewWeek < 28 ? 't2' : 't3';
+    // อายุครรภ์แบบทศนิยมสำหรับวาดภาพ: สัปดาห์ที่กำลังดูอยู่ปัจจุบันใช้วัน "วันนี้" จริง (เปลี่ยนทุกวัน)
+    const gwImg = (viewWeek === curWeek && p) ? (p.week + p.day / 7) : viewWeek;
 
     // เช็กลิสต์
     const checked = preg.checklist || {};
@@ -94,7 +132,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
       <div class="section-title">🍎 สัปดาห์ที่ ${viewWeek} – ลูกตอนนี้</div>
       <div class="card">
-        <div class="center"><img src="icons/baby-${triKey}.png" alt="ลูกในครรภ์สัปดาห์ที่ ${viewWeek}" style="width:172px;height:172px;display:block;margin:0 auto" loading="lazy" /></div>
+        <div class="center">${MB.fetusSVG(gwImg)}</div>
+        <div class="center muted" style="font-size:11px;margin:-2px 0 6px">🎨 ภาพวาดค่อย ๆ เปลี่ยนตามอายุครรภ์${viewWeek === curWeek ? ' (ขยับทุกวัน)' : ''}</div>
         <div class="center" style="margin-bottom:8px">ขนาดเทียบ ${wk.fruit} <b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
         <div class="divider"></div>
         <p style="margin:0 0 8px"><b>👶 พัฒนาการลูก:</b> ${wk.baby}</p>

@@ -169,8 +169,10 @@ window.MB = window.MB || {};
 
   function renderTabbar() {
     const tb = document.getElementById('tabbar');
+    // ค่าคลอด/ประกัน เป็นหัวข้อย่อยของ "ความรู้" จึงให้แท็บ develop ไฮไลต์ด้วย
+    const activeTab = (current === 'prices' || current === 'insurance') ? 'develop' : current;
     tb.innerHTML = TABS.map(t =>
-      `<button data-tab="${t.id}" class="${current === t.id ? 'active' : ''}"><span class="ic">${t.ic}</span>${t.label}</button>`
+      `<button data-tab="${t.id}" class="${activeTab === t.id ? 'active' : ''}"><span class="ic">${t.ic}</span>${t.label}</button>`
     ).join('');
     tb.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => go(b.dataset.tab));
   }

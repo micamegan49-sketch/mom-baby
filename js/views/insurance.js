@@ -28,6 +28,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     };
 
     root.innerHTML = `
+      ${MB.knowledgeChips('insurance')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">🛡️</div>
         <div style="flex:1"><h2 style="font-size:18px">ประกันสำหรับลูก</h2><p>เทียบแผนจากบริษัทชั้นนำ (ข้อมูลทางการ)</p></div></div>
       <div class="chips" style="margin:4px 0 12px">
@@ -36,6 +37,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       ${list.map(card).join('') || '<p class="muted center">ไม่มีข้อมูลในหมวดนี้</p>'}
       <div class="disclaimer">⚠️ เบี้ยส่วนใหญ่คำนวณตามอายุ/แผน/ทุนประกัน — ตัวเลขที่แสดงเป็นเบี้ยเริ่มต้น/ตัวอย่างที่ประกาศ ณ ปี 2568 อาจเปลี่ยนแปลง โปรดติดต่อบริษัทเพื่อขอใบเสนอราคาจริงและเงื่อนไขล่าสุดก่อนตัดสินใจ (ไม่ใช่คำแนะนำการลงทุน/การเงินเฉพาะบุคคล)</div>
     `;
+    MB.wireKnowledgeChips(root);
     root.querySelectorAll('[data-t]').forEach(c => c.onclick = () => MB.go('insurance', { type: c.dataset.t }));
   };
 })();

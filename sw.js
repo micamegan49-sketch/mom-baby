@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v10';
+const CACHE = 'tuajiw-v11';
 const ASSETS = [
   './',
   './index.html',
@@ -33,10 +33,7 @@ const ASSETS = [
   './js/views/prices.js',
   './js/views/insurance.js',
   './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/baby-t1.png',
-  './icons/baby-t2.png',
-  './icons/baby-t3.png'
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
