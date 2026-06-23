@@ -138,11 +138,28 @@ window.MB = window.MB || {};
     35: 'melon', 36: 'lettuce', 37: 'spinach', 38: 'garlic', 39: 'watermelon', 40: 'watermelon'
   };
 
+  let _frId = 0;
   MB.fruitSVG = function (key, size, opts) {
     size = size || 120;
     opts = opts || {};
     const art = FRUITS[key] || FRUITS.seed;
-    const bg = opts.bare ? '' : `<circle cx="60" cy="62" r="50" fill="#f0e3d7"/><circle cx="60" cy="62" r="50" fill="#e8b9c0" opacity=".25"/>`;
-    return `<svg viewBox="0 0 120 120" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${bg}${art}</svg>`;
+    const id = 'fr' + (_frId++);
+    const bg = opts.bare ? '' : `<circle cx="60" cy="62" r="54" fill="#f0e3d7"/><circle cx="60" cy="62" r="54" fill="#e8b9c0" opacity=".25"/>`;
+    // viewBox ซูมเข้าหาตัวผลไม้ให้ดูใหญ่ขึ้น + เงาตกกระทบ/ไฮไลต์เงาวับ ให้ดูมีมิติสมจริง
+    return `<svg viewBox="22 24 76 76" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="${id}g" cx="40%" cy="32%" r="72%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".4"/>
+          <stop offset="48%" stop-color="#fff" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="${id}s" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="2.4" stdDeviation="2.2" flood-color="#7a5a48" flood-opacity=".28"/>
+        </filter>
+      </defs>
+      ${bg}
+      <ellipse cx="60" cy="95" rx="25" ry="5.5" fill="#9a7458" opacity=".16"/>
+      <g filter="url(#${id}s)">${art}</g>
+      <ellipse cx="52" cy="50" rx="30" ry="26" fill="url(#${id}g)"/>
+    </svg>`;
   };
 })();

@@ -69,7 +69,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       const wk = (MB.PREG_WEEKS.find(x => x.w === (p ? p.week : 0))) || MB.PREG_WEEKS[0];
       root.innerHTML = `
         <div class="hero" id="open-preg">
-          <div class="emoji" style="padding:6px">${MB.fruitSVG((MB.PREG_FRUIT_KEY && MB.PREG_FRUIT_KEY[p ? p.week : 0]) || 'seed', 52, { bare: true })}</div>
+          <div class="emoji" style="padding:2px">${MB.fruitSVG((MB.PREG_FRUIT_KEY && MB.PREG_FRUIT_KEY[p ? p.week : 0]) || 'seed', 60, { bare: true })}</div>
           <div style="flex:1">
             <div class="tag-week">ไตรมาส ${p ? p.trimester : 1}</div>
             <div class="bigweek"><b>${p ? p.week : '-'}</b><small>สัปดาห์ ${p ? '+' + p.day + ' วัน' : ''}</small></div>

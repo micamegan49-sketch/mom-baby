@@ -122,7 +122,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
     root.innerHTML = `
       <div class="hero">
-        <div class="emoji" style="padding:6px">${MB.fruitSVG(fruitKey, 52, { bare: true })}</div>
+        <div class="emoji" style="padding:2px">${MB.fruitSVG(fruitKey, 60, { bare: true })}</div>
         <div style="flex:1">
           <div class="tag-week">ไตรมาส ${p ? p.trimester : 1} ${viewWeek !== curWeek ? '· กำลังดูย้อน' : ''}</div>
           <div class="bigweek"><b>${p ? p.week : '-'}</b><small>สัปดาห์ ${p ? '+' + p.day + ' วัน' : ''}</small></div>
@@ -135,7 +135,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="card">
         <div class="center">${MB.fetusSVG(gwImg)}</div>
         <div class="center muted" style="font-size:11px;margin:-2px 0 6px">🎨 ภาพวาดค่อย ๆ เปลี่ยนตามอายุครรภ์${viewWeek === curWeek ? ' (ขยับทุกวัน)' : ''}</div>
-        <div class="center" style="margin-bottom:8px">ขนาดเทียบ <span style="display:inline-block;vertical-align:middle">${MB.fruitSVG(fruitKey, 28, { bare: true })}</span> <b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
+        <div class="center" style="margin-bottom:8px">ขนาดเทียบ <span style="display:inline-block;vertical-align:middle">${MB.fruitSVG(fruitKey, 34, { bare: true })}</span> <b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
         <div class="divider"></div>
         <p style="margin:0 0 8px"><b>👶 พัฒนาการลูก:</b> ${wk.baby}</p>
         <p style="margin:0"><b>🤰 ร่างกายคุณแม่:</b> ${wk.mom}</p>
