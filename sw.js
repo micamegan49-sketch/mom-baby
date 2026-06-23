@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v15';
+const CACHE = 'tuajiw-v16';
 const ASSETS = [
   './',
   './index.html',
@@ -40,7 +40,12 @@ const ASSETS = [
   './js/views/plan.js',
   './icons/icon-192.png',
   './icons/icon-512.png'
-];
+].concat(
+  // รูปถ่ายผลไม้เทียบขนาดลูก (ทุกสัปดาห์)
+  ('seed pea blueberry redbean cherry strawberry kiwi lemon peapod peach apple avocado pear bellpepper ' +
+   'mango banana carrot coconut melon corn radish springonion cauliflower eggplant pumpkin cabbage ' +
+   'napacabbage pineapple cantaloupe lettuce spinach garlic watermelon').split(' ').map(k => './icons/fruits/' + k + '.jpg')
+);
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
