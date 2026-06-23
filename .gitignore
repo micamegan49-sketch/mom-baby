@@ -24,3 +24,16 @@ ios/DerivedData/
 DerivedData/
 **/xcuserdata/
 *.xcuserstate
+
+# Android build artifacts (โปรเจกต์ android/ เก็บไว้ แต่ไม่เก็บไฟล์ build)
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/local.properties
+android/.idea/
+android/capacitor-cordova-android-plugins/
+# 🔐 ห้าม commit keystore/รหัสเซ็นแอป เด็ดขาด (เก็บไว้ที่ปลอดภัย สำรองหลายที่)
+*.keystore
+*.jks
+keystore.properties

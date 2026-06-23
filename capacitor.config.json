@@ -5,5 +5,8 @@
   "ios": {
     "contentInset": "always",
     "backgroundColor": "#FBF2EB"
+  },
+  "android": {
+    "backgroundColor": "#FBF2EB"
   }
 }
