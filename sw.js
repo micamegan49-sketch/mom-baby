@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v9';
+const CACHE = 'tuajiw-v10';
 const ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const ASSETS = [
   './js/data/feeding.js',
   './js/data/provinces.js',
   './js/data/prices.js',
+  './js/data/insurance.js',
   './js/data/supabase-config.js',
   './js/cloud.js',
   './js/views/home.js',
@@ -30,6 +31,7 @@ const ASSETS = [
   './js/views/settings.js',
   './js/views/appt.js',
   './js/views/prices.js',
+  './js/views/insurance.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/baby-t1.png',
