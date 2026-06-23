@@ -154,6 +154,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <button class="quick" id="t-kick"><span class="ic">👣</span><span class="lb">นับลูกดิ้น</span></button>
         <button class="quick" id="t-contr"><span class="ic">⏱️</span><span class="lb">จับเวลาหดตัว</span></button>
         <button class="quick" id="t-cost"><span class="ic">🤱</span><span class="lb">ราคาคลอด</span></button>
+        <button class="quick" id="t-menu"><span class="ic">🍱</span><span class="lb">เมนูอาหาร</span></button>
+        <button class="quick" id="t-gear"><span class="ic">🧳</span><span class="lb">ของเตรียมคลอด</span></button>
         <button class="quick" id="t-tips"><span class="ic">📚</span><span class="lb">บทความ</span></button>
       </div>
 
@@ -178,6 +180,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelector('#t-kick').onclick = openKick;
     root.querySelector('#t-contr').onclick = openContraction;
     root.querySelector('#t-cost').onclick = () => MB.go('prices', { tab: 'delivery' });
+    root.querySelector('#t-menu').onclick = openMenu;
+    root.querySelector('#t-gear').onclick = openGear;
     root.querySelector('#t-tips').onclick = () => MB.go('develop', { cat: 'preg' });
 
     renderWeightCard(root.querySelector('#weight-card'));
@@ -321,6 +325,57 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
             active = null; renderList();
           }
         };
+      }
+    });
+  }
+
+  /* ---------- เครื่องมือ: เมนูอาหารคนท้อง ---------- */
+  function openMenu() {
+    const p = U.pregInfo(S.preg());
+    const nut = MB.pregNutrition ? MB.pregNutrition(p ? p.week : 8) : null;
+    const M = MB.PREG_MENU;
+    const day = M.day.map(s => `<div style="margin-top:10px"><b>${s.t}</b><ul style="margin:4px 0 0;padding-left:20px;font-size:14px;line-height:1.6">${s.items.map(i => '<li>' + U.esc(i) + '</li>').join('')}</ul></div>`).join('');
+    MB.sheet({
+      title: '🍱 เมนูอาหารคนท้อง',
+      html: `<p class="muted" style="margin-top:-4px;font-size:13.5px">${M.intro}</p>
+        ${nut ? `<div class="card tint" style="margin:10px 0"><b>${nut.emoji} เน้นช่วงนี้:</b> ${nut.focus}</div>` : ''}
+        <div class="section-title" style="margin-top:8px">ตัวอย่างเมนู 1 วัน</div>${day}
+        <div class="section-title" style="margin-top:14px">🥗 ของว่างที่ดี</div>
+        <div class="chips">${M.good.map(g => `<div class="chip">${U.esc(g)}</div>`).join('')}</div>
+        <div class="section-title" style="margin-top:14px;color:#C45a61">🚫 ควรเลี่ยง</div>
+        <ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.6;color:#7a5a52">${M.avoid.map(a => '<li>' + U.esc(a) + '</li>').join('')}</ul>
+        <div class="disclaimer" style="margin-top:12px">เมนูตัวอย่างเพื่อความรู้ทั่วไป ปรับตามภาวะสุขภาพ/น้ำหนัก/คำแนะนำแพทย์หรือนักโภชนาการ</div>
+        <button class="btn ghost" style="margin-top:10px" onclick="MB.closeSheet()">ปิด</button>`
+    });
+  }
+
+  /* ---------- เครื่องมือ: ของเตรียมก่อนคลอด (เช็กลิสต์) ---------- */
+  function gearHtml() {
+    const checked = S.preg().checklist || {};
+    const total = MB.PREG_GEAR.reduce((n, g) => n + g.items.length, 0);
+    const done = MB.PREG_GEAR.reduce((n, g) => n + g.items.filter(i => checked[i.id]).length, 0);
+    const groups = MB.PREG_GEAR.map(g => `
+      <div class="section-title">${g.em} ${g.label}</div>
+      <div class="card" style="padding:6px 14px">
+        ${g.items.map(i => `<div class="list-item" data-gear="${i.id}" style="cursor:pointer">
+          <div class="ic" style="background:${checked[i.id] ? '#E6F3E9' : 'var(--cream-2)'}">${checked[i.id] ? '✅' : '⬜'}</div>
+          <div class="body"><div class="t" style="${checked[i.id] ? 'text-decoration:line-through;color:var(--muted)' : ''}">${U.esc(i.text)}</div></div>
+        </div>`).join('')}
+      </div>`).join('');
+    return `<div class="center muted" style="font-size:13px;margin:-4px 0 8px">เตรียมแล้ว ${done}/${total} อย่าง</div>${groups}
+      <div class="disclaimer" style="margin-top:10px">รายการแนะนำทั่วไป ปรับตามความจำเป็นและงบประมาณของแต่ละบ้าน</div>`;
+  }
+  function openGear() {
+    MB.sheet({
+      title: '🧳 ของเตรียมก่อนคลอด',
+      html: gearHtml(),
+      onMount(rt) {
+        const wire = () => rt.querySelectorAll('[data-gear]').forEach(n => n.onclick = () => {
+          S.toggleCheck(n.dataset.gear);
+          rt.querySelector('.sheet-body').innerHTML = gearHtml();
+          wire();
+        });
+        wire();
       }
     });
   }
