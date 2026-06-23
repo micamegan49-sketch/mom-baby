@@ -170,7 +170,7 @@ window.MB = window.MB || {};
   function renderTabbar() {
     const tb = document.getElementById('tabbar');
     // ค่าคลอด/ประกัน เป็นหัวข้อย่อยของ "ความรู้" จึงให้แท็บ develop ไฮไลต์ด้วย
-    const activeTab = ['prices', 'insurance', 'pump', 'diaper', 'formula'].includes(current) ? 'develop' : current;
+    const activeTab = ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups'].includes(current) ? 'develop' : current;
     tb.innerHTML = TABS.map(t =>
       `<button data-tab="${t.id}" class="${activeTab === t.id ? 'active' : ''}"><span class="ic">${t.ic}</span>${t.label}</button>`
     ).join('');

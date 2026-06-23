@@ -15,7 +15,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       { k: 'insurance', em: '🛡️', label: 'ประกัน' },
       { k: 'pump',      em: '🍼', label: 'ปั๊มนม' },
       { k: 'diaper',    em: '🧷', label: 'แพมเพิส' },
-      { k: 'formula',   em: '🥛', label: 'นมผง' }
+      { k: 'formula',   em: '🥛', label: 'นมผง' },
+      { k: 'groups',    em: '🤝', label: 'กลุ่มแม่' }
     ];
     return `<div class="chips" style="margin-bottom:14px">
       ${items.map(i => `<div class="chip ${active === i.k ? 'active' : ''}" data-knav="${i.k}">${i.em} ${i.label}</div>`).join('')}
@@ -26,7 +27,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       const k = c.dataset.knav;
       if (k === 'prices') MB.go('prices', { tab: 'delivery' });
       else if (k === 'vaccine') MB.go('prices', { tab: 'vaccine' });
-      else if (k === 'insurance' || k === 'pump' || k === 'diaper' || k === 'formula') MB.go(k);
+      else if (['insurance', 'pump', 'diaper', 'formula', 'groups'].includes(k)) MB.go(k);
       else MB.go('develop', { tab: k });
     });
   };
