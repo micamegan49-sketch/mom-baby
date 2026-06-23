@@ -1,6 +1,12 @@
 # macOS
 .DS_Store
 
+# โฟลเดอร์ขยะที่ python/เครื่องมือ build สร้างโดยตั้ง HOME เป็น temp UUID
+# (เคยมี <uuid>/Library/Caches/... หลุดเข้ารีโป)
+*/Library/Caches/
+__pycache__/
+*.pyc
+
 # ไฟล์สำรองข้อมูลที่ส่งออกจากแอพ (ข้อมูลส่วนตัวของผู้ใช้)
 tuajiw-backup-*.json
 
