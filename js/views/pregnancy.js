@@ -19,7 +19,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const rot = lerp(-12, 6, ease);                 // ท่าค่อย ๆ เปลี่ยน
     const limb = clamp((gw - 8) / 3.5, 0, 1);       // แขนขาเริ่มเห็นราวสัปดาห์ 8-11
     const face = clamp((gw - 9) / 2.5, 0, 1);       // ใบหน้าเริ่มชัดราวสัปดาห์ 9-11
-    const body = '#8b6f62', bodyD = '#7c6155', cheek = '#cf8b86', line = '#5a463c';
+    const body = '#a98a79', bodyD = '#97735f', cheek = '#cf8b86', line = '#5a463c';
     return `<svg viewBox="0 0 200 210" width="172" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ลูกในครรภ์ราวสัปดาห์ที่ ${Math.floor(gw)}">
       <circle cx="100" cy="104" r="95" fill="#c9a89d" opacity="0.15"/>
       <circle cx="100" cy="104" r="71" fill="#c9a89d" opacity="0.15"/>
@@ -89,6 +89,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const pct = Math.min(100, Math.round((p ? p.daysPreg : 0) / 280 * 100));
     // อายุครรภ์แบบทศนิยมสำหรับวาดภาพ: สัปดาห์ที่กำลังดูอยู่ปัจจุบันใช้วัน "วันนี้" จริง (เปลี่ยนทุกวัน)
     const gwImg = (viewWeek === curWeek && p) ? (p.week + p.day / 7) : viewWeek;
+    const fruitKey = (MB.PREG_FRUIT_KEY && MB.PREG_FRUIT_KEY[viewWeek]) || 'seed';
 
     // เช็กลิสต์
     const checked = preg.checklist || {};
@@ -121,7 +122,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
     root.innerHTML = `
       <div class="hero">
-        <div class="emoji">${wk.fruit}</div>
+        <div class="emoji" style="padding:6px">${MB.fruitSVG(fruitKey, 52, { bare: true })}</div>
         <div style="flex:1">
           <div class="tag-week">ไตรมาส ${p ? p.trimester : 1} ${viewWeek !== curWeek ? '· กำลังดูย้อน' : ''}</div>
           <div class="bigweek"><b>${p ? p.week : '-'}</b><small>สัปดาห์ ${p ? '+' + p.day + ' วัน' : ''}</small></div>
@@ -134,7 +135,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="card">
         <div class="center">${MB.fetusSVG(gwImg)}</div>
         <div class="center muted" style="font-size:11px;margin:-2px 0 6px">🎨 ภาพวาดค่อย ๆ เปลี่ยนตามอายุครรภ์${viewWeek === curWeek ? ' (ขยับทุกวัน)' : ''}</div>
-        <div class="center" style="margin-bottom:8px">ขนาดเทียบ ${wk.fruit} <b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
+        <div class="center" style="margin-bottom:8px">ขนาดเทียบ <span style="display:inline-block;vertical-align:middle">${MB.fruitSVG(fruitKey, 28, { bare: true })}</span> <b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
         <div class="divider"></div>
         <p style="margin:0 0 8px"><b>👶 พัฒนาการลูก:</b> ${wk.baby}</p>
         <p style="margin:0"><b>🤰 ร่างกายคุณแม่:</b> ${wk.mom}</p>
