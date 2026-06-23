@@ -108,6 +108,19 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     // บทความ
     const stage = stageOf(a.totalMonths);
     const arts = MB.ARTICLES.filter(x => x.stage === stage || x.stage === 'all').slice(0, 6);
+    const feed = MB.feedingFor ? MB.feedingFor(a.totalMonths) : null;
+    const feedHtml = feed ? `
+      <div class="section-title">🍼 อาหารตามวัย <span class="more">${feed.label}</span></div>
+      <div class="card">
+        <p style="margin:0 0 8px"><b>เน้น:</b> ${feed.focus}</p>
+        <div style="font-weight:700;color:var(--brown);margin-bottom:2px">🍽️ ควรกิน</div>
+        <ul style="margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.65">${feed.foods.map(f => '<li>' + f + '</li>').join('')}</ul>
+        <div style="font-weight:700;color:var(--brown);margin-bottom:2px">💡 เคล็ดลับ</div>
+        <ul style="margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.65">${feed.tips.map(t => '<li>' + t + '</li>').join('')}</ul>
+        <div style="font-weight:700;color:#C45a61;margin-bottom:2px">🚫 ควรเลี่ยง</div>
+        <ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.65;color:#7a5a52">${feed.avoid.map(av => '<li>' + av + '</li>').join('')}</ul>
+        <div class="disclaimer" style="margin-top:10px">คำแนะนำทั่วไป ปรึกษาแพทย์/คลินิกสุขภาพเด็กสำหรับลูกแต่ละคน</div>
+      </div>` : '';
     // ตัวจับเวลา & นัดหมาย
     const timer = S.getTimer();
     const timerOn = timer && timer.childId === child.id;
@@ -177,6 +190,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div style="display:flex;justify-content:space-between;align-items:center"><b>ทำได้แล้ว ${msInfo.done}/${msInfo.total} ข้อ</b><span class="muted" style="font-size:12px">ช่วง ${msInfo.bandLabel}</span></div>
         <div class="progress"><span style="width:${msInfo.total ? Math.round(msInfo.done / msInfo.total * 100) : 0}%"></span></div>
       </div>` : ''}
+
+      ${feedHtml}
 
       <div class="section-title">🔔 นัดหมาย <span class="more" data-go="appt">${appts.length ? 'ดูทั้งหมด' : 'เพิ่มนัด'}</span></div>
       <div class="card" data-go="appt">
