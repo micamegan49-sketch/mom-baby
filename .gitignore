@@ -13,6 +13,9 @@ tuajiw-backup-*.json
 # logs
 *.log
 
+# สคริปต์ชั่วคราว (setup/build เครื่องมือ — ไม่ต้องเก็บในรีโป)
+scratch-*.sh
+
 # Node / Capacitor
 node_modules/
 www/
