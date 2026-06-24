@@ -162,17 +162,4 @@ window.MB = window.MB || {};
       <ellipse cx="52" cy="50" rx="30" ry="26" fill="url(#${id}g)"/>
     </svg>`;
   };
-
-  /* รูปถ่ายจริง (icons/fruits/<key>.jpg) — ถ้าโหลดไม่ได้ จะ fallback เป็นภาพวาด SVG อัตโนมัติ */
-  MB.fruitFallback = function (img) {
-    const s = img.parentNode;
-    if (s && s.dataset) s.innerHTML = MB.fruitSVG(s.dataset.key, +s.dataset.size, { bare: s.dataset.bare === '1' });
-  };
-  MB.fruitImg = function (key, size, opts) {
-    opts = opts || {};
-    const rad = opts.radius != null ? opts.radius : 14;
-    const photo = 'icons/fruits/' + key + '.jpg';
-    return `<span class="fruit-pic" data-key="${key}" data-size="${size}" data-bare="${opts.bare ? 1 : 0}" style="display:inline-block;width:${size}px;height:${size}px;line-height:0;vertical-align:middle">` +
-      `<img src="${photo}" width="${size}" height="${size}" alt="" loading="lazy" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:${rad}px;display:block" onerror="MB.fruitFallback(this)"></span>`;
-  };
 })();

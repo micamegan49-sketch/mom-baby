@@ -104,7 +104,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="card">
         <p style="margin:0 0 8px;font-weight:700">ตัวจิ๋ว 👣 v1.0</p>
         <p class="muted" style="font-size:13px;margin:0">แอพดูแลคุณแม่และลูกน้อย ทำงานบนเครื่องของคุณ ข้อมูลเก็บในเครื่องนี้เท่านั้น ใช้งานออฟไลน์ได้</p>
-        <p class="muted" style="font-size:11.5px;margin:8px 0 0">ภาพผลไม้เทียบขนาด: Pexels, Wikimedia Commons, Openverse (Public Domain / CC0)</p>
         <div class="disclaimer" style="margin-top:12px">⚠️ ข้อมูลในแอพ (วัคซีน เกณฑ์เติบโต พัฒนาการ บทความ) เป็นข้อมูลอ้างอิงทั่วไปเพื่อความรู้ ไม่ใช่คำวินิจฉัยทางการแพทย์ กรุณายึดสมุดสุขภาพเด็กและคำแนะนำของแพทย์เป็นหลักเสมอ</div>
       </div>
     `;
