@@ -234,6 +234,20 @@ window.MB = window.MB || {};
       emit();
     },
 
+    /* ลบบัญชีและข้อมูลถาวร (ข้อกำหนด App Store 5.1.1(v): สมัครได้ ต้องลบได้จากในแอป)
+       เรียก RPC delete_account() ฝั่งเซิร์ฟเวอร์ที่ลบทั้งข้อมูล (homes/app_state/invites/members)
+       และลบ auth user ออกจากระบบจริง แล้วออกจากระบบในเครื่อง */
+    async deleteAccount() {
+      if (!client || !user) throw new Error('ต้องเข้าสู่ระบบก่อน');
+      const { error } = await client.rpc('delete_account');
+      if (error) throw error;
+      unsubscribe();
+      try { await client.auth.signOut(); } catch (e) {}
+      user = null; homes = []; homeId = null; conflict = false;
+      localStorage.removeItem(LS_HOME);
+      emit();
+    },
+
     async syncNow() { if (user) await reconcile(); },
     async pushForce() { conflict = false; await pushNow(); if (MB.toast) MB.toast('อัปโหลดข้อมูลเครื่องนี้ขึ้นคลาวด์แล้ว'); },
     async pullForce() {

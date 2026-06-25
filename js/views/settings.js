@@ -236,7 +236,12 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           <button class="btn ghost sm" id="su-join" style="flex:1">➕ ใส่รหัสเชิญ</button>
         </div>
         <button class="btn ghost" id="su-sync" style="margin-top:10px">🔄 ซิงค์เดี๋ยวนี้</button>
-        <button class="btn ghost" id="su-logout" style="margin-top:10px;color:#D9737A">ออกจากระบบ</button>`;
+        <button class="btn ghost" id="su-logout" style="margin-top:10px;color:#D9737A">ออกจากระบบ</button>
+        <div style="border-top:1px solid #EAD9CC;margin-top:14px;padding-top:12px">
+          <button class="btn ghost" id="su-delacc" style="color:#C0566A;border-color:#E7C2C7">🗑️ ลบบัญชีและข้อมูลถาวร</button>
+          <p class="muted" style="font-size:11.5px;margin:8px 2px 0;text-align:center">ลบบัญชี อีเมล และข้อมูลที่ซิงค์ทั้งหมดออกจากระบบอย่างถาวร (กู้คืนไม่ได้) ·
+            <a href="https://micamegan49-sketch.github.io/mom-baby/delete-account.html" target="_blank" rel="noopener noreferrer" style="color:#8B5E4B">รายละเอียด</a></p>
+        </div>`;
     }
     function wireCloud(card) {
       const $ = id => card.querySelector('#' + id);
@@ -282,6 +287,20 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       if ($('su-pull')) $('su-pull').onclick = () => MB.cloud.pullForce();
       if ($('su-push')) $('su-push').onclick = () => MB.cloud.pushForce();
       if ($('su-logout')) $('su-logout').onclick = async () => { await MB.cloud.signOut(); MB.toast('ออกจากระบบแล้ว'); paintCloud(); };
+      if ($('su-delacc')) $('su-delacc').onclick = async () => {
+        // ยืนยัน 2 ชั้น กันลบโดยไม่ตั้งใจ (ข้อกำหนด App Store 5.1.1(v) — ลบบัญชีได้จากในแอป)
+        if (!confirm('ลบบัญชีและข้อมูลทั้งหมดถาวร?\nบัญชี อีเมล และข้อมูลที่ซิงค์จะถูกลบ กู้คืนไม่ได้')) return;
+        if (!confirm('ยืนยันอีกครั้ง — การลบนี้ถาวรและกู้คืนไม่ได้\nต้องการลบบัญชีต่อหรือไม่?')) return;
+        const btn = $('su-delacc'); btn.disabled = true; btn.textContent = 'กำลังลบบัญชี…';
+        try {
+          await MB.cloud.deleteAccount();
+          MB.toast('ลบบัญชีและข้อมูลถาวรแล้ว');
+          paintCloud();
+        } catch (e) {
+          btn.disabled = false; btn.textContent = '🗑️ ลบบัญชีและข้อมูลถาวร';
+          MB.toast('ลบไม่สำเร็จ: ' + ((e && e.message) || 'ลองใหม่อีกครั้ง'));
+        }
+      };
       if ($('su-home')) $('su-home').onchange = async () => { await MB.cloud.switchHome($('su-home').value); MB.toast('สลับบ้านแล้ว'); paintCloud(); };
       if ($('su-members')) $('su-members').onclick = openMembers;
       if ($('su-join')) $('su-join').onclick = openJoin;
