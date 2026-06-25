@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v17';
+const CACHE = 'tuajiw-v18';
 const ASSETS = [
   './',
   './index.html',
@@ -44,7 +44,8 @@ const ASSETS = [
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    // {cache:'reload'} = โหลดไฟล์สดข้าม HTTP cache (กันได้ไฟล์เก่าตอนอัปเดต)
+    caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())
   );
 });
 
