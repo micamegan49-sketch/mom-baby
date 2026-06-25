@@ -2,6 +2,7 @@
 window.MB = window.MB || {}; MB.views = MB.views || {};
 (function () {
   const S = MB.store, U = MB.util;
+  const COLL = new Intl.Collator('th');   // cached collator (เร็วกว่า localeCompare(...,'th') ที่สร้าง collator ใหม่ทุกครั้ง)
 
   function provinceSelect(sel) {
     return `<select id="prov-sel">
@@ -54,7 +55,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const user = isVax ? S.vaxPricePkgs() : S.deliveryPkgs();
     let items = seed.concat(user);
     if (province) items = items.filter(x => x.province === province);
-    items.sort((a, b) => (a.province || '').localeCompare(b.province || '', 'th') || (a.hospital || '').localeCompare(b.hospital || '', 'th'));
+    items.sort((a, b) => COLL.compare(a.province || '', b.province || '') || COLL.compare(a.hospital || '', b.hospital || ''));
 
     const guide = isVax ? MB.VAX_PRICE_GUIDE : MB.DELIVERY_GUIDE;
     const guideHtml = isVax ? `
@@ -91,10 +92,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="field"><input id="prov-search" placeholder="🔍 ค้นชื่อโรงพยาบาล..." /></div>
 
       <div class="section-title">รายการราคา <span class="more">${items.length} รายการ</span></div>
-      <div id="price-list">
-        ${items.length ? items.map(isVax ? vaccineCard : deliveryCard).join('')
-          : `<div class="empty"><div class="em">${isVax ? '💉' : '🏥'}</div><p>${province ? 'ยังไม่มีข้อมูลในจังหวัดนี้' : 'ยังไม่มีข้อมูล'}<br/>เพิ่มราคาที่คุณทราบได้เลย ช่วยกันสะสมเป็นฐานข้อมูล</p></div>`}
-      </div>
+      <div id="price-list">${items.length ? '' : `<div class="empty"><div class="em">${isVax ? '💉' : '🏥'}</div><p>${province ? 'ยังไม่มีข้อมูลในจังหวัดนี้' : 'ยังไม่มีข้อมูล'}<br/>เพิ่มราคาที่คุณทราบได้เลย ช่วยกันสะสมเป็นฐานข้อมูล</p></div>`}</div>
 
       <button class="btn pink" id="add-pkg" style="margin-top:6px">+ เพิ่มราคา${isVax ? 'วัคซีน' : 'คลอด'}ที่ทราบ</button>
 
@@ -104,13 +102,30 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     MB.wireKnowledgeChips(root);
     root.querySelector('#prov-sel').onchange = (e) => MB.go('prices', { tab, province: e.target.value });
     root.querySelector('#add-pkg').onclick = () => openForm(tab, province);
-    root.querySelectorAll('[data-del]').forEach(n => n.onclick = () => {
-      if (confirm('ลบรายการนี้?')) { isVax ? S.removeVaxPricePkg(n.dataset.del) : S.removeDeliveryPkg(n.dataset.del); MB.go('prices', { tab, province }); }
+
+    // render การ์ดทีละช่วง (กันหน้า "ค้าง" ตอนรายการเยอะ เช่น ดูทุกจังหวัด ~120 รายการ)
+    const listEl = root.querySelector('#price-list');
+    const cardFn = isVax ? vaccineCard : deliveryCard;
+    if (items.length) {
+      let i = 0; const CHUNK = 24;
+      (function renderChunk() {
+        if (!listEl.isConnected) return;              // ออกจากหน้านี้ไปแล้ว → หยุด
+        listEl.insertAdjacentHTML('beforeend', items.slice(i, i + CHUNK).map(cardFn).join(''));
+        i += CHUNK;
+        if (i < items.length) requestAnimationFrame(renderChunk);
+      })();
+    }
+
+    // ลบรายการ — ใช้ event delegation (ทำงานแม้การ์ดยังทยอย render อยู่)
+    listEl.addEventListener('click', (e) => {
+      const del = e.target.closest('[data-del]'); if (!del) return;
+      if (confirm('ลบรายการนี้?')) { isVax ? S.removeVaxPricePkg(del.dataset.del) : S.removeDeliveryPkg(del.dataset.del); MB.go('prices', { tab, province }); }
     });
+
     const search = root.querySelector('#prov-search');
     search.oninput = () => {
       const q = search.value.trim().toLowerCase();
-      root.querySelectorAll('#price-list [data-search]').forEach(c => {
+      listEl.querySelectorAll('[data-search]').forEach(c => {
         c.style.display = !q || c.getAttribute('data-search').toLowerCase().includes(q) ? '' : 'none';
       });
     };
