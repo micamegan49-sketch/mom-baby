@@ -149,6 +149,20 @@ window.MB = window.MB || {};
     window.scrollTo(0, 0);
   }
 
+  /* ลิงก์ลึกผ่าน URL hash เช่น #develop (บทความ/ความรู้), #pregnancy, #prices, #vaccine
+     ใช้ให้ลิงก์ภายนอก (ริชเมนู LINE/เพจ) เปิดตรงไปยังหน้าที่ต้องการ */
+  function routeFromHash() {
+    const h = (location.hash || '').replace(/^#\/?/, '').trim();
+    if (!h) return false;
+    const [name, qs] = h.split('?');
+    const params = {};
+    if (qs) qs.split('&').forEach(kv => { const [k, v] = kv.split('='); if (k) params[k] = decodeURIComponent(v || ''); });
+    const alias = { articles: ['develop', { tab: 'articles' }], knowledge: ['develop', null], vaccine: ['vax', null], vaccines: ['vax', null], cost: ['prices', null] };
+    if (alias[name]) { go(alias[name][0], alias[name][1] || params); return true; }
+    if (MB.views[name]) { go(name, params); return true; }
+    return false;
+  }
+
   function renderAppbar() {
     const bar = document.getElementById('appbar');
     const child = S.activeChild();
@@ -202,7 +216,8 @@ window.MB = window.MB || {};
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); MB._installPrompt = e; });
 
   document.addEventListener('DOMContentLoaded', () => {
-    render();
+    if (!routeFromHash()) render();
+    window.addEventListener('hashchange', routeFromHash);
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
