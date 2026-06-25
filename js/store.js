@@ -117,6 +117,10 @@ window.MB = window.MB || {};
       else v[vid] = { done: true, date: doneDate || todayISO() };
       save();
     },
+    setVaxDate(childId, vid, date) {
+      const v = store.vax(childId);
+      if (v[vid] && v[vid].done) { v[vid].date = date || todayISO(); save(); }
+    },
 
     // ---------- พัฒนาการ ----------
     ms(childId) { return state.msByChild[childId] || (state.msByChild[childId] = {}); },

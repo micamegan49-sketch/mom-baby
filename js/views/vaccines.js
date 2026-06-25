@@ -93,8 +93,41 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelectorAll('[data-f]').forEach(c => c.onclick = () => MB.go('vax', { filter: c.dataset.f }));
     root.querySelector('#vax-price').onclick = () => MB.go('prices', { tab: 'vaccine' });
     root.querySelectorAll('[data-tog]').forEach(n => n.onclick = () => {
-      S.toggleVax(child.id, n.dataset.tog);
-      MB.rerender({ filter });
+      const x = all.find(v => v.id === n.dataset.tog);
+      if (x) openVaxSheet(child, x, filter);
     });
   };
+
+  /* ชีตบันทึกการฉีด — เลือก/แก้ "วันที่ฉีดจริง" ได้ */
+  function openVaxSheet(child, x, filter) {
+    const today = S.todayISO();
+    const doneDate = x.doneDate || today;
+    MB.sheet({
+      title: '💉 ' + x.name,
+      html: x.done ? `
+        <div class="disclaimer" style="background:#E6F3E9;border-color:#BFE3C6;margin:0 0 14px">✅ ฉีดแล้วเมื่อ <b>${U.fmtDateTH(doneDate)}</b></div>
+        <div class="field"><label>แก้ไขวันที่ฉีด</label><input id="vx-date" type="date" value="${doneDate}" max="${today}" /></div>
+        <button class="btn" id="vx-savedate">บันทึกวันที่ใหม่</button>
+        <button class="btn ghost" id="vx-undo" style="margin-top:10px;color:#D9737A">↩️ ยังไม่ได้ฉีด (ยกเลิก)</button>`
+      : `
+        <p class="muted" style="font-size:13px;margin:0 0 12px">${U.esc(x.dose)} · ${U.esc(x.info)}</p>
+        <div class="field"><label>วันที่ฉีดจริง</label><input id="vx-date" type="date" value="${today}" max="${today}" /></div>
+        <button class="btn" id="vx-done">✅ บันทึกว่าฉีดแล้ว</button>`,
+      onMount(rt) {
+        const q = id => rt.querySelector('#' + id);
+        const dateVal = () => (q('vx-date') && q('vx-date').value) || today;
+        if (q('vx-done')) q('vx-done').onclick = () => {
+          S.toggleVax(child.id, x.id, dateVal());
+          MB.closeSheet(); MB.toast('บันทึกการฉีดแล้ว 💉'); MB.rerender({ filter });
+        };
+        if (q('vx-savedate')) q('vx-savedate').onclick = () => {
+          S.setVaxDate(child.id, x.id, dateVal());
+          MB.closeSheet(); MB.toast('แก้วันที่ฉีดแล้ว ✓'); MB.rerender({ filter });
+        };
+        if (q('vx-undo')) q('vx-undo').onclick = () => {
+          if (confirm('ยกเลิกว่ายังไม่ได้ฉีดวัคซีนนี้?')) { S.toggleVax(child.id, x.id); MB.closeSheet(); MB.rerender({ filter }); }
+        };
+      }
+    });
+  }
 })();

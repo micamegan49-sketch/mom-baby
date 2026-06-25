@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v22';
+const CACHE = 'tuajiw-v23';
 const ASSETS = [
   './',
   './index.html',
