@@ -139,6 +139,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="divider"></div>
         <p style="margin:0 0 8px"><b>👶 พัฒนาการลูก:</b> ${wk.baby}</p>
         <p style="margin:0"><b>🤰 ร่างกายคุณแม่:</b> ${wk.mom}</p>
+        ${MB.citeBlock('pregnancy')}
         <div class="btn-row" style="margin-top:14px">
           <button class="btn ghost sm" id="wk-prev">‹ ก่อนหน้า</button>
           ${viewWeek !== curWeek ? '<button class="btn ghost sm" id="wk-now">กลับสัปดาห์นี้</button>' : ''}

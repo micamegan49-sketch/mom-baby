@@ -108,6 +108,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         </div>`;
       }).join('')}</div>` : '<div class="empty"><div class="em">📏</div><p>ยังไม่มีข้อมูล เริ่มบันทึกน้ำหนัก/ส่วนสูงได้เลย</p></div>'}
       <div class="disclaimer">เกณฑ์อ้างอิงอิง WHO Child Growth Standards (ค่าโดยประมาณ) ใช้ดู “แนวโน้ม” การเติบโต ไม่ใช่การวินิจฉัย หากกราฟตก/แบนผิดปกติ ควรปรึกษากุมารแพทย์</div>
+      ${MB.citeBlock('growth')}
     `;
 
     const canvas = root.querySelector('#chart');

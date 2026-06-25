@@ -100,13 +100,33 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="section-title">☁️ บัญชี & ซิงค์ข้ามเครื่อง</div>
       <div class="card" id="cloud-card"></div>
 
+      <div class="section-title">📚 แหล่งอ้างอิงทางการแพทย์</div>
+      <div class="card">
+        <p class="muted" style="font-size:13px;margin:0 0 10px">ข้อมูลสุขภาพในแอพอ้างอิงจากแหล่งที่น่าเชื่อถือต่อไปนี้ (แตะเพื่อเปิดดูที่มา)</p>
+        <div id="sources-list"></div>
+      </div>
+
       <div class="section-title">ℹ️ เกี่ยวกับ</div>
       <div class="card">
         <p style="margin:0 0 8px;font-weight:700">ตัวจิ๋ว 👣 v1.0</p>
-        <p class="muted" style="font-size:13px;margin:0">แอพดูแลคุณแม่และลูกน้อย ทำงานบนเครื่องของคุณ ข้อมูลเก็บในเครื่องนี้เท่านั้น ใช้งานออฟไลน์ได้</p>
-        <div class="disclaimer" style="margin-top:12px">⚠️ ข้อมูลในแอพ (วัคซีน เกณฑ์เติบโต พัฒนาการ บทความ) เป็นข้อมูลอ้างอิงทั่วไปเพื่อความรู้ ไม่ใช่คำวินิจฉัยทางการแพทย์ กรุณายึดสมุดสุขภาพเด็กและคำแนะนำของแพทย์เป็นหลักเสมอ</div>
+        <p class="muted" style="font-size:13px;margin:0">แอพดูแลคุณแม่และลูกน้อย ทำงานบนเครื่องของคุณ ข้อมูลเก็บในเครื่องนี้เท่านั้น ใช้งานออฟไลน์ได้ — ไม่จำเป็นต้องสมัครบัญชี (การซิงค์คลาวด์เป็นทางเลือก)</p>
+        <div class="disclaimer" style="margin-top:12px">⚠️ <b>ข้อมูลเพื่อความรู้ทั่วไป ไม่ใช่คำแนะนำทางการแพทย์</b> — ข้อมูลในแอพ (วัคซีน เกณฑ์เติบโต พัฒนาการ การตั้งครรภ์ บทความ) เป็นข้อมูลอ้างอิงทั่วไป ไม่ใช่คำวินิจฉัยหรือคำแนะนำเฉพาะบุคคล กรุณายึดสมุดสุขภาพเด็กและคำแนะนำของแพทย์เป็นหลักเสมอ ดูแหล่งอ้างอิงด้านบน</div>
+        <a href="https://micamegan49-sketch.github.io/mom-baby/support.html" target="_blank" rel="noopener noreferrer"
+          class="btn ghost" style="margin-top:12px;display:block;text-decoration:none;text-align:center">💬 ความช่วยเหลือ & ติดต่อเรา</a>
       </div>
     `;
+
+    /* แหล่งอ้างอิง: เรนเดอร์รายการพร้อมลิงก์ (citations – ข้อกำหนด App Store 1.4.1) */
+    const srcBox = root.querySelector('#sources-list');
+    if (srcBox && MB.SOURCES) {
+      srcBox.innerHTML = (MB.SOURCE_KEYS || Object.keys(MB.SOURCES)).map(k => {
+        const s = MB.SOURCES[k]; if (!s) return '';
+        const links = s.items.map(it =>
+          `<a href="${it.url}" target="_blank" rel="noopener noreferrer" style="display:block;color:#8B5E4B;text-decoration:underline;font-size:13px;margin:3px 0;word-break:break-word">• ${it.name} ↗</a>`
+        ).join('');
+        return `<div style="margin-bottom:12px"><div style="font-weight:700;font-size:14px;margin-bottom:2px">${s.title}</div>${links}</div>`;
+      }).join('');
+    }
 
     root.querySelector('#add-baby').onclick = () => MB.views.editChild(null);
     root.querySelectorAll('[data-edit]').forEach(n => n.onclick = () => {
@@ -226,18 +246,38 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         await MB.cloud.saveConfig(url, key); MB.toast('บันทึกแล้ว'); paintCloud();
       };
       if ($('su-edit')) $('su-edit').onclick = () => { MB.cloud.clearConfig(); paintCloud(); };
-      if ($('su-login')) $('su-login').onclick = async () => {
-        try { await MB.cloud.signIn($('su-email').value.trim(), $('su-pw').value); MB.toast('เข้าสู่ระบบแล้ว 🎉'); }
-        catch (e) { MB.toast(errTH(e)); }
-        paintCloud();
-      };
-      if ($('su-signup')) $('su-signup').onclick = async () => {
+      async function doAuth(mode) {
+        const email = $('su-email') ? $('su-email').value.trim() : '';
+        const pw = $('su-pw') ? $('su-pw').value : '';
+        // ตรวจช่องว่างก่อน เพื่อให้ปุ่มตอบสนองทันทีเสมอ (ไม่กดแล้วเงียบ)
+        if (!email) { MB.toast('กรอกอีเมลก่อนนะ'); if ($('su-email')) $('su-email').focus(); return; }
+        if (!pw) { MB.toast('กรอกรหัสผ่านก่อนนะ'); if ($('su-pw')) $('su-pw').focus(); return; }
+        if (pw.length < 6) { MB.toast('รหัสผ่านอย่างน้อย 6 ตัว'); if ($('su-pw')) $('su-pw').focus(); return; }
+        const loginBtn = $('su-login'), signBtn = $('su-signup');
+        const btn = mode === 'signup' ? signBtn : loginBtn;
+        const label = btn ? btn.textContent : '';
+        if (loginBtn) loginBtn.disabled = true;
+        if (signBtn) signBtn.disabled = true;
+        if (btn) btn.textContent = mode === 'signup' ? 'กำลังสมัคร…' : 'กำลังเข้าสู่ระบบ…';
         try {
-          const r = await MB.cloud.signUp($('su-email').value.trim(), $('su-pw').value);
-          MB.toast(r && r.session ? 'สมัครและเข้าสู่ระบบแล้ว 🎉' : 'สมัครแล้ว — ตรวจสอบอีเมลเพื่อยืนยันก่อนเข้าสู่ระบบ');
-        } catch (e) { MB.toast(errTH(e)); }
+          if (mode === 'signup') {
+            const r = await MB.cloud.signUp(email, pw);
+            MB.toast(r && r.session ? 'สมัครและเข้าสู่ระบบแล้ว 🎉' : 'สมัครแล้ว — โปรดตรวจอีเมลเพื่อยืนยัน แล้วกด “เข้าสู่ระบบ”');
+          } else {
+            await MB.cloud.signIn(email, pw);
+            MB.toast('เข้าสู่ระบบแล้ว 🎉');
+          }
+        } catch (e) {
+          if (loginBtn) loginBtn.disabled = false;
+          if (signBtn) signBtn.disabled = false;
+          if (btn) btn.textContent = label;
+          MB.toast(errTH(e));
+          return;
+        }
         paintCloud();
-      };
+      }
+      if ($('su-login')) $('su-login').onclick = () => doAuth('login');
+      if ($('su-signup')) $('su-signup').onclick = () => doAuth('signup');
       if ($('su-sync')) $('su-sync').onclick = () => MB.cloud.syncNow();
       if ($('su-pull')) $('su-pull').onclick = () => MB.cloud.pullForce();
       if ($('su-push')) $('su-push').onclick = () => MB.cloud.pushForce();

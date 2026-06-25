@@ -117,7 +117,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
             </div>`;
           }).join('')}
         </div>`;
-    }).join('') + `<div class="disclaimer">เด็กแต่ละคนมีจังหวะพัฒนาการต่างกัน ใช้เป็นแนวทางคร่าว ๆ หากกังวลหรือพบสัญญาณธงแดง ควรปรึกษาแพทย์</div>`;
+    }).join('') + `<div class="disclaimer">เด็กแต่ละคนมีจังหวะพัฒนาการต่างกัน ใช้เป็นแนวทางคร่าว ๆ หากกังวลหรือพบสัญญาณธงแดง ควรปรึกษาแพทย์</div>` + MB.citeBlock('develop');
   }
 
   function renderArticles(cat) {

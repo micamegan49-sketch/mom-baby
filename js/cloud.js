@@ -180,7 +180,12 @@ window.MB = window.MB || {};
     },
 
     async init(reinit) {
-      if (!window.supabase) { emit(); return; }
+      if (!window.supabase) {
+        // เผื่อสคริปต์ supabase ยังโหลดไม่เสร็จ — ลองใหม่เป็นระยะ (สูงสุด ~6 วินาที)
+        if ((MB.cloud._waitTries = (MB.cloud._waitTries || 0) + 1) <= 40)
+          setTimeout(() => { try { MB.cloud.init(reinit); } catch (e) {} }, 150);
+        emit(); return;
+      }
       const c = cfg();
       if (!c) { emit(); return; }
       if (client && !reinit) { emit(); return; }

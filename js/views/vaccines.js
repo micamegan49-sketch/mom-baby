@@ -88,6 +88,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           </div>`).join('')}
         </div>`).join('')}
       <div class="disclaimer">อ้างอิงตารางสร้างเสริมภูมิคุ้มกันโรค (EPI) ของไทยโดยประมาณ กำหนดการจริงและวัคซีนเสริมขึ้นกับนโยบายปีนั้น ๆ และดุลยพินิจแพทย์ — โปรดยึดสมุดสุขภาพเด็กเป็นหลัก</div>
+      ${MB.citeBlock('vaccine')}
     `;
     root.querySelectorAll('[data-f]').forEach(c => c.onclick = () => MB.go('vax', { filter: c.dataset.f }));
     root.querySelector('#vax-price').onclick = () => MB.go('prices', { tab: 'vaccine' });

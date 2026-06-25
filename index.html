@@ -38,8 +38,10 @@
   <script src="js/data/fruitart.js"></script>
   <script src="js/data/babycost.js"></script>
   <script src="js/data/groups.js"></script>
+  <script src="js/data/sources.js"></script>
   <!-- คลาวด์ (ทางเลือก – ใช้ไม่ได้ตอนออฟไลน์ แต่แอพยังทำงานปกติ) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- โหลด supabase แบบ local (bundle ในแอพ) ไม่พึ่ง CDN เพื่อให้ใช้งานได้เสมอแม้เน็ตช้า/ถูกบล็อก -->
+  <script src="js/lib/supabase.js"></script>
   <script src="js/data/supabase-config.js"></script>
   <!-- แกนหลัก -->
   <script src="js/app.js"></script>

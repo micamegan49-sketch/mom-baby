@@ -36,7 +36,12 @@ android/app/release/
 android/local.properties
 android/.idea/
 android/capacitor-cordova-android-plugins/
-# 🔐 ห้าม commit keystore/รหัสเซ็นแอป เด็ดขาด (เก็บไว้ที่ปลอดภัย สำรองหลายที่)
+# 🔐 ห้าม commit keystore/รหัสเซ็นแอป/คีย์ API เด็ดขาด (เก็บไว้ที่ปลอดภัย สำรองหลายที่)
 *.keystore
 *.jks
 keystore.properties
+*.p8
+AuthKey_*.p8
+.env
+.env.*
+signing/
