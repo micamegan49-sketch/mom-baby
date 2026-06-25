@@ -199,7 +199,12 @@ window.MB = window.MB || {};
     const view = document.getElementById('view');
     view.innerHTML = '';
     const fn = MB.views[current] || MB.views.home;
-    fn(view, params);
+    // กัน view ใดพังแล้วทำให้ทั้งหน้า "กดอะไรก็ไม่ไป" — แท็บล่างยังนำทางได้เสมอ
+    try { fn(view, params); }
+    catch (e) {
+      view.innerHTML = '<div class="empty"><div class="em">⚠️</div><p>หน้านี้ขัดข้องชั่วคราว<br/>ลองแตะเมนูอื่นด้านล่าง หรือปิด-เปิดแอปใหม่</p></div>';
+      try { console.error('view render error:', e); } catch (_) {}
+    }
   }
 
   /* ============ เปิดเผย API ============ */
@@ -218,8 +223,17 @@ window.MB = window.MB || {};
   document.addEventListener('DOMContentLoaded', () => {
     if (!routeFromHash()) render();
     window.addEventListener('hashchange', routeFromHash);
+    // แอปเนทีฟ (Capacitor) บันเดิลไฟล์เองอยู่แล้ว — ไม่ใช้ service worker (กันแคชค้าง/โหลดหน้าค้าง)
+    // เว็บ/PWA ยังใช้ SW ตามปกติ เพื่อใช้งานออฟไลน์
+    var isNative = !!(window.Capacitor && (typeof window.Capacitor.isNativePlatform === 'function'
+      ? window.Capacitor.isNativePlatform() : window.Capacitor.isNativePlatform));
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
+      if (isNative) {
+        navigator.serviceWorker.getRegistrations()
+          .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+      } else {
+        navigator.serviceWorker.register('./sw.js').catch(function () {});
+      }
     }
   });
 })();
