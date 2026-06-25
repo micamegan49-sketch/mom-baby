@@ -321,8 +321,23 @@ window.MB = window.MB || {};
     }
   };
 
+  /* โหลดไลบรารี Supabase (204KB) แบบ lazy — ไม่บล็อกการเปิดแอพ
+     โหลดเบื้องหลังหลังแอพพร้อมแล้ว (ฟีเจอร์ซิงค์เป็นทางเลือก ใช้ไม่บ่อย) */
+  function loadSupabaseThenInit() {
+    if (window.supabase) { MB.cloud.init(); return; }
+    var s = document.createElement('script');
+    s.src = './js/lib/supabase.js';
+    s.async = true;
+    s.onload = function () { try { MB.cloud.init(); } catch (e) {} };
+    s.onerror = function () {};
+    document.head.appendChild(s);
+  }
+  function bootCloud() {
+    var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1200); };
+    idle(loadSupabaseThenInit);
+  }
   if (document.readyState === 'loading')
-    document.addEventListener('DOMContentLoaded', () => MB.cloud.init());
+    document.addEventListener('DOMContentLoaded', bootCloud);
   else
-    MB.cloud.init();
+    bootCloud();
 })();
