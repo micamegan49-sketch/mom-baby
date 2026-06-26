@@ -38,8 +38,13 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
   function linkRow(x) {
     let html = '';
-    // ภาพแพ็กเกจที่โรงพยาบาล/คลินิกทำไว้ (แตะเพื่อดูเต็ม) — แทนลิงก์แหล่งข้อมูลเดิม
-    if (x.img) html += `<a href="${U.esc(x.img)}" target="_blank" rel="noopener" style="display:block;margin-top:10px"><img src="${U.esc(x.img)}" alt="ภาพแพ็กเกจ" loading="lazy" style="width:100%;border-radius:12px;border:1px solid var(--line);display:block" /></a>`;
+    // หลัก: ภาพแพ็กเกจที่โรงพยาบาล/คลินิกทำไว้ (แตะดูเต็ม)
+    if (x.img) {
+      html += `<a href="${U.esc(x.img)}" target="_blank" rel="noopener" style="display:block;margin-top:10px"><img src="${U.esc(x.img)}" alt="ภาพแพ็กเกจ" loading="lazy" style="width:100%;border-radius:12px;border:1px solid var(--line);display:block" /></a>`;
+    } else if (x.url) {
+      // แผนสำรอง: ยังไม่มีรูปแพ็กเกจ → ลิงก์ไปดูที่เว็บโรงพยาบาลแทน
+      html += `<div style="margin-top:8px;font-size:12.5px"><a href="${U.esc(x.url)}" target="_blank" rel="noopener">🔗 ดูแพ็กเกจจากเว็บโรงพยาบาล</a></div>`;
+    }
     if (x.phone) html += `<div style="margin-top:8px;font-size:12.5px"><a href="tel:${U.esc(String(x.phone).replace(/\s/g, ''))}">📞 ${U.esc(x.phone)}</a></div>`;
     if (x.userAdded) html += `<div style="text-align:right;margin-top:4px"><span data-del="${x.id}" style="color:#D9737A;font-size:12px;cursor:pointer">ลบรายการนี้</span></div>`;
     return html;
