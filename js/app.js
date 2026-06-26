@@ -55,17 +55,19 @@ window.MB = window.MB || {};
 
   /* ข้อมูลอายุครรภ์ */
   function pregInfo(preg) {
-    let edd = preg.edd;
-    if (!edd && preg.lmp) edd = addDays(preg.lmp, 280);
+    let edd = preg.edd, lmp = preg.lmp;
+    if (!edd && lmp) edd = addDays(lmp, 280);
     if (!edd) return null;
     const today = startOfToday(), eddDate = parseISO(edd);
     const daysLeft = Math.round((eddDate - today) / 86400000);
-    const daysPreg = 280 - daysLeft;
+    // อายุครรภ์ยึด "ประจำเดือนครั้งสุดท้าย (LMP)" เป็นหลัก = อายุครรภ์จริง
+    // ไม่เพี้ยนตามวันนัดผ่าคลอด/วันคลอดที่หมอกำหนด (ถ้าไม่มี LMP ค่อยคิดจากกำหนดคลอด = 40 สัปดาห์)
+    const daysPreg = lmp ? Math.round((today - parseISO(lmp)) / 86400000) : (280 - daysLeft);
     let week = Math.floor(daysPreg / 7);
     let day = ((daysPreg % 7) + 7) % 7;
     week = Math.max(0, Math.min(42, week));
     const trimester = week < 14 ? 1 : week < 28 ? 2 : 3;
-    return { edd, eddDate, daysLeft, daysPreg, week, day, trimester };
+    return { edd, eddDate, daysLeft, daysPreg, week, day, trimester, lmp };
   }
 
   function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
