@@ -37,24 +37,19 @@ button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; font-size: 16px; }
 a { color: var(--pink-deep); }
 
-/* ===== Layout (app-shell: หน้าจอล็อก, ให้ส่วนเนื้อหาเลื่อนเอง → เมนูล่างนิ่ง ไม่เด้งบน iOS) ===== */
-html, body { height: 100%; }
-body { overflow: hidden; }
+/* ===== Layout (เลื่อนแบบเอกสารปกติ — เสถียรบนมือถือทุกเครื่อง) ===== */
 #app {
   max-width: var(--maxw);
   margin: 0 auto;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
   background: var(--cream);
   position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  padding-bottom: 86px;   /* เผื่อพื้นที่ให้แถบเมนูล่าง (position: fixed) */
 }
 
 .appbar {
-  flex: 0 0 auto;
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 40;
   background: linear-gradient(135deg, var(--brown) 0%, #A06F58 60%, var(--pink-deep) 130%);
   color: #fff;
@@ -94,14 +89,7 @@ body { overflow: hidden; }
 }
 .appbar .child-pill span.nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.view {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  padding: 16px 16px 24px;
-  animation: fade .25s ease;
-}
+.view { padding: 16px 16px 8px; animation: fade .25s ease; }
 @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .section-title {
@@ -233,9 +221,8 @@ body { overflow: hidden; }
 
 /* ===== Bottom nav ===== */
 .tabbar {
-  flex: 0 0 auto;
-  position: relative;
-  width: 100%;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 0;
+  width: 100%; max-width: var(--maxw);
   background: rgba(255,255,255,.98);
   border-top: 1px solid var(--line);
   display: flex; justify-content: space-around;

@@ -145,8 +145,7 @@ window.MB = window.MB || {};
   function go(route, params) {
     current = route;
     render(params);
-    const v = document.getElementById('view');
-    if (v) v.scrollTop = 0;            // เลื่อนเนื้อหาขึ้นบนสุดเมื่อเปลี่ยนหน้า (ตัวเลื่อนคือ .view)
+    window.scrollTo(0, 0);            // เลื่อนขึ้นบนสุดเมื่อเปลี่ยนหน้า (เลื่อนแบบเอกสารปกติ)
   }
 
   /* ลิงก์ลึกผ่าน URL hash เช่น #develop (บทความ/ความรู้), #pregnancy, #prices, #vaccine
@@ -197,9 +196,6 @@ window.MB = window.MB || {};
   }
 
   function render(params) {
-    // คงตำแหน่งเลื่อนไว้เมื่อเรนเดอร์ซ้ำหน้าเดิม (go() จะรีเซ็ตเป็น 0 เองตอนเปลี่ยนหน้า)
-    const prev = document.getElementById('view');
-    const keepScroll = prev ? prev.scrollTop : 0;
     renderAppbar();
     renderTabbar();
     const view = document.getElementById('view');
@@ -211,7 +207,6 @@ window.MB = window.MB || {};
       view.innerHTML = '<div class="empty"><div class="em">⚠️</div><p>หน้านี้ขัดข้องชั่วคราว<br/>ลองแตะเมนูอื่นด้านล่าง หรือปิด-เปิดแอปใหม่</p></div>';
       try { console.error('view render error:', e); } catch (_) {}
     }
-    view.scrollTop = keepScroll;
   }
 
   /* ============ แจ้งเตือน (รวมศูนย์) ============ */
