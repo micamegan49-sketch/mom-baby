@@ -157,7 +157,7 @@ window.MB = window.MB || {};
     const [name, qs] = h.split('?');
     const params = {};
     if (qs) qs.split('&').forEach(kv => { const [k, v] = kv.split('='); if (k) params[k] = decodeURIComponent(v || ''); });
-    const alias = { articles: ['develop', { tab: 'articles' }], knowledge: ['develop', null], vaccine: ['vax', null], vaccines: ['vax', null], cost: ['prices', null] };
+    const alias = { articles: ['develop', { tab: 'articles' }], knowledge: ['develop', null], vaccine: ['vax', null], vaccines: ['vax', null], cost: ['prices', null], raising: ['prices', { tab: 'raising' }] };
     if (alias[name]) { go(alias[name][0], alias[name][1] || params); return true; }
     if (MB.views[name]) { go(name, params); return true; }
     return false;

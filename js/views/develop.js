@@ -11,9 +11,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       { k: 'articles',  em: '📖', label: 'บทความ' },
       { k: 'faq',       em: '💬', label: 'ถาม-ตอบ' },
       { k: 'cost',      em: '💰', label: 'ค่าใช้จ่าย' },
-      { k: 'pump',      em: '🍼', label: 'ปั๊มนม' },
-      { k: 'diaper',    em: '🧷', label: 'แพมเพิส' },
-      { k: 'formula',   em: '🥛', label: 'นมผง' },
       { k: 'groups',    em: '🤝', label: 'กลุ่มแม่' }
     ];
     return `<div class="chips" style="margin-bottom:14px">
@@ -24,7 +21,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelectorAll('[data-knav]').forEach(c => c.onclick = () => {
       const k = c.dataset.knav;
       if (k === 'cost') MB.go('prices', { tab: 'delivery' });
-      else if (['pump', 'diaper', 'formula', 'groups'].includes(k)) MB.go(k);
+      else if (k === 'groups') MB.go('groups');
       else MB.go('develop', { tab: k });
     });
   };

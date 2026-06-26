@@ -46,19 +46,105 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     return html;
   }
 
-  /* แท็บย่อยของหน้า "ค่าใช้จ่าย": ค่าคลอด · ค่าวัคซีน · ประกัน */
+  /* แท็บย่อยของหน้า "ค่าใช้จ่าย": ค่าคลอด · ค่าวัคซีน · ประกัน · ปั๊มนม · แพมเพิส · นมผง
+     ค่าคลอด/ค่าวัคซีน/ประกัน เรนเดอร์ในเราต์ prices ส่วน ปั๊มนม/แพมเพิส/นมผง เป็นเราต์ของตัวเอง (babycost.js) */
+  const COST_SUBS = [
+    { k: 'raising', em: '🧮', label: 'ค่าเลี้ยงลูก' },
+    { k: 'delivery', em: '🏥', label: 'ค่าคลอด' },
+    { k: 'vaccine', em: '💉', label: 'ค่าวัคซีน' },
+    { k: 'insurance', em: '🛡️', label: 'ประกัน' },
+    { k: 'pump', em: '🍼', label: 'ปั๊มนม' },
+    { k: 'diaper', em: '🧷', label: 'แพมเพิส' },
+    { k: 'formula', em: '🥛', label: 'นมผง' }
+  ];
   function costSubbar(tab) {
-    const subs = [
-      { k: 'delivery', em: '🏥', label: 'ค่าคลอด' },
-      { k: 'vaccine', em: '💉', label: 'ค่าวัคซีน' },
-      { k: 'insurance', em: '🛡️', label: 'ประกัน' }
-    ];
-    return `<div class="chips" style="margin:0 0 14px;justify-content:space-between">
-      ${subs.map(s => `<div class="chip ${tab === s.k ? 'active' : ''}" data-cost="${s.k}" style="flex:1;justify-content:center;text-align:center">${s.em} ${s.label}</div>`).join('')}
+    return `<div class="chips" style="margin:0 0 14px">
+      ${COST_SUBS.map(s => `<div class="chip ${tab === s.k ? 'active' : ''}" data-cost="${s.k}">${s.em} ${s.label}</div>`).join('')}
     </div>`;
   }
   function wireCostSubbar(root) {
-    root.querySelectorAll('[data-cost]').forEach(b => b.onclick = () => MB.go('prices', { tab: b.dataset.cost }));
+    root.querySelectorAll('[data-cost]').forEach(b => b.onclick = () => {
+      const k = b.dataset.cost;
+      if (['delivery', 'vaccine', 'insurance', 'raising'].includes(k)) MB.go('prices', { tab: k });
+      else MB.go(k);   // pump / diaper / formula → เราต์ของตัวเอง
+    });
+  }
+  MB.costSubbar = costSubbar;            // ให้ babycost.js (ปั๊มนม/แพมเพิส/นมผง) ใช้แถบเดียวกันได้
+  MB.wireCostSubbar = wireCostSubbar;
+
+  /* แท็บ "ค่าเลี้ยงลูก 1 คน" — เครื่องคำนวณประมาณการค่าใช้จ่ายแรกเกิด→จบป.ตรี
+     ตัวเลขเป็นค่าประมาณการ (รวมค่ากิน-อยู่-เรียน) อิงช่วงที่พบบ่อยในไทย ปี 2568 — ปรับได้ตามไลฟ์สไตล์ */
+  const RAISE = {
+    tiers: [
+      { k: 'low',  label: 'ประหยัด', sub: 'ร.ร.รัฐ · ใช้สิทธิบัตรทอง/ประกันสังคม', once: 30000,  m: [4000, 4000, 5000, 5000, 6000, 7000, 9000] },
+      { k: 'mid',  label: 'ปานกลาง', sub: 'ร.ร.เอกชนทั่วไป',                       once: 80000,  m: [8000, 8000, 12000, 13000, 15000, 16000, 18000] },
+      { k: 'high', label: 'พรีเมียม', sub: 'ร.ร.อินเตอร์ / ทุกอย่างพรีเมียม',        once: 150000, m: [15000, 18000, 35000, 50000, 60000, 70000, 60000] }
+    ],
+    stages: [
+      { label: '0–1 ปี',   sub: 'นม แพมเพิส ของใช้ วัคซีน',  months: 12 },
+      { label: '1–3 ปี',   sub: 'อาหาร ของเล่น เนอสเซอรี่',  months: 24 },
+      { label: '3–6 ปี',   sub: 'ชั้นอนุบาล',                months: 36 },
+      { label: '6–12 ปี',  sub: 'ชั้นประถม',                 months: 72 },
+      { label: '12–15 ปี', sub: 'มัธยมต้น',                  months: 36 },
+      { label: '15–18 ปี', sub: 'มัธยมปลาย',                 months: 36 },
+      { label: '18–22 ปี', sub: 'มหาวิทยาลัย (ป.ตรี)',       months: 48 }
+    ]
+  };
+  function renderRaising(root, params) {
+    const tier = RAISE.tiers.find(t => t.k === ((params && params.tier) || 'mid')) || RAISE.tiers[1];
+    const fmt = n => Math.round(n).toLocaleString('en-US');
+    let total = tier.once;
+    const rows = RAISE.stages.map((s, i) => { const sub = tier.m[i] * s.months; total += sub; return { s, perMonth: tier.m[i], sub }; });
+    const totalMonths = RAISE.stages.reduce((a, s) => a + s.months, 0);   // 264 เดือน (~22 ปี)
+    const avgMonth = Math.round(total / totalMonths / 100) * 100;
+    const millions = (total / 1000000).toFixed(total >= 1000000 ? 1 : 2);
+
+    root.innerHTML = `
+      ${MB.knowledgeChips('cost')}
+      ${costSubbar('raising')}
+      <div class="hero" style="padding:14px 16px"><div class="emoji">🧮</div>
+        <div style="flex:1"><h2 style="font-size:18px">ค่าเลี้ยงลูก 1 คน</h2><p>ประมาณการแรกเกิด → จบปริญญาตรี</p></div></div>
+
+      <div class="chips" style="margin:2px 0 12px">
+        ${RAISE.tiers.map(t => `<div class="chip ${t.k === tier.k ? 'active' : ''}" data-tier="${t.k}">${t.label}</div>`).join('')}
+      </div>
+
+      <div class="card tint" style="text-align:center;padding:18px 16px">
+        <div class="muted" style="font-size:12.5px">${U.esc(tier.label)} · ${U.esc(tier.sub)}</div>
+        <div style="font-size:30px;font-weight:800;color:var(--brown);margin:4px 0">≈ ${millions} ล้านบาท</div>
+        <div class="muted" style="font-size:12.5px">ตั้งแต่แรกเกิดจนจบ ป.ตรี (~22 ปี)</div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:center;gap:24px">
+          <div><div style="font-size:18px;font-weight:800;color:var(--pink-deep)">${fmt(avgMonth)}</div><div class="muted" style="font-size:11.5px">บาท/เดือน (เฉลี่ย)</div></div>
+          <div><div style="font-size:18px;font-weight:800;color:var(--pink-deep)">${fmt(total)}</div><div class="muted" style="font-size:11.5px">บาท (รวมทั้งหมด)</div></div>
+        </div>
+      </div>
+
+      <div class="section-title">📋 แยกตามช่วงวัย</div>
+      <div class="card" style="padding:6px 14px">
+        <div class="list-item" style="border-bottom:1px solid var(--line)">
+          <div class="ic" style="background:var(--cream-2)">👶</div>
+          <div class="body"><div class="t">ค่าคลอด + ของแรกเกิด</div><div class="s">จ่ายครั้งเดียว (เปล/คาร์ซีท/รถเข็น ฯลฯ)</div></div>
+          <b style="color:var(--brown);white-space:nowrap">${fmt(tier.once)}</b>
+        </div>
+        ${rows.map(r => `<div class="list-item" style="border-bottom:1px solid var(--line)">
+          <div class="ic" style="background:var(--cream-2)">📅</div>
+          <div class="body"><div class="t">${U.esc(r.s.label)} <span class="muted" style="font-weight:400;font-size:12px">${U.esc(r.s.sub)}</span></div>
+            <div class="s">~${fmt(r.perMonth)} บาท/เดือน × ${r.s.months} เดือน</div></div>
+          <b style="color:var(--brown);white-space:nowrap">${fmt(r.sub)}</b>
+        </div>`).join('')}
+        <div class="list-item" style="border-bottom:none">
+          <div class="ic" style="background:var(--pink-soft)">💰</div>
+          <div class="body"><div class="t">รวมทั้งหมด</div><div class="s">เฉลี่ย ~${fmt(avgMonth)} บาท/เดือน</div></div>
+          <b style="color:var(--pink-deep);white-space:nowrap;font-size:15px">${fmt(total)}</b>
+        </div>
+      </div>
+
+      <div class="disclaimer">🧮 ตัวเลขเป็น <b>ค่าประมาณการเพื่อวางแผนเท่านั้น</b> รวมค่ากิน-อยู่-เรียนคร่าว ๆ อิงช่วงที่พบบ่อยในไทย (ปี 2568) ค่าใช้จ่ายจริงต่างกันมากตามจังหวัด โรงเรียน ไลฟ์สไตล์ และเงินเฟ้อ — ไม่ใช่คำแนะนำการเงินเฉพาะบุคคล</div>
+    `;
+    MB.wireKnowledgeChips(root);
+    wireCostSubbar(root);
+    root.querySelectorAll('[data-tier]').forEach(c => c.onclick = () => MB.go('prices', { tab: 'raising', tier: c.dataset.tier }));
   }
 
   /* แท็บ "ประกัน" (ย้ายมารวมไว้ในหน้าค่าใช้จ่าย) */
@@ -104,6 +190,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
   MB.views.prices = function (root, params) {
     const tab = (params && params.tab) || 'delivery';
+    if (tab === 'raising') return renderRaising(root, params);
     if (tab === 'insurance') return renderInsurance(root, params);
     const province = (params && params.province) || '';
     const isVax = tab === 'vaccine';
@@ -149,10 +236,11 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="field"><label>เลือกจังหวัด</label>${provinceSelect(province)}</div>
       <div class="field"><input id="prov-search" placeholder="🔍 ค้นชื่อโรงพยาบาล..." /></div>
 
-      <div class="section-title">รายการราคา <span class="more">${items.length} รายการ</span></div>
-      <div id="price-list">${items.length ? '' : `<div class="empty"><div class="em">${isVax ? '💉' : '🏥'}</div><p>${province ? 'ยังไม่มีข้อมูลในจังหวัดนี้' : 'ยังไม่มีข้อมูล'}<br/>เพิ่มราคาที่คุณทราบได้เลย ช่วยกันสะสมเป็นฐานข้อมูล</p></div>`}</div>
+      <div class="section-title">รายการราคา <span class="more" id="list-count">${items.length} รายการ</span></div>
+      <div id="price-list"></div>
+      <button class="btn ghost sm" id="more-btn" style="display:none;width:100%;margin-top:2px"></button>
 
-      <button class="btn pink" id="add-pkg" style="margin-top:6px">+ เพิ่มราคา${isVax ? 'วัคซีน' : 'คลอด'}ที่ทราบ</button>
+      <button class="btn pink" id="add-pkg" style="margin-top:10px">+ เพิ่มราคา${isVax ? 'วัคซีน' : 'คลอด'}ที่ทราบ</button>
 
       <div class="disclaimer">ราคาเป็นข้อมูลที่รวบรวมจากเว็บสาธารณะ/ผู้ใช้ ณ ช่วงเวลาหนึ่ง <b>อาจเปลี่ยนแปลงหรือเป็นโปรโมชันชั่วคราว</b> โปรดโทรยืนยันกับโรงพยาบาลทุกครั้งก่อนตัดสินใจ — รพ.รัฐส่วนใหญ่ใช้สิทธิบัตรทอง/ประกันสังคม</div>
     `;
@@ -162,31 +250,48 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelector('#prov-sel').onchange = (e) => MB.go('prices', { tab, province: e.target.value });
     root.querySelector('#add-pkg').onclick = () => openForm(tab, province);
 
-    // render การ์ดทีละช่วง (กันหน้า "ค้าง" ตอนรายการเยอะ เช่น ดูทุกจังหวัด ~120 รายการ)
+    // แบ่งหน้าทีละ 20 การ์ด (กันหน้า "ค้าง" บนมือถือ — ไม่สร้าง DOM ทั้ง ~120 รายการในครั้งเดียว)
     const listEl = root.querySelector('#price-list');
+    const moreBtn = root.querySelector('#more-btn');
+    const countEl = root.querySelector('#list-count');
     const cardFn = isVax ? vaccineCard : deliveryCard;
-    if (items.length) {
-      let i = 0; const CHUNK = 24;
-      (function renderChunk() {
-        if (!listEl.isConnected) return;              // ออกจากหน้านี้ไปแล้ว → หยุด
-        listEl.insertAdjacentHTML('beforeend', items.slice(i, i + CHUNK).map(cardFn).join(''));
-        i += CHUNK;
-        if (i < items.length) requestAnimationFrame(renderChunk);
-      })();
-    }
+    const searchKey = x => ((x.hospital || '') + ' ' + (x.province || '') + ' ' + (x.packageName || '')).toLowerCase();
+    const emptyHtml = `<div class="empty"><div class="em">${isVax ? '💉' : '🏥'}</div><p>${province ? 'ยังไม่มีข้อมูลในจังหวัดนี้' : 'ไม่พบรายการ'}<br/>เพิ่มราคาที่คุณทราบได้เลย ช่วยกันสะสมเป็นฐานข้อมูล</p></div>`;
+    const PAGE = 20;
+    let matches = items, shown = 0;
 
-    // ลบรายการ — ใช้ event delegation (ทำงานแม้การ์ดยังทยอย render อยู่)
+    function renderPage() {
+      listEl.insertAdjacentHTML('beforeend', matches.slice(shown, shown + PAGE).map(cardFn).join(''));
+      shown += PAGE;
+      const rest = matches.length - shown;
+      if (rest > 0) { moreBtn.style.display = ''; moreBtn.textContent = `ดูเพิ่มอีก (${rest} รายการ)`; }
+      else moreBtn.style.display = 'none';
+    }
+    function resetList(list) {
+      matches = list; shown = 0; listEl.innerHTML = '';
+      if (!matches.length) { listEl.innerHTML = emptyHtml; moreBtn.style.display = 'none'; return; }
+      renderPage();
+    }
+    moreBtn.onclick = renderPage;
+    resetList(items);
+
+    // ลบรายการ — ใช้ event delegation
     listEl.addEventListener('click', (e) => {
       const del = e.target.closest('[data-del]'); if (!del) return;
       if (confirm('ลบรายการนี้?')) { isVax ? S.removeVaxPricePkg(del.dataset.del) : S.removeDeliveryPkg(del.dataset.del); MB.go('prices', { tab, province }); }
     });
 
+    // ค้นหา = กรองจากชุดข้อมูลเต็มแล้วเรนเดอร์ใหม่ (ทำงานครบทุกรายการ ไม่ใช่แค่ที่โชว์อยู่)
     const search = root.querySelector('#prov-search');
+    let t = null;
     search.oninput = () => {
-      const q = search.value.trim().toLowerCase();
-      listEl.querySelectorAll('[data-search]').forEach(c => {
-        c.style.display = !q || c.getAttribute('data-search').toLowerCase().includes(q) ? '' : 'none';
-      });
+      clearTimeout(t);
+      t = setTimeout(() => {
+        const q = search.value.trim().toLowerCase();
+        const list = q ? items.filter(x => searchKey(x).includes(q)) : items;
+        countEl.textContent = list.length + ' รายการ';
+        resetList(list);
+      }, 120);
     };
   };
 

@@ -31,7 +31,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div style="margin-top:6px;font-weight:700;color:var(--pink-deep)">💵 ${U.esc(x.price)}</div>
       <div style="font-size:13.5px;color:#4f3d33;margin-top:4px">${U.esc(x.note)}</div>
     </div>`).join('');
-    root.innerHTML = `${MB.knowledgeChips('pump')}
+    root.innerHTML = `${MB.knowledgeChips('cost')}${MB.costSubbar('pump')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">🍼</div>
         <div style="flex:1"><h2 style="font-size:18px">เครื่องปั๊มนม</h2><p>เปรียบเทียบยี่ห้อ/รุ่นยอดนิยมในไทย</p></div></div>
       <div class="card tint"><b>💡 เลือกยังไงดี</b>
@@ -40,7 +40,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="section-title">รายการ <span class="more">${MB.PUMP_DATA.length} รุ่น</span></div>
       ${cards}
       ${disc('รีวิว/ราคาเพื่อประกอบการตัดสินใจเท่านั้น ไม่ใช่การโฆษณา การเลือกขึ้นกับสรีระและการใช้งานของแต่ละคน — ' + PRICE_DISC)}`;
-    MB.wireKnowledgeChips(root); wireSearch(root);
+    MB.wireKnowledgeChips(root); MB.wireCostSubbar(root); wireSearch(root);
   };
 
   /* ---------- ผ้าอ้อม/แพมเพิส ---------- */
@@ -53,7 +53,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div style="flex:1;background:var(--cream-2);border-radius:10px;padding:8px;text-align:center"><div class="muted" style="font-size:11px">ราคาต่อชิ้น</div><b style="color:var(--pink-deep)">${U.esc(x.perPiece)}</b></div>
       </div>
     </div>`).join('');
-    root.innerHTML = `${MB.knowledgeChips('diaper')}
+    root.innerHTML = `${MB.knowledgeChips('cost')}${MB.costSubbar('diaper')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">🧷</div>
         <div style="flex:1"><h2 style="font-size:18px">ผ้าอ้อม/แพมเพิส</h2><p>เทียบราคาต่อชิ้น ทุกยี่ห้อ/ไซส์</p></div></div>
       <div class="card tint"><b>📏 ราคากลางต่อชิ้น</b>
@@ -63,7 +63,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="section-title">รายการ <span class="more">${MB.DIAPER_DATA.length} ยี่ห้อ</span></div>
       ${cards}
       ${disc(PRICE_DISC + ' · ไซส์ NB/S/M/L/XL/XXL เลือกตามน้ำหนักลูก (ดูที่ข้างห่อ)')}`;
-    MB.wireKnowledgeChips(root); wireSearch(root);
+    MB.wireKnowledgeChips(root); MB.wireCostSubbar(root); wireSearch(root);
   };
 
   /* ---------- นมผง ---------- */
@@ -77,7 +77,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div style="flex:1;background:var(--cream-2);border-radius:10px;padding:8px;text-align:center"><div class="muted" style="font-size:11px">ต่อ 100 ก.</div><b style="color:var(--pink-deep)">${U.esc(x.per100g)}</b></div>
       </div>
     </div>`).join('');
-    root.innerHTML = `${MB.knowledgeChips('formula')}
+    root.innerHTML = `${MB.knowledgeChips('cost')}${MB.costSubbar('formula')}
       <div class="hero" style="padding:14px 16px"><div class="emoji">🥛</div>
         <div style="flex:1"><h2 style="font-size:18px">นมผง</h2><p>เทียบราคาต่อ 100 กรัม</p></div></div>
       <div class="card" style="background:#FFF3E6;border-color:#F3DCBD"><b style="color:#B9802F">🤱 นมแม่ดีที่สุด</b>
@@ -87,6 +87,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="section-title">รายการ <span class="more">${MB.FORMULA_DATA.length} รายการ</span></div>
       ${cards}
       ${disc('สูตรเฉพาะ (แพ้นมวัว/ไฮโดรไลซ์/soy/A2) ควรใช้ตามคำแนะนำแพทย์ · ' + PRICE_DISC)}`;
-    MB.wireKnowledgeChips(root); wireSearch(root);
+    MB.wireKnowledgeChips(root); MB.wireCostSubbar(root); wireSearch(root);
   };
 })();
