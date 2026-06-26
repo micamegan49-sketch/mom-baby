@@ -13,7 +13,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       { k: 'cost',      em: '💰', label: 'ค่าใช้จ่าย' },
       { k: 'groups',    em: '🤝', label: 'กลุ่มแม่' }
     ];
-    return `<div class="chips" style="margin-bottom:14px">
+    return `<div class="chips chips-main" style="margin-bottom:14px">
       ${items.map(i => `<div class="chip ${active === i.k ? 'active' : ''}" data-knav="${i.k}">${i.em} ${i.label}</div>`).join('')}
     </div>`;
   };

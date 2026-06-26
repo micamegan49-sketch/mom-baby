@@ -219,6 +219,13 @@ a { color: var(--pink-deep); }
   border-color: var(--pink); color: var(--pink-deep);
   box-shadow: 0 3px 11px rgba(216, 126, 140, 0.24);
 }
+/* แถบเมนูหลัก "ความรู้" = หัวข้อหลักโทนน้ำตาล (แยกจากตัวกรองย่อยสีชมพู) */
+.chips-main .chip { color: var(--brown-dark); font-weight: 700; }
+.chips-main .chip.active {
+  background: linear-gradient(135deg, var(--brown) 0%, var(--brown-dark) 100%);
+  border-color: var(--brown-dark); color: #fff;
+  box-shadow: 0 3px 12px rgba(107, 70, 54, 0.30);
+}
 
 /* forms */
 .field { margin-bottom: 14px; }
