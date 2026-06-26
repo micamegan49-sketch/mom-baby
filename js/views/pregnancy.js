@@ -131,7 +131,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         </div>
       </div>
 
-      <div class="section-title">🍎 สัปดาห์ที่ ${viewWeek} – ลูกตอนนี้</div>
+      <div class="section-title">${MB.fruitSVG(fruitKey, 22, { bare: true })} สัปดาห์ที่ ${viewWeek} – ลูกตอนนี้</div>
       <div class="card">
         <div class="center">${MB.fetusSVG(gwImg)}</div>
         <div class="center muted" style="font-size:11px;margin:-2px 0 6px">🎨 ภาพวาดค่อย ๆ เปลี่ยนตามอายุครรภ์${viewWeek === curWeek ? ' (ขยับทุกวัน)' : ''}</div>
