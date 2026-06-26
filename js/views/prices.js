@@ -54,7 +54,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
      ค่าคลอด/ค่าวัคซีน/ประกัน เรนเดอร์ในเราต์ prices ส่วน ปั๊มนม/แพมเพิส/นมผง เป็นเราต์ของตัวเอง (babycost.js) */
   const COST_SUBS = [
     { k: 'raising', em: '🧮', label: 'ค่าเลี้ยงลูก' },
-    { k: 'insurance', em: '🛡️', label: 'ประกัน' },
     { k: 'diaper', em: '🧷', label: 'แพมเพิส' },
     { k: 'formula', em: '🥛', label: 'นมผง' }
   ];
@@ -66,8 +65,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   function wireCostSubbar(root) {
     root.querySelectorAll('[data-cost]').forEach(b => b.onclick = () => {
       const k = b.dataset.cost;
-      if (['insurance', 'raising'].includes(k)) MB.go('prices', { tab: k });
-      else MB.go(k);   // pump / diaper / formula → เราต์ของตัวเอง
+      if (k === 'raising') MB.go('prices', { tab: 'raising' });
+      else MB.go(k);   // diaper / formula → เราต์ของตัวเอง
     });
   }
   MB.costSubbar = costSubbar;            // ให้ babycost.js (ปั๊มนม/แพมเพิส/นมผง) ใช้แถบเดียวกันได้
