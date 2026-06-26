@@ -3,16 +3,14 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 (function () {
   const S = MB.store, U = MB.util;
 
-  /* แถบหัวข้อหลักของ "ความรู้" — ใช้ร่วมกันทั้ง พัฒนาการ/บทความ/ถาม-ตอบ/ค่าคลอด/ประกัน
-     (ค่าคลอด & ประกัน เป็นเราต์ของตัวเอง จึงนำทางออกไปหน้าเต็มแทนการเรนเดอร์ในหน้านี้) */
+  /* แถบหัวข้อหลักของ "ความรู้" — ใช้ร่วมกันทุกหน้าย่อย
+     ค่าคลอด/ค่าวัคซีน/ประกัน ถูกรวมเป็นหน้าเดียว "💰 ค่าใช้จ่าย" (เราต์ prices + แท็บย่อย) */
   MB.knowledgeChips = function (active) {
     const items = [
       { k: 'ms',        em: '🌱', label: 'พัฒนาการ' },
       { k: 'articles',  em: '📖', label: 'บทความ' },
       { k: 'faq',       em: '💬', label: 'ถาม-ตอบ' },
-      { k: 'prices',    em: '🏥', label: 'ค่าคลอด' },
-      { k: 'vaccine',   em: '💉', label: 'ค่าวัคซีน' },
-      { k: 'insurance', em: '🛡️', label: 'ประกัน' },
+      { k: 'cost',      em: '💰', label: 'ค่าใช้จ่าย' },
       { k: 'pump',      em: '🍼', label: 'ปั๊มนม' },
       { k: 'diaper',    em: '🧷', label: 'แพมเพิส' },
       { k: 'formula',   em: '🥛', label: 'นมผง' },
@@ -25,9 +23,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   MB.wireKnowledgeChips = function (root) {
     root.querySelectorAll('[data-knav]').forEach(c => c.onclick = () => {
       const k = c.dataset.knav;
-      if (k === 'prices') MB.go('prices', { tab: 'delivery' });
-      else if (k === 'vaccine') MB.go('prices', { tab: 'vaccine' });
-      else if (['insurance', 'pump', 'diaper', 'formula', 'groups'].includes(k)) MB.go(k);
+      if (k === 'cost') MB.go('prices', { tab: 'delivery' });
+      else if (['pump', 'diaper', 'formula', 'groups'].includes(k)) MB.go(k);
       else MB.go('develop', { tab: k });
     });
   };
