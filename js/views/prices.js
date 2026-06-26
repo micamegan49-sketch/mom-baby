@@ -55,7 +55,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   const COST_SUBS = [
     { k: 'raising', em: '🧮', label: 'ค่าเลี้ยงลูก' },
     { k: 'insurance', em: '🛡️', label: 'ประกัน' },
-    { k: 'pump', em: '🍼', label: 'ปั๊มนม' },
     { k: 'diaper', em: '🧷', label: 'แพมเพิส' },
     { k: 'formula', em: '🥛', label: 'นมผง' }
   ];
