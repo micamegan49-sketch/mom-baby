@@ -4,7 +4,7 @@
   "private": true,
   "description": "ตัวจิ๋ว — แอพดูแลแม่และลูกน้อย (PWA + Capacitor iOS/Android)",
   "scripts": {
-    "build:web": "rm -rf www && mkdir -p www && cp -R index.html manifest.json sw.js css js icons www/",
+    "build:web": "rm -rf www && mkdir -p www && cp -R index.html manifest.json sw.js css js icons img www/",
     "sync": "npm run build:web && npx cap sync",
     "sync:ios": "npm run build:web && npx cap sync ios",
     "sync:android": "npm run build:web && npx cap sync android",

@@ -37,11 +37,10 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   }
 
   function linkRow(x) {
-    const links = [];
-    if (x.phone) links.push(`<a href="tel:${U.esc(String(x.phone).replace(/\s/g, ''))}">📞 ${U.esc(x.phone)}</a>`);
-    if (x.url) links.push(`<a href="${U.esc(x.url)}" target="_blank" rel="noopener">🔗 ดูแหล่งข้อมูล</a>`);
-    let html = links.length ? `<div style="margin-top:8px;display:flex;gap:14px;font-size:12.5px;flex-wrap:wrap">${links.join('')}</div>` : '';
-    if (x.source) html += `<div class="muted" style="font-size:11px;margin-top:4px">ที่มา: ${U.esc(x.source)}</div>`;
+    let html = '';
+    // ภาพแพ็กเกจที่โรงพยาบาล/คลินิกทำไว้ (แตะเพื่อดูเต็ม) — แทนลิงก์แหล่งข้อมูลเดิม
+    if (x.img) html += `<a href="${U.esc(x.img)}" target="_blank" rel="noopener" style="display:block;margin-top:10px"><img src="${U.esc(x.img)}" alt="ภาพแพ็กเกจ" loading="lazy" style="width:100%;border-radius:12px;border:1px solid var(--line);display:block" /></a>`;
+    if (x.phone) html += `<div style="margin-top:8px;font-size:12.5px"><a href="tel:${U.esc(String(x.phone).replace(/\s/g, ''))}">📞 ${U.esc(x.phone)}</a></div>`;
     if (x.userAdded) html += `<div style="text-align:right;margin-top:4px"><span data-del="${x.id}" style="color:#D9737A;font-size:12px;cursor:pointer">ลบรายการนี้</span></div>`;
     return html;
   }
@@ -271,7 +270,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       ${MB.knowledgeChips('cost')}
       ${costSubbar(tab)}
       <div class="hero" style="padding:14px 16px"><div class="emoji">${isVax ? '💉' : '🤱'}</div>
-        <div style="flex:1"><h2 style="font-size:18px">ราคา${isVax ? 'แพ็กเกจวัคซีน' : 'คลอด'}</h2><p>ดูได้ทุกจังหวัด · ข้อมูลจริงพร้อมแหล่งอ้างอิง</p></div></div>
+        <div style="flex:1"><h2 style="font-size:18px">ราคา${isVax ? 'แพ็กเกจวัคซีน' : 'คลอด'}</h2><p>ดูได้ทุกจังหวัด · เทียบราคาก่อนตัดสินใจ</p></div></div>
 
       ${guideHtml}
       ${niptHtml}
@@ -355,7 +354,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       title: (isVax ? '💉 เพิ่มราคาวัคซีน' : '🤱 เพิ่มราคาคลอด'),
       html: body + `
         <div class="field"><div class="row"><div><label>ปีของราคา</label><input id="pk-year" placeholder="2568" /></div><div><label>เบอร์โทร</label><input id="pk-phone" placeholder="0xx-xxx-xxxx" /></div></div></div>
-        <div class="field"><label>ลิงก์แหล่งข้อมูล (ถ้ามี)</label><input id="pk-url" placeholder="https://..." /></div>
+        <div class="field"><label>ลิงก์รูปแพ็กเกจ (ถ้ามี)</label><input id="pk-img" placeholder="วางลิงก์รูปภาพ https://..." /><div class="muted" style="font-size:11px;margin-top:3px">ใส่ลิงก์รูปโบรชัวร์/แพ็กเกจ จะแสดงเป็นภาพในการ์ด</div></div>
         <button class="btn pink" id="pk-save">บันทึก</button>`,
       onMount(rt) {
         rt.querySelectorAll('[data-grp="type"] .chip').forEach(ch => ch.onclick = () => {
@@ -366,7 +365,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           const hospital = rt.querySelector('#pk-hosp').value.trim();
           if (!prov) return MB.toast('เลือกจังหวัดก่อนนะ');
           if (!hospital) return MB.toast('ใส่ชื่อโรงพยาบาลก่อนนะ');
-          const base = { province: prov, hospital, year: rt.querySelector('#pk-year').value.trim() || undefined, phone: rt.querySelector('#pk-phone').value.trim() || undefined, url: rt.querySelector('#pk-url').value.trim() || undefined, source: 'เพิ่มเอง' };
+          const base = { province: prov, hospital, year: rt.querySelector('#pk-year').value.trim() || undefined, phone: rt.querySelector('#pk-phone').value.trim() || undefined, img: rt.querySelector('#pk-img').value.trim() || undefined, source: 'เพิ่มเอง' };
           if (isVax) {
             S.addVaxPricePkg(Object.assign(base, { packageName: rt.querySelector('#pk-name').value.trim() || 'แพ็กเกจวัคซีน', ages: rt.querySelector('#pk-ages').value.trim() || undefined, price: rt.querySelector('#pk-price').value.trim() || undefined, includes: rt.querySelector('#pk-inc').value.trim() || undefined }));
           } else {

@@ -126,6 +126,16 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="disclaimer" style="margin-top:10px">คำแนะนำทั่วไป ปรึกษาแพทย์/นักโภชนาการสำหรับแผนเฉพาะบุคคล</div>
       </div>` : '';
 
+    // ฟีดประจำวัน — การ์ดเปลี่ยนทุกวันตามจำนวนวันตั้งครรภ์ และเรียกชื่อลูก (สไตล์ฟีดแบบมะลิ)
+    const feedDayIdx = (viewWeek === curWeek && p) ? p.daysPreg : viewWeek * 7;
+    const feed = MB.pregFeed ? MB.pregFeed(viewWeek, feedDayIdx, preg.name) : [];
+    const feedHtml = feed.length ? `
+      <div class="section-title">💌 อัปเดตวันนี้${viewWeek === curWeek ? '' : ' (สัปดาห์ ' + viewWeek + ')'}</div>
+      ${feed.map(c => `
+        <div style="display:flex;align-items:center;gap:8px;margin:0 2px 6px"><span style="font-size:18px">${c.em}</span><b style="font-size:14.5px;color:var(--pink-deep)">${U.esc(c.label)}</b></div>
+        <div class="card" style="border-color:var(--pink-soft);margin-bottom:14px"><p style="margin:0;font-size:14.5px;line-height:1.7;color:#4f3d33">${U.esc(c.text)}</p></div>
+      `).join('')}` : '';
+
     root.innerHTML = `
       <div class="hero">
         <div class="emoji" style="padding:2px">${MB.fruitSVG(fruitKey, 60, { bare: true })}</div>
@@ -152,6 +162,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           <button class="btn ghost sm" id="wk-next">ถัดไป ›</button>
         </div>
       </div>
+
+      ${feedHtml}
 
       ${nutHtml}
 
