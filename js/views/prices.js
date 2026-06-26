@@ -88,6 +88,20 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       { label: '12–15 ปี', sub: 'มัธยมต้น',                  months: 36 },
       { label: '15–18 ปี', sub: 'มัธยมปลาย',                 months: 36 },
       { label: '18–22 ปี', sub: 'มหาวิทยาลัย (ป.ตรี)',       months: 48 }
+    ],
+    // แจกแจงค่าใช้จ่ายพื้นฐาน (สัดส่วน % ของยอดต่อเดือน/ครั้ง — ใช้กับทุกระดับ) รวมกัน = 100
+    onceItems: [
+      { l: 'ค่าคลอด (เฉลี่ยรัฐ/เอกชน)', w: 55 }, { l: 'เปล/ที่นอน', w: 12 },
+      { l: 'คาร์ซีท', w: 12 }, { l: 'รถเข็น', w: 11 }, { l: 'เสื้อผ้า/ขวดนม/ของใช้แรกเกิด', w: 10 }
+    ],
+    breakdown: [
+      [{ l: 'นม/อาหาร', w: 30 }, { l: 'แพมเพิส', w: 20 }, { l: 'สุขภาพ/วัคซีน', w: 13 }, { l: 'เสื้อผ้า/ของใช้', w: 12 }, { l: 'ของเล่น/หนังสือ', w: 7 }, { l: 'เบ็ดเตล็ด/เก็บออม', w: 18 }],
+      [{ l: 'อาหาร', w: 30 }, { l: 'เนอสเซอรี่/ค่าเลี้ยง', w: 25 }, { l: 'แพมเพิส/ของใช้', w: 15 }, { l: 'เสื้อผ้า', w: 10 }, { l: 'สุขภาพ', w: 8 }, { l: 'ของเล่น/เบ็ดเตล็ด', w: 12 }],
+      [{ l: 'ค่าเทอม/ค่าเรียน', w: 45 }, { l: 'อาหาร', w: 20 }, { l: 'เสื้อผ้า/อุปกรณ์', w: 10 }, { l: 'เดินทาง', w: 8 }, { l: 'สุขภาพ', w: 7 }, { l: 'เบ็ดเตล็ด', w: 10 }],
+      [{ l: 'ค่าเทอม/ค่าเรียน', w: 43 }, { l: 'อาหาร/ขนม', w: 18 }, { l: 'เรียนพิเศษ', w: 13 }, { l: 'เดินทาง', w: 8 }, { l: 'อุปกรณ์/เสื้อผ้า', w: 8 }, { l: 'เบ็ดเตล็ด', w: 10 }],
+      [{ l: 'ค่าเทอม', w: 40 }, { l: 'เรียนพิเศษ', w: 18 }, { l: 'อาหาร', w: 15 }, { l: 'เดินทาง', w: 9 }, { l: 'มือถือ/อินเทอร์เน็ต', w: 8 }, { l: 'เบ็ดเตล็ด', w: 10 }],
+      [{ l: 'ค่าเทอม', w: 38 }, { l: 'เรียนพิเศษ/ติว', w: 20 }, { l: 'อาหาร', w: 15 }, { l: 'เดินทาง', w: 9 }, { l: 'มือถือ/เน็ต', w: 8 }, { l: 'เบ็ดเตล็ด', w: 10 }],
+      [{ l: 'ค่าเทอม', w: 48 }, { l: 'ที่พัก/หอ', w: 18 }, { l: 'อาหาร', w: 17 }, { l: 'เดินทาง', w: 7 }, { l: 'หนังสือ/อุปกรณ์', w: 5 }, { l: 'เบ็ดเตล็ด', w: 5 }]
     ]
   };
   function renderRaising(root, params) {
@@ -98,6 +112,20 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const totalMonths = RAISE.stages.reduce((a, s) => a + s.months, 0);   // 264 เดือน (~22 ปี)
     const avgMonth = Math.round(total / totalMonths / 100) * 100;
     const millions = (total / 1000000).toFixed(total >= 1000000 ? 1 : 2);
+
+    // แจกแจงยอด (amount) ตามสัดส่วน cats ให้รวมกันเท่ากับ amount พอดี (ตัวสุดท้ายรับเศษ)
+    function catRows(amount, cats) {
+      let acc = 0;
+      return cats.map((c, i) => {
+        const v = i === cats.length - 1 ? amount - acc : Math.round(amount * c.w / 100);
+        acc += v;
+        return `<div style="display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:12.5px"><span class="muted">• ${U.esc(c.l)}</span><b style="color:var(--brown);font-weight:600;white-space:nowrap">${fmt(v)}</b></div>`;
+      }).join('');
+    }
+    function detailBox(headline, inner) {
+      return `<div class="raise-detail" style="display:none;margin:0 0 8px;padding:8px 12px;background:var(--cream);border-radius:10px;border:1px solid var(--line)">
+        <div class="muted" style="font-size:11px;margin-bottom:2px">${headline}</div>${inner}</div>`;
+    }
 
     root.innerHTML = `
       ${MB.knowledgeChips('cost')}
@@ -120,18 +148,24 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         </div>
       </div>
 
-      <div class="section-title">📋 แยกตามช่วงวัย</div>
+      <div class="section-title">📋 แยกตามช่วงวัย <span class="more">แตะดูค่าใช้จ่ายพื้นฐาน</span></div>
       <div class="card" style="padding:6px 14px">
-        <div class="list-item" style="border-bottom:1px solid var(--line)">
-          <div class="ic" style="background:var(--cream-2)">👶</div>
-          <div class="body"><div class="t">ค่าคลอด + ของแรกเกิด</div><div class="s">จ่ายครั้งเดียว (เปล/คาร์ซีท/รถเข็น ฯลฯ)</div></div>
-          <b style="color:var(--brown);white-space:nowrap">${fmt(tier.once)}</b>
+        <div>
+          <div class="list-item" style="border-bottom:1px solid var(--line);cursor:pointer" data-exp="once">
+            <div class="ic" style="background:var(--cream-2)">👶</div>
+            <div class="body"><div class="t">ค่าคลอด + ของแรกเกิด <span class="exp-ic" style="color:var(--pink-deep)">▾</span></div><div class="s">จ่ายครั้งเดียว</div></div>
+            <b style="color:var(--brown);white-space:nowrap">${fmt(tier.once)}</b>
+          </div>
+          ${detailBox('รายการจ่ายครั้งเดียว (โดยประมาณ)', catRows(tier.once, RAISE.onceItems))}
         </div>
-        ${rows.map(r => `<div class="list-item" style="border-bottom:1px solid var(--line)">
-          <div class="ic" style="background:var(--cream-2)">📅</div>
-          <div class="body"><div class="t">${U.esc(r.s.label)} <span class="muted" style="font-weight:400;font-size:12px">${U.esc(r.s.sub)}</span></div>
-            <div class="s">~${fmt(r.perMonth)} บาท/เดือน × ${r.s.months} เดือน</div></div>
-          <b style="color:var(--brown);white-space:nowrap">${fmt(r.sub)}</b>
+        ${rows.map((r, i) => `<div>
+          <div class="list-item" style="border-bottom:1px solid var(--line);cursor:pointer" data-exp="${i}">
+            <div class="ic" style="background:var(--cream-2)">📅</div>
+            <div class="body"><div class="t">${U.esc(r.s.label)} <span class="muted" style="font-weight:400;font-size:12px">${U.esc(r.s.sub)}</span> <span class="exp-ic" style="color:var(--pink-deep)">▾</span></div>
+              <div class="s">~${fmt(r.perMonth)} บาท/เดือน × ${r.s.months} เดือน</div></div>
+            <b style="color:var(--brown);white-space:nowrap">${fmt(r.sub)}</b>
+          </div>
+          ${detailBox('ค่าใช้จ่ายพื้นฐานต่อเดือน (โดยประมาณ)', catRows(r.perMonth, RAISE.breakdown[i]))}
         </div>`).join('')}
         <div class="list-item" style="border-bottom:none">
           <div class="ic" style="background:var(--pink-soft)">💰</div>
@@ -145,6 +179,15 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     MB.wireKnowledgeChips(root);
     wireCostSubbar(root);
     root.querySelectorAll('[data-tier]').forEach(c => c.onclick = () => MB.go('prices', { tab: 'raising', tier: c.dataset.tier }));
+    // แตะแถวเพื่อกาง/พับรายละเอียดค่าใช้จ่ายพื้นฐาน
+    root.querySelectorAll('[data-exp]').forEach(row => row.onclick = () => {
+      const detail = row.nextElementSibling;
+      const ic = row.querySelector('.exp-ic');
+      if (!detail) return;
+      const open = detail.style.display === 'none';
+      detail.style.display = open ? '' : 'none';
+      if (ic) ic.textContent = open ? '▴' : '▾';
+    });
   }
 
   /* แท็บ "ประกัน" (ย้ายมารวมไว้ในหน้าค่าใช้จ่าย) */
