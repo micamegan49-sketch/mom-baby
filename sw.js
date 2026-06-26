@@ -1,5 +1,5 @@
 /* ตัวจิ๋ว – Service Worker (ใช้งานออฟไลน์) */
-const CACHE = 'tuajiw-v32';
+const CACHE = 'tuajiw-v33';
 const ASSETS = [
   './',
   './index.html',
@@ -62,14 +62,22 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
-  // network-first: ออนไลน์ได้ของใหม่เสมอ, ออฟไลน์ค่อยใช้แคช
+  const url = new URL(req.url);
+  // เฉพาะไฟล์ของเราเอง (same-origin) — ฟอนต์/รูปภายนอกปล่อยให้เบราว์เซอร์จัดการ
+  if (url.origin !== location.origin) return;
+  // cache-first + อัปเดตเบื้องหลัง (stale-while-revalidate):
+  // โหลดทันทีจากแคช → ไม่ต้องรอเน็ตมือถือทีละ ~40 ไฟล์ (กันอาการ "ไม่โหลด/ค้าง")
+  // เวอร์ชันใหม่จะถูกดึงไว้เบื้องหลังและใช้รอบถัดไป (CACHE ถูกบัมป์ทุกรุ่น → ของใหม่เสมอ)
   e.respondWith(
-    fetch(req)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+    caches.match(req).then((cached) => {
+      const network = fetch(req).then((res) => {
+        if (res && res.status === 200 && res.type === 'basic') {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+        }
         return res;
-      })
-      .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
+      }).catch(() => cached || caches.match('./index.html'));
+      return cached || network;
+    })
   );
 });

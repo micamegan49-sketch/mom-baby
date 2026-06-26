@@ -42,6 +42,18 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     return { name: n.name, due: n.due, ageLabel: n.ageLabel, text: n.status.text, cls: n.status.cls };
   };
 
+  /* แท็บย่อยบนหน้า "วัคซีน": ตารางวัคซีน ↔ ราคาแพ็กเกจ (ย้าย "ค่าวัคซีน" มาอยู่ที่นี่) */
+  MB.vaxTabs = function (active) {
+    return `<div class="chips" style="margin:0 0 12px">
+      <div class="chip ${active === 'schedule' ? 'active' : ''}" data-vaxtab="schedule" style="flex:1;justify-content:center;text-align:center">📅 ตารางวัคซีน</div>
+      <div class="chip ${active === 'price' ? 'active' : ''}" data-vaxtab="price" style="flex:1;justify-content:center;text-align:center">💰 ราคาแพ็กเกจ</div>
+    </div>`;
+  };
+  MB.wireVaxTabs = function (root) {
+    root.querySelectorAll('[data-vaxtab]').forEach(c => c.onclick = () =>
+      c.dataset.vaxtab === 'price' ? MB.go('prices', { tab: 'vaccine' }) : MB.go('vax'));
+  };
+
   MB.views.vax = function (root, params) {
     const child = S.activeChild();
     if (!child) {
@@ -65,6 +77,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     list.forEach(x => (groups[x.ageLabel] || (groups[x.ageLabel] = [])).push(x));
 
     root.innerHTML = `
+      ${MB.vaxTabs('schedule')}
       <div class="hero" style="padding:14px 16px">
         <div class="emoji">💉</div>
         <div style="flex:1">
@@ -77,7 +90,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="chips" style="margin:4px 0 12px">
         ${['พื้นฐาน', 'เสริม', 'ค้าง', 'ทั้งหมด'].map(f => `<div class="chip ${filter === f ? 'active' : ''}" data-f="${f}">${f}</div>`).join('')}
       </div>
-      <button class="btn ghost sm" id="vax-price" style="width:100%;margin-bottom:10px">💰 ดูราคาแพ็กเกจวัคซีน รพ.เอกชน (ทุกจังหวัด)</button>
       ${Object.entries(groups).map(([age, items]) => `
         <div class="section-title">📅 ${age}</div>
         <div class="card" style="padding:6px 14px">
@@ -90,8 +102,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="disclaimer">อ้างอิงตารางสร้างเสริมภูมิคุ้มกันโรค (EPI) ของไทยโดยประมาณ กำหนดการจริงและวัคซีนเสริมขึ้นกับนโยบายปีนั้น ๆ และดุลยพินิจแพทย์ — โปรดยึดสมุดสุขภาพเด็กเป็นหลัก</div>
       ${MB.citeBlock('vaccine')}
     `;
+    MB.wireVaxTabs(root);
     root.querySelectorAll('[data-f]').forEach(c => c.onclick = () => MB.go('vax', { filter: c.dataset.f }));
-    root.querySelector('#vax-price').onclick = () => MB.go('prices', { tab: 'vaccine' });
     root.querySelectorAll('[data-tog]').forEach(n => n.onclick = () => {
       const x = all.find(v => v.id === n.dataset.tog);
       if (x) openVaxSheet(child, x, filter);

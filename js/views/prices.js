@@ -55,7 +55,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   const COST_SUBS = [
     { k: 'raising', em: '🧮', label: 'ค่าเลี้ยงลูก' },
     { k: 'delivery', em: '🏥', label: 'ค่าคลอด' },
-    { k: 'vaccine', em: '💉', label: 'ค่าวัคซีน' },
     { k: 'insurance', em: '🛡️', label: 'ประกัน' },
     { k: 'pump', em: '🍼', label: 'ปั๊มนม' },
     { k: 'diaper', em: '🧷', label: 'แพมเพิส' },
@@ -69,7 +68,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   function wireCostSubbar(root) {
     root.querySelectorAll('[data-cost]').forEach(b => b.onclick = () => {
       const k = b.dataset.cost;
-      if (['delivery', 'vaccine', 'insurance', 'raising'].includes(k)) MB.go('prices', { tab: k });
+      if (['delivery', 'insurance', 'raising'].includes(k)) MB.go('prices', { tab: k });
       else MB.go(k);   // pump / diaper / formula → เราต์ของตัวเอง
     });
   }
@@ -271,9 +270,12 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="disclaimer" style="margin-top:10px">${N.notes.map(n => '• ' + U.esc(n)).join('<br>')}</div>
       </div>` : '';
 
+    // หน้า "ค่าวัคซีน" ถูกย้ายไปอยู่ใต้แท็บ "วัคซีน" → ใช้แถบย่อยของวัคซีน แทนแถบค่าใช้จ่าย
+    const topNav = isVax
+      ? (MB.vaxTabs ? MB.vaxTabs('price') : '')
+      : (MB.knowledgeChips('cost') + costSubbar(tab));
     root.innerHTML = `
-      ${MB.knowledgeChips('cost')}
-      ${costSubbar(tab)}
+      ${topNav}
       <div class="hero" style="padding:14px 16px"><div class="emoji">${isVax ? '💉' : '🤱'}</div>
         <div style="flex:1"><h2 style="font-size:18px">ราคา${isVax ? 'แพ็กเกจวัคซีน' : 'คลอด'}</h2><p>ดูได้ทุกจังหวัด · เทียบราคาก่อนตัดสินใจ</p></div></div>
 
@@ -292,8 +294,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="disclaimer">ราคาเป็นข้อมูลที่รวบรวมจากเว็บสาธารณะ/ผู้ใช้ ณ ช่วงเวลาหนึ่ง <b>อาจเปลี่ยนแปลงหรือเป็นโปรโมชันชั่วคราว</b> โปรดโทรยืนยันกับโรงพยาบาลทุกครั้งก่อนตัดสินใจ — รพ.รัฐส่วนใหญ่ใช้สิทธิบัตรทอง/ประกันสังคม</div>
     `;
 
-    MB.wireKnowledgeChips(root);
-    wireCostSubbar(root);
+    if (isVax) { MB.wireVaxTabs(root); }
+    else { MB.wireKnowledgeChips(root); wireCostSubbar(root); }
     root.querySelector('#prov-sel').onchange = (e) => MB.go('prices', { tab, province: e.target.value });
     root.querySelector('#add-pkg').onclick = () => openForm(tab, province);
 

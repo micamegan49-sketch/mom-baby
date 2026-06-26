@@ -141,6 +141,7 @@ window.MB = window.MB || {};
     { id: 'develop', label: 'ความรู้',   ic: '📚' }
   ];
   let current = 'home';
+  let currentParams = {};
 
   function go(route, params) {
     current = route;
@@ -187,8 +188,9 @@ window.MB = window.MB || {};
 
   function renderTabbar() {
     const tb = document.getElementById('tabbar');
-    // ค่าคลอด/ประกัน เป็นหัวข้อย่อยของ "ความรู้" จึงให้แท็บ develop ไฮไลต์ด้วย
-    const activeTab = ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups'].includes(current) ? 'develop' : current;
+    // ค่าวัคซีน ย้ายไปอยู่ใต้แท็บ "วัคซีน" → ไฮไลต์ vax; ค่าคลอด/ประกัน/อื่น ๆ อยู่ใต้ "ความรู้"
+    const activeTab = (current === 'prices' && currentParams.tab === 'vaccine') ? 'vax'
+      : ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups'].includes(current) ? 'develop' : current;
     tb.innerHTML = TABS.map(t =>
       `<button data-tab="${t.id}" class="${activeTab === t.id ? 'active' : ''}"><span class="ic">${t.ic}</span>${t.label}</button>`
     ).join('');
@@ -196,6 +198,7 @@ window.MB = window.MB || {};
   }
 
   function render(params) {
+    currentParams = params || {};
     renderAppbar();
     renderTabbar();
     const view = document.getElementById('view');
