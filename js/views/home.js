@@ -9,6 +9,54 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     return d.getFullYear() === r.getFullYear() && d.getMonth() === r.getMonth() && d.getDate() === r.getDate();
   }
 
+  /* ===== สร้างรายการแจ้งเตือน (ใช้โดยกระดิ่งบนแถบบน + ส่วนแจ้งเตือนหน้าหลัก) =====
+     รวมเรื่องที่ "ต้องทำ": วัคซีนเลย/ใกล้กำหนด, นัดหมายเร็ว ๆ นี้, ถึงเวลาชั่งน้ำหนัก, ใกล้คลอด */
+  MB.buildNotifications = function () {
+    const out = [];
+    const today = S.todayISO();
+    const child = S.activeChild();
+    const preg = S.preg();
+
+    if (child && MB.vaxList) {
+      const vlist = MB.vaxList(child);
+      vlist.filter(x => !x.done && x.status.cls === 'due')
+        .forEach(x => out.push({ em: '💉', cls: 'due', title: 'วัคซีนเลยกำหนด: ' + x.name, sub: 'กำหนด ' + U.fmtDateTH(x.due) + ' · ควรพาไปฉีด', go: 'vax' }));
+      vlist.filter(x => !x.done && x.status.cls === 'soon').slice(0, 3)
+        .forEach(x => out.push({ em: '💉', cls: 'soon', title: 'ใกล้ถึงกำหนดวัคซีน: ' + x.name, sub: 'กำหนด ' + U.fmtDateTH(x.due), go: 'vax' }));
+    }
+
+    (S.appts() || []).filter(a => !a.done).forEach(a => {
+      if (child && a.childId && a.childId !== child.id) return;
+      const d = U.daysBetween(today, a.date);
+      const em = a.kind === 'vaccine' ? '💉' : a.kind === 'anc' ? '🤰' : a.kind === 'checkup' ? '🩺' : '🔔';
+      if (d < 0) out.push({ em, cls: 'due', title: 'นัดเลยกำหนด: ' + a.title, sub: U.fmtDateTH(a.date) + ' · แตะเพื่อจัดการ', go: 'appt' });
+      else if (d <= 7) {
+        const lbl = d === 0 ? 'วันนี้' : d === 1 ? 'พรุ่งนี้' : 'อีก ' + d + ' วัน';
+        out.push({ em, cls: d <= 1 ? 'due' : 'soon', title: 'นัดหมาย: ' + a.title, sub: U.fmtDateTH(a.date) + (a.time ? ' · ' + a.time + ' น.' : '') + ' · ' + lbl, go: 'appt' });
+      }
+    });
+
+    if (child) {
+      const meas = S.measurements(child.id);
+      const last = meas[meas.length - 1];
+      const age = U.ageInfo(child.birthDate);
+      const limit = age.totalMonths < 12 ? 30 : 90;   // เด็กเล็กควรวัดถี่กว่า
+      if (!last) out.push({ em: '📈', cls: 'soon', title: 'ยังไม่มีข้อมูลการเจริญเติบโต', sub: 'เพิ่มน้ำหนัก/ส่วนสูงเพื่อดูกราฟเทียบเกณฑ์', go: 'growth' });
+      else {
+        const days = U.daysBetween(last.date, today);
+        if (days >= limit) out.push({ em: '📈', cls: 'soon', title: 'ถึงเวลาชั่งน้ำหนัก/วัดส่วนสูง', sub: 'วัดล่าสุด ' + U.fmtDateTH(last.date) + ' (' + days + ' วันก่อน)', go: 'growth' });
+      }
+    }
+
+    if (!child && preg.active) {
+      const p = U.pregInfo(preg);
+      if (p && p.daysLeft >= 0 && p.daysLeft <= 30)
+        out.push({ em: '🤰', cls: 'soon', title: 'ใกล้กำหนดคลอดแล้ว', sub: 'เหลืออีก ' + p.daysLeft + ' วัน · เตรียมกระเป๋าคลอดได้เลย', go: 'preg' });
+    }
+
+    return out;
+  };
+
   /* การ์ดเกร็ดความรู้ (สุ่ม/รายวัน) */
   function tipCardHtml(stage) {
     const arr = MB.tipsFor ? MB.tipsFor(stage) : [];
@@ -142,6 +190,24 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <span class="badge ${cls}">${lbl}</span></div>`;
     };
 
+    // การ์ดสรุปภาพรวม + แจ้งเตือน
+    const vlistAll = MB.vaxList ? MB.vaxList(child) : [];
+    const vaxDone = vlistAll.filter(x => x.group === 'พื้นฐาน' && x.done).length;
+    const vaxTotal = vlistAll.filter(x => x.group === 'พื้นฐาน').length;
+    const notifs = MB.buildNotifications();
+    const summaryHtml = `
+      <div class="summary-card">
+        <div class="su" data-go="log"><div class="v">${logs.length}</div><div class="l">📝 บันทึก</div></div>
+        <div class="su" data-go="vax"><div class="v">${vaxDone}<small>/${vaxTotal}</small></div><div class="l">💉 วัคซีน</div></div>
+        <div class="su" data-go="growth"><div class="v">${meas.length}</div><div class="l">📈 การวัด</div></div>
+      </div>`;
+    const notifHtml = notifs.length ? `
+      <div class="section-title">🔔 การแจ้งเตือน <span class="more" data-notif>ดูทั้งหมด</span></div>
+      <div class="card" style="padding:4px 14px">
+        ${notifs.slice(0, 3).map((n, i) => `<div class="notif-item" data-ni="${i}"><div class="ic ${n.cls || ''}">${n.em}</div><div class="body"><div class="t">${U.esc(n.title)}</div>${n.sub ? `<div class="s">${U.esc(n.sub)}</div>` : ''}</div>${n.go ? '<div class="chev">›</div>' : ''}</div>`).join('')}
+        ${notifs.length > 3 ? `<div class="muted center" style="font-size:12.5px;padding:9px 0;cursor:pointer" data-notif>+ อีก ${notifs.length - 3} รายการ</div>` : ''}
+      </div>` : '';
+
     root.innerHTML = `
       <div class="hero">
         <div class="emoji">${child.emoji || '👶'}</div>
@@ -151,6 +217,9 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           ${lastFeed ? `<p style="margin-top:2px">🍼 ให้นมล่าสุด ${U.relTime(lastFeed.ts)}</p>` : ''}
         </div>
       </div>
+
+      ${summaryHtml}
+      ${notifHtml}
 
       ${timerOn ? `<div class="card tint" data-go="log" style="display:flex;align-items:center;gap:12px;cursor:pointer">
         <div style="font-size:26px">⏱️</div>
@@ -220,6 +289,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelectorAll('[data-q]').forEach(b => b.onclick = () => MB.views.quickLog(b.dataset.q));
     root.querySelectorAll('[data-go]').forEach(n => n.onclick = () => MB.go(n.dataset.go));
     root.querySelectorAll('[data-art]').forEach(n => n.onclick = () => MB.openArticle(n.dataset.art));
+    root.querySelectorAll('[data-ni]').forEach(n => n.onclick = () => { const it = notifs[+n.dataset.ni]; if (it && it.go) MB.go(it.go, it.params); });
+    root.querySelectorAll('[data-notif]').forEach(n => n.onclick = () => MB.openNotifications());
     wireTip(root, stage);
   };
 })();

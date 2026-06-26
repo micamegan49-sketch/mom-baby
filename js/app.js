@@ -145,8 +145,8 @@ window.MB = window.MB || {};
   function go(route, params) {
     current = route;
     render(params);
-    document.getElementById('app').scrollTo(0, 0);
-    window.scrollTo(0, 0);
+    const v = document.getElementById('view');
+    if (v) v.scrollTop = 0;            // เลื่อนเนื้อหาขึ้นบนสุดเมื่อเปลี่ยนหน้า (ตัวเลื่อนคือ .view)
   }
 
   /* ลิงก์ลึกผ่าน URL hash เช่น #develop (บทความ/ความรู้), #pregnancy, #prices, #vaccine
@@ -175,11 +175,14 @@ window.MB = window.MB || {};
       const p = pregInfo(preg);
       pill = `<button class="child-pill" id="childPill"><span class="avatar">🤰</span><span class="nm">${p ? 'สัปดาห์ ' + p.week : 'ตั้งครรภ์'}</span></button>`;
     }
+    const nb = (MB.buildNotifications ? MB.buildNotifications() : []).length;
+    const bell = `<button class="icon-btn" id="bellBtn" aria-label="การแจ้งเตือน">🔔${nb ? `<span class="badge-dot">${nb > 9 ? '9+' : nb}</span>` : ''}</button>`;
     bar.innerHTML = `<div class="logo"><span class="mark">👣</span> ตัวจิ๋ว</div>
-      <div class="spacer"></div>${pill}
+      <div class="spacer"></div>${pill}${bell}
       <button class="child-pill" id="settingsBtn" style="max-width:none"><span class="avatar">⚙️</span></button>`;
     const cp = document.getElementById('childPill');
     if (cp) cp.onclick = openChildSwitcher;
+    document.getElementById('bellBtn').onclick = openNotifications;
     document.getElementById('settingsBtn').onclick = () => go('settings');
   }
 
@@ -194,6 +197,9 @@ window.MB = window.MB || {};
   }
 
   function render(params) {
+    // คงตำแหน่งเลื่อนไว้เมื่อเรนเดอร์ซ้ำหน้าเดิม (go() จะรีเซ็ตเป็น 0 เองตอนเปลี่ยนหน้า)
+    const prev = document.getElementById('view');
+    const keepScroll = prev ? prev.scrollTop : 0;
     renderAppbar();
     renderTabbar();
     const view = document.getElementById('view');
@@ -205,6 +211,30 @@ window.MB = window.MB || {};
       view.innerHTML = '<div class="empty"><div class="em">⚠️</div><p>หน้านี้ขัดข้องชั่วคราว<br/>ลองแตะเมนูอื่นด้านล่าง หรือปิด-เปิดแอปใหม่</p></div>';
       try { console.error('view render error:', e); } catch (_) {}
     }
+    view.scrollTop = keepScroll;
+  }
+
+  /* ============ แจ้งเตือน (รวมศูนย์) ============ */
+  function openNotifications() {
+    const items = MB.buildNotifications ? MB.buildNotifications() : [];
+    const body = items.length
+      ? items.map((n, i) => `<div class="notif-item" data-i="${i}">
+          <div class="ic ${n.cls || ''}">${n.em}</div>
+          <div class="body"><div class="t">${esc(n.title)}</div>${n.sub ? `<div class="s">${esc(n.sub)}</div>` : ''}</div>
+          ${n.go ? '<div class="chev">›</div>' : ''}
+        </div>`).join('')
+      : `<div class="empty" style="padding:22px 8px"><div class="em">🔕</div><p>ยังไม่มีการแจ้งเตือน<br/>เราจะเตือนเมื่อใกล้กำหนดวัคซีน นัดหมาย หรือถึงเวลาชั่งน้ำหนัก</p></div>`;
+    sheet({
+      title: '🔔 การแจ้งเตือน',
+      html: body,
+      onMount(rt) {
+        rt.querySelectorAll('[data-i]').forEach(n => n.onclick = () => {
+          const it = items[+n.dataset.i];
+          closeSheet();
+          if (it && it.go) go(it.go, it.params);
+        });
+      }
+    });
   }
 
   /* ============ เปิดเผย API ============ */
@@ -216,6 +246,7 @@ window.MB = window.MB || {};
   MB.render = render;
   MB.rerender = function (params) { render(params); };   // เรนเดอร์ซ้ำหน้าเดิมโดยไม่เลื่อนจอขึ้นบน
   MB.openChildSwitcher = openChildSwitcher;
+  MB.openNotifications = openNotifications;
 
   /* ============ เริ่มต้น ============ */
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); MB._installPrompt = e; });
