@@ -210,10 +210,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="muted" style="font-size:12.5px;margin:2px 0 8px">รับอายุ ${U.esc(it.ages)} · ข้อมูลปี ${it.year}</div>
         <div style="font-size:14px;line-height:1.6">${U.esc(it.coverage)}</div>
         <div style="margin-top:8px;font-weight:700;color:var(--brown)">💵 ${U.esc(it.premium)}</div>
-        <div style="display:flex;gap:14px;margin-top:10px;font-size:13px;align-items:center">
-          <a href="${U.esc(it.url)}" target="_blank" rel="noopener" style="color:var(--pink-deep);font-weight:700;text-decoration:none">เว็บทางการ ›</a>
-          <span class="muted" style="font-size:11.5px">${U.esc(it.source)}</span>
-        </div>
       </div>`;
     };
 
