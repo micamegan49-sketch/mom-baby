@@ -91,6 +91,12 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const gwImg = (viewWeek === curWeek && p) ? (p.week + p.day / 7) : viewWeek;
     const fruitKey = (MB.PREG_FRUIT_KEY && MB.PREG_FRUIT_KEY[viewWeek]) || 'seed';
 
+    // ขนาดลูกแบบ "อัปเดตทุกวัน" — แทรกค่าความยาว/น้ำหนักตามวันจริงในสัปดาห์ (เฉพาะสัปดาห์ปัจจุบัน)
+    const nextWk = MB.PREG_WEEKS.find(x => x.w === viewWeek + 1);
+    const dayFrac = (viewWeek === curWeek && p) ? Math.min(1, Math.max(0, p.day / 7)) : 0;
+    const dayLen = (nextWk && nextWk.len != null && wk.len != null) ? wk.len + (nextWk.len - wk.len) * dayFrac : wk.len;
+    const dayWt = (nextWk && nextWk.wt != null && wk.wt != null) ? Math.round(wk.wt + (nextWk.wt - wk.wt) * dayFrac) : wk.wt;
+
     // เช็กลิสต์
     const checked = preg.checklist || {};
     const curKey = 't' + (p ? p.trimester : 1);
@@ -134,8 +140,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="section-title">${MB.fruitSVG(fruitKey, 22, { bare: true })} สัปดาห์ที่ ${viewWeek} – ลูกตอนนี้</div>
       <div class="card">
         <div class="center">${MB.fetusSVG(gwImg)}</div>
-        <div class="center muted" style="font-size:11px;margin:-2px 0 6px">🎨 ภาพวาดค่อย ๆ เปลี่ยนตามอายุครรภ์${viewWeek === curWeek ? ' (ขยับทุกวัน)' : ''}</div>
-        <div class="center" style="margin-bottom:8px">ขนาดเทียบ <span style="display:inline-block;vertical-align:middle">${MB.fruitSVG(fruitKey, 34, { bare: true })}</span> <b>≈ ${wk.fruitName}</b> · ยาว ~${wk.len} ซม.${wk.wt ? ' · หนัก ~' + (wk.wt >= 1000 ? (wk.wt / 1000).toFixed(1) + ' กก.' : wk.wt + ' ก.') : ''}</div>
+        <div class="center muted" style="font-size:11px;margin:-2px 0 6px">🎨 ภาพและขนาดโดยประมาณ อัปเดตตามอายุครรภ์${viewWeek === curWeek ? ' (เปลี่ยนทุกวัน)' : ''}</div>
+        <div class="center" style="margin-bottom:8px">ขนาดเทียบ <span style="display:inline-block;vertical-align:middle">${MB.fruitSVG(fruitKey, 34, { bare: true })}</span> <b>≈ ${wk.fruitName}</b> · ยาว ~${dayLen != null ? dayLen.toFixed(1) : '-'} ซม.${dayWt ? ' · หนัก ~' + (dayWt >= 1000 ? (dayWt / 1000).toFixed(2) + ' กก.' : dayWt + ' ก.') : ''}</div>
         <div class="divider"></div>
         <p style="margin:0 0 8px"><b>👶 พัฒนาการลูก:</b> ${wk.baby}</p>
         <p style="margin:0"><b>🤰 ร่างกายคุณแม่:</b> ${wk.mom}</p>
