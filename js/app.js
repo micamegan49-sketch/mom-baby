@@ -188,8 +188,9 @@ window.MB = window.MB || {};
 
   function renderTabbar() {
     const tb = document.getElementById('tabbar');
-    // ค่าวัคซีน ย้ายไปอยู่ใต้แท็บ "วัคซีน" → ไฮไลต์ vax; ค่าคลอด/ประกัน/อื่น ๆ อยู่ใต้ "ความรู้"
+    // ค่าวัคซีน → ไฮไลต์ "วัคซีน" · ค่าคลอด → อยู่ใต้ตั้งครรภ์ (ไฮไลต์ "หน้าหลัก") · ที่เหลืออยู่ใต้ "ความรู้"
     const activeTab = (current === 'prices' && currentParams.tab === 'vaccine') ? 'vax'
+      : (current === 'prices' && currentParams.tab === 'delivery') ? 'home'
       : ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups'].includes(current) ? 'develop' : current;
     tb.innerHTML = TABS.map(t =>
       `<button data-tab="${t.id}" class="${activeTab === t.id ? 'active' : ''}"><span class="ic">${t.ic}</span>${t.label}</button>`
@@ -252,17 +253,14 @@ window.MB = window.MB || {};
   document.addEventListener('DOMContentLoaded', () => {
     if (!routeFromHash()) render();
     window.addEventListener('hashchange', routeFromHash);
-    // แอปเนทีฟ (Capacitor) บันเดิลไฟล์เองอยู่แล้ว — ไม่ใช้ service worker (กันแคชค้าง/โหลดหน้าค้าง)
-    // เว็บ/PWA ยังใช้ SW ตามปกติ เพื่อใช้งานออฟไลน์
-    var isNative = !!(window.Capacitor && (typeof window.Capacitor.isNativePlatform === 'function'
-      ? window.Capacitor.isNativePlatform() : window.Capacitor.isNativePlatform));
+    // เลิกใช้ service worker ทั้งหมด (ทั้งเว็บ/เนทีฟ) — SW เดิมทำให้มือถือค้างที่แคชเก่า/ไฟล์ปนรุ่น
+    // โหลดสดจากเน็ตเสมอ = ของใหม่ ครบ ไม่ค้าง (sw.js ตัวปิดตัวเองจะล้างแคช+เลิก SW ให้เครื่องที่ยังค้างอยู่)
     if ('serviceWorker' in navigator) {
-      if (isNative) {
-        navigator.serviceWorker.getRegistrations()
-          .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
-      } else {
-        navigator.serviceWorker.register('./sw.js').catch(function () {});
-      }
+      navigator.serviceWorker.getRegistrations()
+        .then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }).catch(function () {});
+    }
+    if (window.caches && caches.keys) {
+      caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }).catch(function () {});
     }
   });
 })();

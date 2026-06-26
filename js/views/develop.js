@@ -20,7 +20,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   MB.wireKnowledgeChips = function (root) {
     root.querySelectorAll('[data-knav]').forEach(c => c.onclick = () => {
       const k = c.dataset.knav;
-      if (k === 'cost') MB.go('prices', { tab: 'delivery' });
+      if (k === 'cost') MB.go('prices', { tab: 'raising' });
       else if (k === 'groups') MB.go('groups');
       else MB.go('develop', { tab: k });
     });

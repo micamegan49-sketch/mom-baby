@@ -54,7 +54,6 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
      ค่าคลอด/ค่าวัคซีน/ประกัน เรนเดอร์ในเราต์ prices ส่วน ปั๊มนม/แพมเพิส/นมผง เป็นเราต์ของตัวเอง (babycost.js) */
   const COST_SUBS = [
     { k: 'raising', em: '🧮', label: 'ค่าเลี้ยงลูก' },
-    { k: 'delivery', em: '🏥', label: 'ค่าคลอด' },
     { k: 'insurance', em: '🛡️', label: 'ประกัน' },
     { k: 'pump', em: '🍼', label: 'ปั๊มนม' },
     { k: 'diaper', em: '🧷', label: 'แพมเพิส' },
@@ -68,7 +67,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   function wireCostSubbar(root) {
     root.querySelectorAll('[data-cost]').forEach(b => b.onclick = () => {
       const k = b.dataset.cost;
-      if (['delivery', 'insurance', 'raising'].includes(k)) MB.go('prices', { tab: k });
+      if (['insurance', 'raising'].includes(k)) MB.go('prices', { tab: k });
       else MB.go(k);   // pump / diaper / formula → เราต์ของตัวเอง
     });
   }
@@ -235,7 +234,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
   }
 
   MB.views.prices = function (root, params) {
-    const tab = (params && params.tab) || 'delivery';
+    const tab = (params && params.tab) || 'raising';
     if (tab === 'raising') return renderRaising(root, params);
     if (tab === 'insurance') return renderInsurance(root, params);
     const province = (params && params.province) || '';
@@ -270,10 +269,12 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="disclaimer" style="margin-top:10px">${N.notes.map(n => '• ' + U.esc(n)).join('<br>')}</div>
       </div>` : '';
 
-    // หน้า "ค่าวัคซีน" ถูกย้ายไปอยู่ใต้แท็บ "วัคซีน" → ใช้แถบย่อยของวัคซีน แทนแถบค่าใช้จ่าย
+    // ค่าวัคซีน → อยู่ใต้แท็บ "วัคซีน" · ค่าคลอด → อยู่ใต้หน้า "ตั้งครรภ์" (เอาออกจากค่าใช้จ่าย/ความรู้แล้ว)
     const topNav = isVax
       ? (MB.vaxTabs ? MB.vaxTabs('price') : '')
-      : (MB.knowledgeChips('cost') + costSubbar(tab));
+      : (tab === 'delivery'
+        ? `<button class="btn ghost sm" id="back-preg" style="margin-bottom:12px">‹ กลับหน้าตั้งครรภ์</button>`
+        : (MB.knowledgeChips('cost') + costSubbar(tab)));
     root.innerHTML = `
       ${topNav}
       <div class="hero" style="padding:14px 16px"><div class="emoji">${isVax ? '💉' : '🤱'}</div>
@@ -295,6 +296,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     `;
 
     if (isVax) { MB.wireVaxTabs(root); }
+    else if (tab === 'delivery') { const bp = root.querySelector('#back-preg'); if (bp) bp.onclick = () => MB.go('preg'); }
     else { MB.wireKnowledgeChips(root); wireCostSubbar(root); }
     root.querySelector('#prov-sel').onchange = (e) => MB.go('prices', { tab, province: e.target.value });
     root.querySelector('#add-pkg').onclick = () => openForm(tab, province);
