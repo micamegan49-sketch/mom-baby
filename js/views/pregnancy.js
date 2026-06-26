@@ -53,8 +53,16 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="hero"><div class="emoji">🤰</div><div><h2>เริ่มติดตามการตั้งครรภ์</h2><p>กรอกข้อมูลเพื่อคำนวณอายุครรภ์และกำหนดคลอด</p></div></div>
         <div class="card">
           <div class="field"><label>ชื่อเล่นที่อยากเรียก (ไม่บังคับ)</label><input id="p-name" placeholder="เช่น เบบี๋" /></div>
-          <div class="field"><label>📅 วันแรกของประจำเดือนครั้งสุดท้าย (LMP) <span style="color:var(--pink-deep);font-weight:700">— ใช้คำนวณอายุครรภ์</span></label><input id="p-lmp" type="date" max="${S.todayISO()}" /></div>
-          <div class="field"><label>วันกำหนดคลอด / นัดผ่าคลอด (ถ้ามี)</label><input id="p-edd" type="date" /><div class="muted" style="font-size:11px;margin-top:3px">ใช้แสดงวันคลอดเท่านั้น — ถ้าเป็นนัดผ่าคลอด ควรกรอก LMP ด้วยเพื่อให้อายุครรภ์ตรงจริง</div></div>
+          <div class="field"><label>🩺 อายุครรภ์ตอนนี้ (ตามที่หมอ/อัลตราซาวด์บอก) <span style="color:var(--pink-deep);font-weight:700">— ตรงที่สุด</span></label>
+            <div class="row">
+              <div><input id="p-gw" type="number" inputmode="numeric" min="0" max="42" placeholder="สัปดาห์" /></div>
+              <div><input id="p-gd" type="number" inputmode="numeric" min="0" max="6" placeholder="วัน (0–6)" /></div>
+            </div>
+            <div class="muted" style="font-size:11px;margin-top:3px">กรอกอายุครรภ์ ณ วันนี้ แล้วระบบคำนวณให้ตรงกับหมอ</div>
+          </div>
+          <p class="muted center" style="font-size:12px;margin:2px 0 8px">— หรือกรอกเป็นวันที่ —</p>
+          <div class="field"><label>วันแรกของประจำเดือนครั้งสุดท้าย (LMP)</label><input id="p-lmp" type="date" max="${S.todayISO()}" /></div>
+          <div class="field"><label>วันกำหนดคลอด / นัดผ่าคลอด (ถ้ามี)</label><input id="p-edd" type="date" /><div class="muted" style="font-size:11px;margin-top:3px">ใช้แสดงวันคลอดเท่านั้น ไม่ใช้คำนวณอายุครรภ์</div></div>
           <div class="divider"></div>
           <div class="field"><div class="row">
             <div><label>ส่วนสูง (ซม.)</label><input id="p-h" type="number" inputmode="decimal" placeholder="160" /></div>
@@ -65,9 +73,14 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="disclaimer">การคำนวณเป็นค่าประมาณ กำหนดคลอดจริงควรยึดผลอัลตราซาวด์และคำวินิจฉัยของแพทย์</div>
       `;
       root.querySelector('#p-save').onclick = () => {
-        const lmp = root.querySelector('#p-lmp').value;
-        const edd = root.querySelector('#p-edd').value;
-        if (!lmp && !edd) return MB.toast('กรอก LMP หรือวันกำหนดคลอดอย่างน้อย 1 อย่าง');
+        let lmp = root.querySelector('#p-lmp').value || null;
+        const edd = root.querySelector('#p-edd').value || null;
+        const gw = parseInt(root.querySelector('#p-gw').value, 10);
+        if (!isNaN(gw) && gw >= 0) {   // กรอกอายุครรภ์เอง → แปลงเป็น LMP (วันนี้ − อายุครรภ์)
+          const gd = Math.min(6, Math.max(0, parseInt(root.querySelector('#p-gd').value, 10) || 0));
+          lmp = U.addDays(S.todayISO(), -(gw * 7 + gd));
+        }
+        if (!lmp && !edd) return MB.toast('กรอกอายุครรภ์ หรือ LMP/วันกำหนดคลอด');
         S.setPreg({
           active: true, lmp: lmp || null, edd: edd || null,
           name: root.querySelector('#p-name').value.trim(),
@@ -405,28 +418,43 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       title: 'แก้ไขการตั้งครรภ์',
       html: `
         <div class="field"><label>ชื่อเล่น</label><input id="e-name" value="${U.esc(preg.name || '')}" /></div>
-        <div class="field"><label>📅 วันแรกของประจำเดือนครั้งสุดท้าย (LMP) <span style="color:var(--pink-deep);font-weight:700">— ใช้คำนวณอายุครรภ์</span></label><input id="e-lmp" type="date" value="${preg.lmp || ''}" max="${S.todayISO()}" /></div>
-        <div class="field"><label>วันกำหนดคลอด / นัดผ่าคลอด (ถ้ามี)</label><input id="e-edd" type="date" value="${preg.edd || ''}" /><div class="muted" style="font-size:11px;margin-top:3px">ใช้แสดงวันคลอดเท่านั้น — อายุครรภ์ยึดจาก LMP เพราะวันผ่าคลอดที่หมอนัดไม่ตรงอายุครรภ์จริง</div></div>
+        <div class="field"><label>🩺 อายุครรภ์ตอนนี้ (ตามที่หมอ/อัลตราซาวด์บอก) <span style="color:var(--pink-deep);font-weight:700">— ตรงที่สุด</span></label>
+          <div class="row">
+            <div><input id="e-gw" type="number" inputmode="numeric" min="0" max="42" placeholder="สัปดาห์" /></div>
+            <div><input id="e-gd" type="number" inputmode="numeric" min="0" max="6" placeholder="วัน (0–6)" /></div>
+          </div>
+          <div class="muted" style="font-size:11px;margin-top:3px">กรอกอายุครรภ์ ณ วันนี้ แล้วระบบคำนวณให้ตรงกับหมอเป๊ะ</div>
+        </div>
+        <p class="muted center" style="font-size:12px;margin:2px 0 8px">— หรือกรอกเป็นวันที่ —</p>
+        <div class="field"><label>วันแรกของประจำเดือนครั้งสุดท้าย (LMP)</label><input id="e-lmp" type="date" value="${preg.lmp || ''}" max="${S.todayISO()}" /></div>
+        <div class="field"><label>วันกำหนดคลอด / นัดผ่าคลอด (ถ้ามี)</label><input id="e-edd" type="date" value="${preg.edd || ''}" /><div class="muted" style="font-size:11px;margin-top:3px">ใช้แสดงวันคลอดเท่านั้น ไม่ใช้คำนวณอายุครรภ์</div></div>
         <div class="card tint" id="e-preview" style="text-align:center;font-size:13.5px;padding:10px"></div>
         <button class="btn pink" id="e-save">บันทึก</button>
         <button class="btn ghost" id="e-off" style="margin-top:10px;color:#D9737A">ปิดโหมดตั้งครรภ์</button>
       `,
       onMount(rt) {
-        const lmpEl = rt.querySelector('#e-lmp'), eddEl = rt.querySelector('#e-edd'), prev = rt.querySelector('#e-preview');
-        // LMP เป็นตัวคำนวณอายุครรภ์เสมอ; กำหนดคลอด/นัดผ่าคลอด เก็บไว้แสดงวันคลอดเฉย ๆ
-        function effective() { return { lmp: lmpEl.value || null, edd: eddEl.value || null }; }
+        const lmpEl = rt.querySelector('#e-lmp'), eddEl = rt.querySelector('#e-edd'),
+          gwEl = rt.querySelector('#e-gw'), gdEl = rt.querySelector('#e-gd'), prev = rt.querySelector('#e-preview');
+        // ลำดับความสำคัญ: อายุครรภ์ที่กรอกเอง > LMP > กำหนดคลอด
+        function effective() {
+          const gw = parseInt(gwEl.value, 10);
+          if (!isNaN(gw) && gw >= 0) {
+            const gd = Math.min(6, Math.max(0, parseInt(gdEl.value, 10) || 0));
+            return { lmp: U.addDays(S.todayISO(), -(gw * 7 + gd)), edd: eddEl.value || null };  // LMP = วันนี้ − อายุครรภ์
+          }
+          return { lmp: lmpEl.value || null, edd: eddEl.value || null };
+        }
         function refresh() {
           const info = U.pregInfo(effective());
           prev.innerHTML = info
-            ? `ตอนนี้ ~สัปดาห์ที่ <b>${info.week}</b>${info.day ? ' +' + info.day + ' วัน' : ''}${info.lmp ? ' (คิดจาก LMP)' : ''} · กำหนดคลอด <b>${U.fmtDateTH(info.edd)}</b>`
-            : 'กรอก LMP หรือกำหนดคลอด เพื่อคำนวณอายุครรภ์';
+            ? `ตอนนี้ ~สัปดาห์ที่ <b>${info.week}</b>${info.day ? ' +' + info.day + ' วัน' : ''} · กำหนดคลอด <b>${U.fmtDateTH(info.edd)}</b>`
+            : 'กรอกอายุครรภ์ หรือ LMP/กำหนดคลอด';
         }
-        lmpEl.onchange = refresh;
-        eddEl.onchange = refresh;
+        [lmpEl, eddEl, gwEl, gdEl].forEach(el => { el.onchange = refresh; el.oninput = refresh; });
         refresh();
         rt.querySelector('#e-save').onclick = () => {
           const eff = effective();
-          if (!eff.lmp && !eff.edd) return MB.toast('กรอก LMP หรือกำหนดคลอดอย่างน้อย 1 อย่าง');
+          if (!eff.lmp && !eff.edd) return MB.toast('กรอกอายุครรภ์ หรือ LMP/กำหนดคลอด');
           S.setPreg({ name: rt.querySelector('#e-name').value.trim(), lmp: eff.lmp, edd: eff.edd });
           MB.closeSheet(); MB.toast('บันทึกแล้ว'); MB.go('preg');
         };
