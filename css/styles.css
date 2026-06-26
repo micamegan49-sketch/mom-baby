@@ -111,6 +111,7 @@ a { color: var(--pink-deep); }
 }
 .card.flat { box-shadow: none; }
 .card.tint { background: linear-gradient(135deg, #FFF8F3, #FCEEE6); }
+.card.onboard { border: 1.5px solid var(--brown); }
 
 /* Hero / banner */
 .hero {

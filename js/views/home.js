@@ -92,19 +92,19 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           <h2 style="margin:8px 0 4px;color:var(--brown-deep)">ยินดีต้อนรับสู่ ตัวจิ๋ว</h2>
           <p class="muted" style="margin:0 0 22px">ผู้ช่วยดูแลคุณแม่และลูกน้อย<br/>ตั้งแต่ในครรภ์จนถึงวัยเตาะแตะ</p>
         </div>
-        <div class="card tint" id="start-plan" style="display:flex;align-items:center;gap:14px">
+        <div class="card tint onboard" id="start-plan" style="display:flex;align-items:center;gap:14px">
           <div style="font-size:40px">🌷</div>
           <div style="flex:1"><div style="font-weight:800;font-size:17px">วางแผนมีลูก</div>
           <div class="muted" style="font-size:13px">คำนวณวันไข่ตก & ช่วงมีบุตรง่าย</div></div>
           <div style="font-size:22px;color:var(--pink-deep)">›</div>
         </div>
-        <div class="card tint" id="start-preg" style="display:flex;align-items:center;gap:14px">
+        <div class="card tint onboard" id="start-preg" style="display:flex;align-items:center;gap:14px">
           <div style="font-size:40px">🤰</div>
           <div style="flex:1"><div style="font-weight:800;font-size:17px">กำลังตั้งครรภ์</div>
           <div class="muted" style="font-size:13px">ติดตามครรภ์รายสัปดาห์ เทียบขนาดลูก นับลูกดิ้น</div></div>
           <div style="font-size:22px;color:var(--pink-deep)">›</div>
         </div>
-        <div class="card tint" id="start-baby" style="display:flex;align-items:center;gap:14px">
+        <div class="card tint onboard" id="start-baby" style="display:flex;align-items:center;gap:14px">
           <div style="font-size:40px">👶</div>
           <div style="flex:1"><div style="font-weight:800;font-size:17px">มีลูกแล้ว</div>
           <div class="muted" style="font-size:13px">บันทึกประจำวัน วัคซีน กราฟเติบโต พัฒนาการ</div></div>
