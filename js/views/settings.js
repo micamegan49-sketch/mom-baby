@@ -408,6 +408,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     if (MB.cloud) {
       paintCloud();
       MB.views._cloudUnsub = MB.cloud.onChange(() => paintCloud());
+      MB.cloud.init();   // โหลดไลบรารีคลาวด์แบบ lazy เมื่อผู้ใช้เปิดหน้าตั้งค่า (กรณียังไม่เคยล็อกอิน)
     } else {
       root.querySelector('#cloud-card').innerHTML =
         '<p class="muted" style="font-size:13px;margin:0">ระบบคลาวด์ยังไม่พร้อม (อาจกำลังออฟไลน์) — แอพใช้งานออฟไลน์ได้ตามปกติ</p>';

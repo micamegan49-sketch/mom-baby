@@ -181,10 +181,8 @@ window.MB = window.MB || {};
 
     async init(reinit) {
       if (!window.supabase) {
-        // เผื่อสคริปต์ supabase ยังโหลดไม่เสร็จ — ลองใหม่เป็นระยะ (สูงสุด ~6 วินาที)
-        if ((MB.cloud._waitTries = (MB.cloud._waitTries || 0) + 1) <= 40)
-          setTimeout(() => { try { MB.cloud.init(reinit); } catch (e) {} }, 150);
-        emit(); return;
+        await loadLib();                              // โหลดไลบรารี Supabase แบบ lazy เมื่อต้องใช้จริง
+        if (!window.supabase) { emit(); return; }     // โหลดไม่ได้ (ออฟไลน์) — แอพยังทำงานออฟไลน์ได้
       }
       const c = cfg();
       if (!c) { emit(); return; }
@@ -209,6 +207,7 @@ window.MB = window.MB || {};
     },
 
     async signUp(email, password) {
+      if (!client) await MB.cloud.init();
       if (!client) throw new Error('ยังไม่ได้ตั้งค่า Supabase');
       const { data, error } = await client.auth.signUp({ email, password });
       if (error) throw error;
@@ -217,6 +216,7 @@ window.MB = window.MB || {};
       return data;
     },
     async signIn(email, password) {
+      if (!client) await MB.cloud.init();
       if (!client) throw new Error('ยังไม่ได้ตั้งค่า Supabase');
       const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -323,18 +323,36 @@ window.MB = window.MB || {};
 
   /* โหลดไลบรารี Supabase (204KB) แบบ lazy — ไม่บล็อกการเปิดแอพ
      โหลดเบื้องหลังหลังแอพพร้อมแล้ว (ฟีเจอร์ซิงค์เป็นทางเลือก ใช้ไม่บ่อย) */
-  function loadSupabaseThenInit() {
-    if (window.supabase) { MB.cloud.init(); return; }
-    var s = document.createElement('script');
-    s.src = './js/lib/supabase.js';
-    s.async = true;
-    s.onload = function () { try { MB.cloud.init(); } catch (e) {} };
-    s.onerror = function () {};
-    document.head.appendChild(s);
+  // โหลดไลบรารี Supabase (204KB) แบบ lazy — โหลดเฉพาะเมื่อต้องใช้จริง (คืน Promise โหลดครั้งเดียว)
+  function loadLib() {
+    if (window.supabase) return Promise.resolve();
+    if (loadLib._p) return loadLib._p;
+    loadLib._p = new Promise(function (resolve) {
+      var s = document.createElement('script');
+      s.src = './js/lib/supabase.js';
+      s.async = true;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { resolve(); };   // โหลดไม่ได้ก็ไม่เป็นไร แอพทำงานออฟไลน์ต่อได้
+      document.head.appendChild(s);
+    });
+    return loadLib._p;
+  }
+  // เคยล็อกอินค้างไว้ไหม — เช็กจาก session ที่ supabase เก็บใน localStorage (ไม่ต้องโหลดไลบรารี)
+  function hasSavedSession() {
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && /^sb-.*-auth-token$/.test(k)) return true;
+      }
+    } catch (e) {}
+    return false;
   }
   function bootCloud() {
+    // โหลด+ซิงค์อัตโนมัติเฉพาะผู้ที่ "เคยล็อกอินแล้ว" เท่านั้น
+    // ผู้ใช้ใหม่/ยังไม่ล็อกอิน จะโหลดไลบรารีตอนเปิด "ตั้งค่า → บัญชี & ซิงค์" แทน (ประหยัด ~204KB ตอนเปิดแอพ)
+    if (!cfg() || !hasSavedSession()) return;
     var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1200); };
-    idle(loadSupabaseThenInit);
+    idle(function () { MB.cloud.init(); });
   }
   if (document.readyState === 'loading')
     document.addEventListener('DOMContentLoaded', bootCloud);
