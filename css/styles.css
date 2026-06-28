@@ -94,6 +94,21 @@ a { color: var(--pink-deep); }
 .view { padding: 16px 16px 8px; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
+/* ===== iPad / จอใหญ่: ทำให้คอลัมน์แอปดู "ตั้งใจ" ไม่โล่ง =====
+   พื้นหลังข้าง ๆ เป็นกราเดียนต์สีแบรนด์ + เงารอบคอลัมน์ ให้ดูเหมือนแผงแอปกึ่งกลาง */
+@media (min-width: 700px) {
+  :root { --maxw: 540px; }
+  body {
+    background: linear-gradient(160deg, var(--brown) 0%, #A06F58 45%, var(--pink-deep) 120%);
+    background-attachment: fixed;
+  }
+  #app {
+    box-shadow: 0 0 55px rgba(74, 51, 42, 0.40);
+  }
+  /* แถบเมนูล่างยังตรึงกึ่งกลาง (กว้างเท่าคอลัมน์) ขอบบนชัดขึ้นบนพื้นกราเดียนต์ */
+  .tabbar { box-shadow: 0 -2px 18px rgba(74, 51, 42, 0.22); }
+}
+
 .section-title {
   font-size: 15px; font-weight: 700; color: var(--brown-dark);
   margin: 18px 4px 10px; display: flex; align-items: center; gap: 7px;
