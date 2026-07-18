@@ -126,11 +126,12 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <div class="chip ${!cat ? 'active' : ''}" data-cat="">ทั้งหมด</div>
       ${Object.keys(cats).map(k => `<div class="chip ${cat === k ? 'active' : ''}" data-cat="${k}">${cats[k].em} ${cats[k].label}</div>`).join('')}
     </div>`;
+    const CAT_TINT = { feed: 'rose', sleep: 'peach', health: 'mint', preg: 'lilac', insure: 'sky' };
     const list = MB.ARTICLES.filter(a => !cat || a.cat === cat);
-    const cards = list.map(a => `<div class="card" data-art="${a.id}" style="display:flex;align-items:center;gap:12px;cursor:pointer">
-      <div style="font-size:30px">${a.em}</div>
-      <div style="flex:1"><div style="font-weight:700">${U.esc(a.title)}</div><div class="muted" style="font-size:12.5px">${cats[a.cat] ? cats[a.cat].label : ''}</div></div>
-      <div style="color:var(--pink-deep);font-size:20px">›</div></div>`).join('');
+    const cards = list.map(a => `<div class="card art-item ${CAT_TINT[a.cat] || 'rose'}" data-art="${a.id}">
+      <div class="ic">${a.em}</div>
+      <div class="body"><div class="t">${U.esc(a.title)}</div><div class="s">${cats[a.cat] ? cats[a.cat].label : ''}</div></div>
+      <div class="chev">›</div></div>`).join('');
     return chips + (cards || '<p class="muted center">ไม่มีบทความในหมวดนี้</p>');
   }
 
