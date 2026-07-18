@@ -188,7 +188,7 @@ window.MB = window.MB || {};
     const nb = (MB.buildNotifications ? MB.buildNotifications() : []).length;
     bar.innerHTML = `
       <div class="brand">
-        <span class="mark">👣</span>
+        <span class="mark"><img src="icons/logo.png" alt="ตัวจิ๋ว"></span>
         <div class="bt"><div class="tt">ตัวจิ๋ว <i>💗</i></div><div class="sub">บันทึกรัก…ทุกการเติบโต</div></div>
       </div>
       <div class="spacer"></div>
