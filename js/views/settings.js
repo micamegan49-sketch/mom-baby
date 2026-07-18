@@ -84,6 +84,11 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
       <div class="section-title">🔔 อื่น ๆ</div>
       <div class="card">
+        <div class="list-item" id="notif-row" style="cursor:default">
+          <div class="ic">🔔</div>
+          <div class="body"><div class="t">แจ้งเตือนบนมือถือ</div><div class="s" id="notif-sub">เตือนวัคซีน นัดหมาย และบันทึกประจำวันให้อัตโนมัติ</div></div>
+          <label class="switch"><input type="checkbox" id="notif-toggle"><span class="slider"></span></label>
+        </div>
         <div class="list-item" id="go-appt">
           <div class="ic">🔔</div>
           <div class="body"><div class="t">นัดหมาย & การเตือน</div><div class="s">ฝากครรภ์ วัคซีน หมอเด็ก</div></div>
@@ -135,6 +140,26 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelector('#go-preg').onclick = () => MB.go('preg');
     root.querySelector('#go-appt').onclick = () => MB.go('appt');
     root.querySelector('#go-diary').onclick = () => MB.go('diary');
+
+    // สวิตช์แจ้งเตือนบนมือถือ
+    const nt = root.querySelector('#notif-toggle'), nsub = root.querySelector('#notif-sub');
+    if (nt) {
+      nt.checked = MB.notify ? MB.notify.isEnabled() : false;
+      if (MB.notify && !MB.notify.isNative())
+        nsub.textContent = 'ใช้ได้เต็มรูปแบบในแอพบนมือถือ (App Store / Play) — บนเว็บเป็นการทดสอบ';
+      nt.onchange = async () => {
+        if (!MB.notify) { nt.checked = false; return; }
+        if (nt.checked) {
+          const r = await MB.notify.enable();
+          if (r && r.supported === false) { nt.checked = false; MB.toast('อุปกรณ์นี้ไม่รองรับการแจ้งเตือน'); }
+          else if (r && r.granted === false) { nt.checked = false; MB.toast('กรุณาอนุญาตแจ้งเตือนในการตั้งค่าเครื่อง'); }
+          else MB.toast('เปิดแจ้งเตือนแล้ว 🔔');
+        } else {
+          await MB.notify.disable();
+          MB.toast('ปิดแจ้งเตือนแล้ว');
+        }
+      };
+    }
     const installBtn = root.querySelector('#install');
     if (MB._installPrompt) {
       installBtn.style.display = 'block';

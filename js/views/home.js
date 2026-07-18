@@ -196,10 +196,10 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const vaxTotal = vlistAll.filter(x => x.group === 'พื้นฐาน').length;
     const notifs = MB.buildNotifications();
     const summaryHtml = `
-      <div class="summary-card">
-        <div class="su" data-go="log"><div class="v">${logs.length}</div><div class="l">📝 บันทึก</div></div>
-        <div class="su" data-go="vax"><div class="v">${vaxDone}<small>/${vaxTotal}</small></div><div class="l">💉 วัคซีน</div></div>
-        <div class="su" data-go="growth"><div class="v">${meas.length}</div><div class="l">📈 การวัด</div></div>
+      <div class="stat3">
+        <div class="s3 sky" data-go="log"><div class="ic">📝</div><div class="v">${logs.length}</div><div class="l">บันทึก</div><div class="sub">ทั้งหมด</div></div>
+        <div class="s3 mint" data-go="vax"><div class="ic">💉</div><div class="v">${vaxDone}<small>/${vaxTotal}</small></div><div class="l">วัคซีน</div><div class="sub">ที่กำหนด</div></div>
+        <div class="s3 lilac" data-go="growth"><div class="ic">📈</div><div class="v">${meas.length}</div><div class="l">การวัด</div><div class="sub">ข้อมูล</div></div>
       </div>`;
     const notifHtml = notifs.length ? `
       <div class="section-title">🔔 การแจ้งเตือน <span class="more" data-notif>ดูทั้งหมด</span></div>
@@ -208,13 +208,17 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         ${notifs.length > 3 ? `<div class="muted center" style="font-size:12.5px;padding:9px 0;cursor:pointer" data-notif>+ อีก ${notifs.length - 3} รายการ</div>` : ''}
       </div>` : '';
 
+    const canSwitch = S.children().length > 1 || preg.active;
+    const heroDeco = MB.babyHeroSVG ? MB.babyHeroSVG() : '';
     root.innerHTML = `
-      <div class="hero">
+      <div class="hero"${canSwitch ? ' data-switch' : ''} style="${canSwitch ? 'cursor:pointer' : ''}">
+        ${heroDeco}
         <div class="emoji">${child.emoji || '👶'}</div>
         <div style="flex:1">
           <h2>${U.esc(child.name)}</h2>
           <p>อายุ ${a.label} · ${child.sex === 'M' ? 'ชาย 👦' : 'หญิง 👧'}</p>
           ${lastFeed ? `<p style="margin-top:2px">🍼 ให้นมล่าสุด ${U.relTime(lastFeed.ts)}</p>` : ''}
+          ${canSwitch ? '<div class="switch-hint">▾ แตะเพื่อสลับ</div>' : ''}
         </div>
       </div>
 
@@ -228,17 +232,17 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
       <div class="section-title">⚡ บันทึกด่วน</div>
       <div class="quick-grid">
-        <button class="quick" data-q="feed"><span class="ic">🍼</span><span class="lb">ให้นม</span></button>
-        <button class="quick" data-q="sleep"><span class="ic">😴</span><span class="lb">การนอน</span></button>
-        <button class="quick" data-q="diaper"><span class="ic">🧷</span><span class="lb">ผ้าอ้อม</span></button>
-        <button class="quick" data-q="note"><span class="ic">📝</span><span class="lb">บันทึก</span></button>
+        <button class="quick rose" data-q="feed"><span class="ic">🍼</span><span class="lb">ให้นม</span></button>
+        <button class="quick lilac" data-q="sleep"><span class="ic">🌙</span><span class="lb">การนอน</span></button>
+        <button class="quick sky" data-q="diaper"><span class="ic">🧷</span><span class="lb">ผ้าอ้อม</span></button>
+        <button class="quick peach" data-q="note"><span class="ic">📝</span><span class="lb">บันทึก</span></button>
       </div>
 
       <div class="section-title">📊 วันนี้ <span class="more" data-go="log">ดูประวัติ ›</span></div>
       <div class="stat-row">
-        <div class="stat" data-go="log" style="cursor:pointer"><div class="v">${feeds}</div><div class="l">🍼 มื้อนม</div></div>
-        <div class="stat" data-go="log" style="cursor:pointer"><div class="v">${sleepH || '0'}</div><div class="l">😴 ชม.นอน</div></div>
-        <div class="stat" data-go="log" style="cursor:pointer"><div class="v">${diapers}</div><div class="l">🧷 ผ้าอ้อม</div></div>
+        <div class="stat rose" data-go="log" style="cursor:pointer"><div class="ic">🍼</div><div class="v">${feeds}</div><div class="l">มื้อนม</div></div>
+        <div class="stat mint" data-go="log" style="cursor:pointer"><div class="ic">🌙</div><div class="v">${sleepH || '0'}</div><div class="l">ชม.นอน</div></div>
+        <div class="stat sky" data-go="log" style="cursor:pointer"><div class="ic">🧷</div><div class="v">${diapers}</div><div class="l">ผ้าอ้อม</div></div>
       </div>
 
       ${tipCardHtml(stage)}
@@ -287,6 +291,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     `;
 
     root.querySelectorAll('[data-q]').forEach(b => b.onclick = () => MB.views.quickLog(b.dataset.q));
+    root.querySelectorAll('[data-switch]').forEach(n => n.onclick = () => MB.openChildSwitcher && MB.openChildSwitcher());
     root.querySelectorAll('[data-go]').forEach(n => n.onclick = () => MB.go(n.dataset.go));
     root.querySelectorAll('[data-art]').forEach(n => n.onclick = () => MB.openArticle(n.dataset.art));
     root.querySelectorAll('[data-ni]').forEach(n => n.onclick = () => { const it = notifs[+n.dataset.ni]; if (it && it.go) MB.go(it.go, it.params); });

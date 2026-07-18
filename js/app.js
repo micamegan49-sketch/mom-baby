@@ -135,12 +135,14 @@ window.MB = window.MB || {};
   }
 
   /* ============ เราเตอร์ ============ */
+  // ไอคอนแถบล่าง = เส้น SVG (สะอาด คมชัด ใช้สี currentColor ตามสถานะ active)
+  const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
   const TABS = [
-    { id: 'home',    label: 'หน้าหลัก',  ic: '🏠' },
-    { id: 'log',     label: 'บันทึก',    ic: '📝' },
-    { id: 'vax',     label: 'วัคซีน',    ic: '💉' },
-    { id: 'growth',  label: 'เติบโต',    ic: '📈' },
-    { id: 'develop', label: 'ความรู้',   ic: '📚' }
+    { id: 'home',    label: 'หน้าหลัก',  ic: svg('<path d="M15 21v-7a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v7"/><path d="M3 10.2a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6a2 2 0 0 1 .7 1.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>') },
+    { id: 'log',     label: 'บันทึก',    ic: svg('<path d="M2 6h4M2 10h4M2 14h4M2 18h4"/><rect x="4" y="2.5" width="16" height="19" rx="2.6"/><path d="M9.5 8h5M9.5 12H16M9.5 16H14"/>') },
+    { id: 'vax',     label: 'วัคซีน',    ic: svg('<path d="m18 2 4 4M17 7l3-3"/><path d="M18.5 8.5 8.2 18.8c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L14.5 4.5"/><path d="m9 11 4 4M5 19l-3 3M14 4l6 6"/>') },
+    { id: 'growth',  label: 'เติบโต',    ic: svg('<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>') },
+    { id: 'develop', label: 'ความรู้',   ic: svg('<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>') }
   ];
   let current = 'home';
   let currentParams = {};
@@ -149,6 +151,7 @@ window.MB = window.MB || {};
     current = route;
     render(params);
     window.scrollTo(0, 0);            // เลื่อนขึ้นบนสุดเมื่อเปลี่ยนหน้า (เลื่อนแบบเอกสารปกติ)
+    if (MB.notify) MB.notify.rescheduleSoon();   // ข้อมูลอาจเปลี่ยน → ตั้งเตือนใหม่ (debounce, no-op บนเว็บ)
   }
 
   /* ลิงก์ลึกผ่าน URL hash เช่น #develop (บทความ/ความรู้), #pregnancy, #prices, #vaccine
@@ -169,19 +172,24 @@ window.MB = window.MB || {};
     const bar = document.getElementById('appbar');
     const child = S.activeChild();
     const preg = S.preg();
-    let pill = '';
-    if (child) {
-      const a = ageInfo(child.birthDate);
-      pill = `<button class="child-pill" id="childPill"><span class="avatar">${child.emoji || '👶'}</span><span class="nm">${esc(child.name)} · ${esc(a.label)}</span></button>`;
-    } else if (preg.active) {
-      const p = pregInfo(preg);
-      pill = `<button class="child-pill" id="childPill"><span class="avatar">🤰</span><span class="nm">${p ? 'สัปดาห์ ' + p.week : 'ตั้งครรภ์'}</span></button>`;
+    const kids = S.children();
+    // ปุ่มสลับลูก: โผล่เฉพาะเมื่อมีมากกว่า 1 คน หรือมีทั้งลูก+ครรภ์ (คนเดียวไม่ต้องรก)
+    const showSwitch = kids.length > 1 || (kids.length >= 1 && preg.active);
+    let sw = '';
+    if (showSwitch) {
+      const av = child ? (child.emoji || '👶') : '🤰';
+      sw = `<button class="mini-switch" id="childPill" aria-label="สลับลูก"><span>${av}</span><small>▾</small></button>`;
     }
     const nb = (MB.buildNotifications ? MB.buildNotifications() : []).length;
-    const bell = `<button class="icon-btn" id="bellBtn" aria-label="การแจ้งเตือน">🔔${nb ? `<span class="badge-dot">${nb > 9 ? '9+' : nb}</span>` : ''}</button>`;
-    bar.innerHTML = `<div class="logo"><span class="mark">👣</span> ตัวจิ๋ว</div>
-      <div class="spacer"></div>${pill}${bell}
-      <button class="child-pill" id="settingsBtn" style="max-width:none"><span class="avatar">⚙️</span></button>`;
+    bar.innerHTML = `
+      <div class="brand">
+        <span class="mark">👣</span>
+        <div class="bt"><div class="tt">ตัวจิ๋ว <i>💗</i></div><div class="sub">บันทึกรัก…ทุกการเติบโต</div></div>
+      </div>
+      <div class="spacer"></div>
+      ${sw}
+      <button class="pill-btn" id="bellBtn" aria-label="การแจ้งเตือน">🔔<span>แจ้งเตือน</span>${nb ? `<b class="badge-dot">${nb > 9 ? '9+' : nb}</b>` : ''}</button>
+      <button class="pill-btn" id="settingsBtn" aria-label="ตั้งค่า">⚙️<span>ตั้งค่า</span></button>`;
     const cp = document.getElementById('childPill');
     if (cp) cp.onclick = openChildSwitcher;
     document.getElementById('bellBtn').onclick = openNotifications;
@@ -255,6 +263,7 @@ window.MB = window.MB || {};
   document.addEventListener('DOMContentLoaded', () => {
     if (!routeFromHash()) render();
     window.addEventListener('hashchange', routeFromHash);
+    if (MB.notify) MB.notify.init();   // แจ้งเตือนบนมือถือ (เนทีฟ) — ขออนุญาต + ตั้งเตือนจากข้อมูล
     // เลิกใช้ service worker ทั้งหมด (ทั้งเว็บ/เนทีฟ) — SW เดิมทำให้มือถือค้างที่แคชเก่า/ไฟล์ปนรุ่น
     // โหลดสดจากเน็ตเสมอ = ของใหม่ ครบ ไม่ค้าง (sw.js ตัวปิดตัวเองจะล้างแคช+เลิก SW ให้เครื่องที่ยังค้างอยู่)
     if ('serviceWorker' in navigator) {
