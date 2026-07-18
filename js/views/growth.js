@@ -97,14 +97,14 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         ${st ? `<div class="center" style="margin-top:10px"><span class="badge ${st.c}">${METRICS[metric].label}ล่าสุด: ${st.t}</span></div>` : ''}
       </div>
       <button class="btn pink" id="add-m">+ บันทึกการวัดวันนี้</button>
-      <div class="section-title">ประวัติการวัด</div>
-      ${meas.length ? `<div class="card" style="padding:6px 14px">${meas.slice().reverse().map(m => {
-        const a = U.ageInfo(m.date); // not used; show date
-        return `<div class="list-item" data-del="${m.id}">
-          <div class="ic">📏</div>
+      <div class="section-title">🕘 ประวัติการวัด</div>
+      ${meas.length ? `<div class="card timeline" style="padding:4px 14px">${meas.slice().reverse().map((m, i, arr) => {
+        return `<div class="tl-item${i === arr.length - 1 ? ' last' : ''}" data-del="${m.id}">
+          <span class="tl-rail"><span class="tl-dot" style="background:#8FB9D9"></span></span>
+          <div class="ic sky">📏</div>
           <div class="body"><div class="t">${[m.weight ? m.weight + ' กก.' : '', m.height ? m.height + ' ซม.' : '', m.head ? 'รอบหัว ' + m.head : ''].filter(Boolean).join(' · ')}</div>
           <div class="s">อายุ ~${(U.daysBetween(child.birthDate, m.date) / 30.4375).toFixed(1)} เดือน</div></div>
-          <div class="meta">${U.fmtDateTH(m.date)}<br/><span style="color:#D9737A;font-size:11px">ลบ</span></div>
+          <div class="meta">${U.fmtDateTH(m.date)}<br><span class="del">ลบ</span></div>
         </div>`;
       }).join('')}</div>` : '<div class="empty"><div class="em">📏</div><p>ยังไม่มีข้อมูล เริ่มบันทึกน้ำหนัก/ส่วนสูงได้เลย</p></div>'}
       <div class="disclaimer">เกณฑ์อ้างอิงอิง WHO Child Growth Standards (ค่าโดยประมาณ) ใช้ดู “แนวโน้ม” การเติบโต ไม่ใช่การวินิจฉัย หากกราฟตก/แบนผิดปกติ ควรปรึกษากุมารแพทย์</div>
