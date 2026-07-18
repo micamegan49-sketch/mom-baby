@@ -97,17 +97,23 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       <b style="color:#B9802F">⚠️ สัญญาณที่ควรปรึกษาแพทย์ (ราว ${mLabel(rf.m)})</b>
       <p style="margin:6px 0 0;font-size:13.5px">${rf.text}</p></div>` : '';
 
+    const DOM_TINT = { motor: 'peach', fine: 'sky', lang: 'rose', social: 'peach', cog: 'lilac' };
+    const DOM_DOT = { motor: '#D9A06A', fine: '#6FA8D6', lang: '#E59BA6', social: '#E0A94E', cog: '#9B7ED0' };
     return rfCard + ages.map(a => {
       const items = MB.MILESTONES.filter(m => m.m === a);
       const cur = a === curBand;
-      return `<div class="section-title">${MB.DOMAINS ? '' : ''}📅 ${mLabel(a)} ${cur ? '<span class="badge soon" style="margin-left:6px">ช่วงนี้</span>' : ''}</div>
-        <div class="card" style="padding:6px 14px;${cur ? 'border-color:var(--pink);' : ''}">
-          ${items.map(m => {
+      return `<div class="section-title">📅 ${mLabel(a)} ${cur ? '<span class="badge soon" style="margin-left:6px">ช่วงนี้</span>' : ''}</div>
+        <div class="card timeline ms" style="padding:4px 14px;${cur ? 'border-color:var(--pink);' : ''}">
+          ${items.map((m, i) => {
             const done = ms[m.id] && ms[m.id].done;
             const d = MB.DOMAINS[m.domain] || { em: '•', label: '' };
-            return `<div class="list-item" data-ms="${m.id}">
-              <div class="ic" style="background:${done ? '#E6F3E9' : 'var(--cream-2)'}">${done ? '✅' : d.em}</div>
+            const tint = done ? 'done' : (DOM_TINT[m.domain] || 'peach');
+            const dot = done ? '#5FBF9B' : (DOM_DOT[m.domain] || '#D9A06A');
+            return `<div class="tl-item${i === items.length - 1 ? ' last' : ''}" data-ms="${m.id}">
+              <span class="tl-rail"><span class="tl-dot" style="background:${dot}"></span></span>
+              <div class="ic ${tint}">${done ? '✅' : d.em}</div>
               <div class="body"><div class="t">${U.esc(m.text)}</div><div class="s">${d.label}</div></div>
+              <div class="chev">${done ? '✓' : '›'}</div>
             </div>`;
           }).join('')}
         </div>`;
