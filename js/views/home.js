@@ -124,6 +124,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       const wk = (MB.PREG_WEEKS.find(x => x.w === (p ? p.week : 0))) || MB.PREG_WEEKS[0];
       root.innerHTML = `
         <div class="hero" id="open-preg">
+          ${MB.pregHeroSVG ? MB.pregHeroSVG() : ''}
           <div class="emoji" style="padding:2px">${MB.fruitSVG((MB.PREG_FRUIT_KEY && MB.PREG_FRUIT_KEY[p ? p.week : 0]) || 'seed', 60, { bare: true })}</div>
           <div style="flex:1">
             <div class="tag-week">ไตรมาส ${p ? p.trimester : 1}</div>
@@ -208,42 +209,52 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         ${notifs.length > 3 ? `<div class="muted center" style="font-size:12.5px;padding:9px 0;cursor:pointer" data-notif>+ อีก ${notifs.length - 3} รายการ</div>` : ''}
       </div>` : '';
 
-    const canSwitch = S.children().length > 1 || preg.active;
     const heroDeco = MB.babyHeroSVG ? MB.babyHeroSVG() : '';
+    const LT = MB.LOG_TYPE || {};
+    const QUICK = [['feed', 'rose'], ['sleep', 'lilac'], ['diaper', 'sky'], ['note', 'peach'], ['health', 'mint']];
+    const DOT = { feed: '#E59BA6', sleep: '#9B7ED0', diaper: '#6FA8D6', note: '#D9A06A', health: '#5FBF9B' };
+    const TINT = { feed: 'rose', sleep: 'lilac', diaper: 'sky', note: 'peach', health: 'mint' };
+    const recent = logs.slice(0, 4);
+    const histHtml = recent.length ? `
+      <div class="section-title">🕘 ประวัติ <span class="more" data-go="log">ดูทั้งหมด ›</span></div>
+      <div class="card timeline" style="padding:4px 14px">
+        ${recent.map((l, i) => `<div class="tl-item${i === recent.length - 1 ? ' last' : ''}" data-del="${l.id}">
+          <span class="tl-rail"><span class="tl-dot" style="background:${DOT[l.type] || '#C9B7A8'}"></span></span>
+          <div class="ic ${TINT[l.type] || ''}">${LT[l.type] ? LT[l.type].em : '📝'}</div>
+          <div class="body"><div class="t">${U.esc(MB.logTitle ? MB.logTitle(l) : (l.text || 'บันทึก'))}</div></div>
+          <div class="meta">${U.fmtTime(l.ts)}<br><span class="del">ลบ</span></div>
+        </div>`).join('')}
+      </div>` : '';
+
     root.innerHTML = `
-      <div class="hero"${canSwitch ? ' data-switch' : ''} style="${canSwitch ? 'cursor:pointer' : ''}">
+      <div class="hero">
         ${heroDeco}
-        <div class="emoji">${child.emoji || '👶'}</div>
+        <div class="emoji">${MB.avatar(child)}</div>
         <div style="flex:1">
           <h2>${U.esc(child.name)}</h2>
           <p>อายุ ${a.label} · ${child.sex === 'M' ? 'ชาย 👦' : 'หญิง 👧'}</p>
           ${lastFeed ? `<p style="margin-top:2px">🍼 ให้นมล่าสุด ${U.relTime(lastFeed.ts)}</p>` : ''}
-          ${canSwitch ? '<div class="switch-hint">▾ แตะเพื่อสลับ</div>' : ''}
         </div>
       </div>
 
-      ${summaryHtml}
-      ${notifHtml}
+      ${MB.timerCardHtml ? MB.timerCardHtml(child) : ''}
 
-      ${timerOn ? `<div class="card tint" data-go="log" style="display:flex;align-items:center;gap:12px;cursor:pointer">
-        <div style="font-size:26px">⏱️</div>
-        <div style="flex:1"><b>กำลังจับเวลา${timer.type === 'sleep' ? 'การนอน 😴' : 'ให้นม 🍼'}</b><div class="muted" style="font-size:12.5px">แตะเพื่อหยุดและบันทึก</div></div>
-        <div style="color:var(--pink-deep);font-size:20px">›</div></div>` : ''}
-
-      <div class="section-title">⚡ บันทึกด่วน</div>
+      <div class="section-title">✨ เพิ่มบันทึก</div>
       <div class="quick-grid">
-        <button class="quick rose" data-q="feed"><span class="ic">🍼</span><span class="lb">ให้นม</span></button>
-        <button class="quick lilac" data-q="sleep"><span class="ic">🌙</span><span class="lb">การนอน</span></button>
-        <button class="quick sky" data-q="diaper"><span class="ic">🧷</span><span class="lb">ผ้าอ้อม</span></button>
-        <button class="quick peach" data-q="note"><span class="ic">📝</span><span class="lb">บันทึก</span></button>
+        ${QUICK.map(([t, tint]) => `<button class="quick ${tint}" data-q="${t}"><span class="ic">${LT[t] ? LT[t].em : ''}</span><span class="lb">${LT[t] ? LT[t].label : t}</span></button>`).join('')}
       </div>
 
       <div class="section-title">📊 วันนี้ <span class="more" data-go="log">ดูประวัติ ›</span></div>
       <div class="stat-row">
-        <div class="stat rose" data-go="log" style="cursor:pointer"><div class="ic">🍼</div><div class="v">${feeds}</div><div class="l">มื้อนม</div></div>
-        <div class="stat mint" data-go="log" style="cursor:pointer"><div class="ic">🌙</div><div class="v">${sleepH || '0'}</div><div class="l">ชม.นอน</div></div>
-        <div class="stat sky" data-go="log" style="cursor:pointer"><div class="ic">🧷</div><div class="v">${diapers}</div><div class="l">ผ้าอ้อม</div></div>
+        <div class="stat rose" data-go="log"><div class="ic">🍼</div><div class="vwrap"><div class="v">${feeds}</div><div class="l">มื้อนมวันนี้</div></div></div>
+        <div class="stat lilac" data-go="log"><div class="ic">🌙</div><div class="vwrap"><div class="v">${sleepH || '0'}</div><div class="l">ชม.นอน</div></div></div>
+        <div class="stat sky" data-go="log"><div class="ic">🧷</div><div class="vwrap"><div class="v">${diapers}</div><div class="l">ผ้าอ้อม</div></div></div>
       </div>
+
+      ${histHtml}
+
+      ${summaryHtml}
+      ${notifHtml}
 
       ${tipCardHtml(stage)}
 
@@ -291,7 +302,12 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     `;
 
     root.querySelectorAll('[data-q]').forEach(b => b.onclick = () => MB.views.quickLog(b.dataset.q));
-    root.querySelectorAll('[data-switch]').forEach(n => n.onclick = () => MB.openChildSwitcher && MB.openChildSwitcher());
+    if (MB.wireTimer) MB.wireTimer(root, child);
+    root.querySelectorAll('.timeline .tl-item').forEach(n => {
+      const del = n.querySelector('.del');
+      if (del) del.onclick = (e) => { e.stopPropagation(); if (confirm('ลบบันทึกนี้?')) { S.removeLog(child.id, n.dataset.del); MB.rerender(); } };
+      n.onclick = () => MB.go('log');
+    });
     root.querySelectorAll('[data-go]').forEach(n => n.onclick = () => MB.go(n.dataset.go));
     root.querySelectorAll('[data-art]').forEach(n => n.onclick = () => MB.openArticle(n.dataset.art));
     root.querySelectorAll('[data-ni]').forEach(n => n.onclick = () => { const it = notifs[+n.dataset.ni]; if (it && it.go) MB.go(it.go, it.params); });

@@ -57,12 +57,12 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="btn-row"><button class="btn pink" id="timer-stop">■ หยุด & บันทึก</button><button class="btn ghost" id="timer-cancel">ยกเลิก</button></div>
       </div>`;
     }
-    return `<div class="card flat" style="padding:12px">
-      <div style="font-size:13px;font-weight:700;color:var(--brown-dark);margin-bottom:8px">⏱️ จับเวลาแบบเรียลไทม์</div>
+    return `<div class="card" style="padding:14px">
+      <div style="font-size:13.5px;font-weight:800;color:var(--brown-dark);margin-bottom:10px">⏱️ จับเวลาแบบเรียลไทม์</div>
       <div class="btn-row">
-        <button class="btn ghost sm" data-start="feed:ซ้าย">🍼 นมซ้าย</button>
-        <button class="btn ghost sm" data-start="feed:ขวา">🍼 นมขวา</button>
-        <button class="btn ghost sm" data-start="sleep:">😴 เริ่มนอน</button>
+        <button class="tbtn rose" data-start="feed:ซ้าย">🍼 นมซ้าย</button>
+        <button class="tbtn peach" data-start="feed:ขวา">🍼 นมขวา</button>
+        <button class="tbtn lilac" data-start="sleep:">😴 เริ่มนอน</button>
       </div>
     </div>`;
   }
@@ -234,4 +234,10 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       if (confirm('ลบบันทึกนี้?')) { S.removeLog(child.id, n.dataset.del); MB.render(); }
     });
   };
+
+  /* เปิดให้หน้าอื่น (หน้าหลัก) ใช้ซ้ำได้ */
+  MB.LOG_TYPE = TYPE;
+  MB.logTitle = logTitle;
+  MB.timerCardHtml = timerCardHtml;
+  MB.wireTimer = wireTimer;
 })();

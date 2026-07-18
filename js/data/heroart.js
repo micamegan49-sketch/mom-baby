@@ -38,3 +38,26 @@ MB.babyHeroSVG = function () {
     <ellipse cx="95" cy="113" rx="30" ry="3.5" fill="#E7D2DE" opacity=".45"/>
   </svg>`;
 };
+
+/* ภาพประกอบ "ฝันหวาน" สำหรับการ์ดหลักหน้าตั้งครรภ์ (พระจันทร์ ดาว เมฆ หัวใจ) */
+MB.pregHeroSVG = function () {
+  return `<svg class="hero-deco" viewBox="0 0 140 120" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <!-- พระจันทร์เสี้ยว -->
+    <path d="M112 16a17 17 0 1 0 10 25 13 13 0 1 1-10-25Z" fill="#F9E3A6"/>
+    <!-- ดาวประกาย -->
+    <path d="M74 22l1.5 3.4 3.4 1.5-3.4 1.5L74 33.4l-1.5-3.4-3.4-1.5 3.4-1.5z" fill="#F3B6C6"/>
+    <path d="M126 58l1.1 2.5 2.5 1.1-2.5 1.1L126 66.3l-1.1-2.5-2.5-1.1 2.5-1.1z" fill="#C6B0EA"/>
+    <circle cx="60" cy="42" r="1.7" fill="#fff"/>
+    <circle cx="94" cy="34" r="1.6" fill="#F3B6C6"/>
+    <!-- หัวใจน้อย ๆ ลอย -->
+    <path d="M88 60c0-3 4.6-3.6 4.6.4 0-4 4.6-3.4 4.6-.4 0 3.4-4.6 6-4.6 6s-4.6-2.6-4.6-6Z" fill="#F3A6B0" opacity=".85"/>
+    <!-- เมฆฟูนุ่ม -->
+    <g fill="#ffffff">
+      <ellipse cx="92" cy="98" rx="34" ry="14"/>
+      <ellipse cx="69" cy="94" rx="15" ry="12"/>
+      <ellipse cx="115" cy="95" rx="15" ry="12"/>
+      <ellipse cx="92" cy="87" rx="19" ry="13"/>
+    </g>
+    <ellipse cx="92" cy="107" rx="29" ry="3.4" fill="#E7D2DE" opacity=".45"/>
+  </svg>`;
+};

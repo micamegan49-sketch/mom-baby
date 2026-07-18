@@ -106,7 +106,7 @@ window.MB = window.MB || {};
       const a = ageInfo(c.birthDate);
       const active = c.id === (S.activeChild() || {}).id;
       return `<div class="list-item" data-pick="${c.id}">
-        <div class="ic">${c.emoji || '👶'}</div>
+        <div class="ic">${avatar(c)}</div>
         <div class="body"><div class="t">${esc(c.name)} ${active ? '✓' : ''}</div><div class="s">${a.label} · เกิด ${fmtDateTH(c.birthDate)}</div></div>
         <button class="btn ghost sm" data-edit-kid="${c.id}" style="width:auto;padding:6px 10px">✏️ แก้</button>
       </div>`;
@@ -168,17 +168,22 @@ window.MB = window.MB || {};
     return false;
   }
 
+  /* รูปแทนตัว: ถ้ามีรูปที่อัปโหลด → <img> เต็มกรอบ (border-radius ตามพาเรนต์) ไม่งั้นใช้อิโมจิ */
+  function avatar(entity) {
+    if (entity && entity.photo) return `<img class="ava-img" src="${entity.photo}" alt="">`;
+    return (entity && entity.emoji) || '👶';
+  }
+  MB.avatar = avatar;
+
   function renderAppbar() {
     const bar = document.getElementById('appbar');
     const child = S.activeChild();
     const preg = S.preg();
-    const kids = S.children();
-    // ปุ่มสลับลูก: โผล่เฉพาะเมื่อมีมากกว่า 1 คน หรือมีทั้งลูก+ครรภ์ (คนเดียวไม่ต้องรก)
-    const showSwitch = kids.length > 1 || (kids.length >= 1 && preg.active);
+    // ปุ่มสลับลูก (รูป + ▾) โผล่เสมอเมื่อมีลูกหรือมีครรภ์ — แตะเพื่อสลับ/จัดการ
     let sw = '';
-    if (showSwitch) {
-      const av = child ? (child.emoji || '👶') : '🤰';
-      sw = `<button class="mini-switch" id="childPill" aria-label="สลับลูก"><span>${av}</span><small>▾</small></button>`;
+    if (child || preg.active) {
+      const av = child ? avatar(child) : '🤰';
+      sw = `<button class="mini-switch" id="childPill" aria-label="สลับลูก"><span class="ava">${av}</span><small>▾</small></button>`;
     }
     const nb = (MB.buildNotifications ? MB.buildNotifications() : []).length;
     bar.innerHTML = `

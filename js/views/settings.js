@@ -3,6 +3,22 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 (function () {
   const S = MB.store, U = MB.util;
 
+  /* แปลงไฟล์รูป → dataURL สี่เหลี่ยมจัตุรัส ย่อ 240px (ครอปกลาง) เก็บใน localStorage ได้สบาย */
+  function photoToDataURL(file, cb) {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = function () {
+      const size = 240, s = Math.min(img.width, img.height);
+      const sx = (img.width - s) / 2, sy = (img.height - s) / 2;
+      const cv = document.createElement('canvas'); cv.width = size; cv.height = size;
+      cv.getContext('2d').drawImage(img, sx, sy, s, s, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      try { cb(cv.toDataURL('image/jpeg', 0.82)); } catch (e) { cb(null); }
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+    img.src = url;
+  }
+
   /* ---- ฟอร์มเพิ่ม/แก้ไขลูก (บอตทอมชีต) ---- */
   MB.views.editChild = function (child) {
     const isNew = !child;
@@ -20,28 +36,47 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         </div>
         <div class="field"><label>วันเกิด</label><input id="f-bd" type="date" value="${c.birthDate}" max="${S.todayISO()}" /></div>
         <div class="field"><label>รูปแทนตัว</label>
-          <div class="chips" id="f-emo">${emojis.map(e => `<div class="chip ${c.emoji === e ? 'active' : ''}" data-v="${e}" style="font-size:20px">${e}</div>`).join('')}</div>
+          <div class="ava-row">
+            <div class="ava-preview" id="f-ava">${c.photo ? `<img class="ava-img" src="${c.photo}">` : (c.emoji || '👶')}</div>
+            <div style="flex:1">
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button type="button" class="btn ghost sm" id="f-photo-btn" style="width:auto">📷 อัปโหลดรูป</button>
+                <button type="button" class="btn ghost sm" id="f-photo-del" style="width:auto;color:#D9737A;${c.photo ? '' : 'display:none'}">ลบรูป</button>
+              </div>
+              <input type="file" id="f-photo" accept="image/*" style="display:none" />
+              <div class="muted" style="font-size:11.5px;margin-top:7px">อัปโหลดรูปลูก หรือเลือกอิโมจิด้านล่าง</div>
+            </div>
+          </div>
+          <div class="chips" id="f-emo" style="margin-top:10px">${emojis.map(e => `<div class="chip ${!c.photo && c.emoji === e ? 'active' : ''}" data-v="${e}" style="font-size:20px">${e}</div>`).join('')}</div>
         </div>
         <button class="btn" id="f-save">${isNew ? 'เพิ่มลูกน้อย' : 'บันทึก'}</button>
         ${isNew ? '' : '<button class="btn ghost" id="f-del" style="margin-top:10px;color:#D9737A">ลบโปรไฟล์นี้</button>'}
       `,
       onMount(root) {
-        let sex = c.sex, emoji = c.emoji;
+        let sex = c.sex, emoji = c.emoji, photo = c.photo || null;
+        const ava = root.querySelector('#f-ava'), delBtn = root.querySelector('#f-photo-del'), fileInput = root.querySelector('#f-photo');
+        function renderAva() { ava.innerHTML = photo ? `<img class="ava-img" src="${photo}">` : emoji; delBtn.style.display = photo ? '' : 'none'; }
         root.querySelectorAll('#f-sex .chip').forEach(ch => ch.onclick = () => {
           root.querySelectorAll('#f-sex .chip').forEach(x => x.classList.remove('active'));
           ch.classList.add('active'); sex = ch.dataset.v;
         });
         root.querySelectorAll('#f-emo .chip').forEach(ch => ch.onclick = () => {
           root.querySelectorAll('#f-emo .chip').forEach(x => x.classList.remove('active'));
-          ch.classList.add('active'); emoji = ch.dataset.v;
+          ch.classList.add('active'); emoji = ch.dataset.v; if (!photo) renderAva();
         });
+        root.querySelector('#f-photo-btn').onclick = () => fileInput.click();
+        fileInput.onchange = () => {
+          const f = fileInput.files && fileInput.files[0]; if (!f) return;
+          photoToDataURL(f, d => { if (d) { photo = d; renderAva(); } else MB.toast('อ่านรูปไม่สำเร็จ ลองรูปอื่นนะ'); });
+        };
+        delBtn.onclick = () => { photo = null; renderAva(); };
         root.querySelector('#f-save').onclick = () => {
           const name = root.querySelector('#f-name').value.trim();
           const birthDate = root.querySelector('#f-bd').value;
           if (!name) return MB.toast('กรอกชื่อก่อนนะ');
           if (!birthDate) return MB.toast('เลือกวันเกิดก่อนนะ');
-          if (isNew) { const nc = S.addChild({ name, sex, birthDate, emoji }); S.setActiveChild(nc.id); }
-          else S.updateChild(child.id, { name, sex, birthDate, emoji });
+          if (isNew) { const nc = S.addChild({ name, sex, birthDate, emoji, photo }); S.setActiveChild(nc.id); }
+          else S.updateChild(child.id, { name, sex, birthDate, emoji, photo });
           MB.closeSheet(); MB.toast('บันทึกแล้ว 🎉'); MB.go('home');
         };
         const del = root.querySelector('#f-del');
@@ -61,7 +96,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const kidRows = kids.length ? kids.map(c => {
       const a = U.ageInfo(c.birthDate);
       return `<div class="list-item" data-edit="${c.id}">
-        <div class="ic">${c.emoji || '👶'}</div>
+        <div class="ic">${MB.avatar ? MB.avatar(c) : (c.emoji || '👶')}</div>
         <div class="body"><div class="t">${U.esc(c.name)}</div><div class="s">${a.label} · เกิด ${U.fmtDateTH(c.birthDate)}</div></div>
         <div class="meta">แก้ไข ›</div></div>`;
     }).join('') : '<p class="muted center" style="padding:10px">ยังไม่มีโปรไฟล์ลูก</p>';
