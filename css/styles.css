@@ -274,16 +274,16 @@ a { color: var(--pink-deep); }
 .timeline .ic.sky { background: var(--sky-bg); } .timeline .ic.peach { background: var(--peach-bg); }
 .timeline .ic.mint { background: var(--mint-bg); }
 .timeline .body { flex: 1; min-width: 0; }
-.timeline .body .t { font-weight: 700; font-size: 14px; color: var(--brown-deep); }
+.timeline .body .t { font-weight: 700; font-size: 14px; color: var(--brown-deep); line-height: 1.4; }
+.timeline .body .s { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
 .timeline .meta { font-size: 12px; color: var(--muted); text-align: right; flex: 0 0 auto; line-height: 1.55; }
 .timeline .meta .del { color: #D9737A; font-size: 11px; }
-/* variant: พัฒนาการ (ไอคอนสี่เหลี่ยมมน + หมวดสีชมพู + chevron) */
-.timeline.ms .ic { border-radius: 14px; }
+/* variant: ไอคอนสี่เหลี่ยมมน (พัฒนาการ/วัคซีน) */
+.timeline.ms .ic, .timeline.sq .ic { border-radius: 14px; }
 .timeline .ic.done { background: #E6F3E9; }
-.timeline.ms .body .t { line-height: 1.4; }
-.timeline.ms .body .s { font-size: 12px; font-weight: 700; color: var(--pink-deep); margin-top: 2px; }
+/* พัฒนาการ: หมวดใต้ชื่อเป็นสีชมพู */
+.timeline.ms .body .s { font-size: 12px; font-weight: 700; color: var(--pink-deep); }
 .timeline .chev { color: var(--pink-deep); font-size: 20px; flex: 0 0 auto; }
-.timeline .tl-item.done .body .t { color: var(--muted); }
 
 /* list item */
 .list-item {

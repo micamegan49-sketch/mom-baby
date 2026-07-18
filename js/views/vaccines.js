@@ -92,12 +92,17 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       </div>
       ${Object.entries(groups).map(([age, items]) => `
         <div class="section-title">📅 ${age}</div>
-        <div class="card" style="padding:6px 14px">
-          ${items.map(x => `<div class="list-item" data-tog="${x.id}">
-            <div class="ic" style="background:${x.done ? '#E6F3E9' : 'var(--cream-2)'}">${x.done ? '✅' : '💉'}</div>
-            <div class="body"><div class="t">${U.esc(x.name)}</div><div class="s">${U.esc(x.dose)} · ${U.esc(x.info)}</div></div>
-            <span class="badge ${x.status.cls}">${x.status.text}</span>
-          </div>`).join('')}
+        <div class="card timeline sq" style="padding:4px 14px">
+          ${items.map((x, i) => {
+            const dotC = x.done ? '#5FBF9B' : x.status.cls === 'due' ? '#D9737A' : x.status.cls === 'soon' ? '#E0A94E' : '#C9B7A8';
+            const tint = x.done ? 'done' : x.status.cls === 'due' ? 'rose' : x.status.cls === 'soon' ? 'peach' : 'sky';
+            return `<div class="tl-item${i === items.length - 1 ? ' last' : ''}" data-tog="${x.id}">
+              <span class="tl-rail"><span class="tl-dot" style="background:${dotC}"></span></span>
+              <div class="ic ${tint}">${x.done ? '✅' : '💉'}</div>
+              <div class="body"><div class="t">${U.esc(x.name)}</div><div class="s">${U.esc(x.dose)} · ${U.esc(x.info)}</div></div>
+              <span class="badge ${x.status.cls}">${x.status.text}</span>
+            </div>`;
+          }).join('')}
         </div>`).join('')}
       <div class="disclaimer">อ้างอิงตารางสร้างเสริมภูมิคุ้มกันโรค (EPI) ของไทยโดยประมาณ กำหนดการจริงและวัคซีนเสริมขึ้นกับนโยบายปีนั้น ๆ และดุลยพินิจแพทย์ — โปรดยึดสมุดสุขภาพเด็กเป็นหลัก</div>
       ${MB.citeBlock('vaccine')}
