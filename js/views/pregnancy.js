@@ -126,16 +126,14 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
     const nut = MB.pregNutrition ? MB.pregNutrition(viewWeek) : null;
     const nutHtml = nut ? `
-      <div class="section-title">${nut.emoji} โภชนาการ <span class="more">${nut.weeks}</span></div>
-      <div class="card">
-        <p style="margin:0 0 8px"><b>สารอาหารเด่นช่วงนี้:</b> ${nut.focus}</p>
-        <div style="font-weight:700;color:var(--brown);margin-bottom:2px">🍽️ ควรกิน</div>
-        <ul style="margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.65">${nut.foods.map(f => '<li>' + f + '</li>').join('')}</ul>
-        <div style="font-weight:700;color:var(--brown);margin-bottom:2px">💡 เคล็ดลับ</div>
-        <ul style="margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.65">${nut.tips.map(t => '<li>' + t + '</li>').join('')}</ul>
-        <div style="font-weight:700;color:#C45a61;margin-bottom:2px">🚫 ควรเลี่ยง</div>
-        <ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.65;color:#7a5a52">${nut.avoid.map(a => '<li>' + a + '</li>').join('')}</ul>
-        <div class="disclaimer" style="margin-top:10px">คำแนะนำทั่วไป ปรึกษาแพทย์/นักโภชนาการสำหรับแผนเฉพาะบุคคล</div>
+      <div class="card nut-card">
+        <div class="nut-head"><div class="ic">🍴</div><div class="tw"><div class="t">สารอาหารเด่นช่วงนี้</div><div class="s">${U.esc(nut.focus)}</div></div></div>
+        <div class="nut-inner">
+          <div class="nut-sec"><div class="ic sky">🐟</div><div class="b"><div class="h" style="color:var(--sky-ink)">ควรกิน</div><ul>${nut.foods.map(f => '<li>' + U.esc(f) + '</li>').join('')}</ul></div></div>
+          <div class="nut-sec"><div class="ic amber">💡</div><div class="b"><div class="h" style="color:#C88A2E">เคล็ดลับ</div><ul>${nut.tips.map(t => '<li>' + U.esc(t) + '</li>').join('')}</ul></div></div>
+          <div class="nut-sec"><div class="ic rose">🚫</div><div class="b"><div class="h" style="color:#C45a61">ควรเลี่ยง</div><ul>${nut.avoid.map(a => '<li>' + U.esc(a) + '</li>').join('')}</ul></div></div>
+        </div>
+        <div class="nut-note"><span>👩‍⚕️</span><div><b>คำแนะนำทั่วไป</b> ปรึกษาแพทย์/นักโภชนาการสำหรับแผนเฉพาะบุคคล</div></div>
       </div>` : '';
 
     // ฟีดประจำวัน — การ์ดเปลี่ยนทุกวันตามจำนวนวันตั้งครรภ์ และเรียกชื่อลูก (สไตล์ฟีดแบบมะลิ)
@@ -179,15 +177,15 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
       ${nutHtml}
 
-      <div class="section-title">🧰 เครื่องมือคนท้อง</div>
-      <div class="quick-grid">
-        <button class="quick" id="t-weight"><span class="ic">⚖️</span><span class="lb">น้ำหนัก/BMI</span></button>
-        <button class="quick" id="t-kick"><span class="ic">👣</span><span class="lb">นับลูกดิ้น</span></button>
-        <button class="quick" id="t-contr"><span class="ic">⏱️</span><span class="lb">จับเวลาหดตัว</span></button>
-        <button class="quick" id="t-cost"><span class="ic">🤱</span><span class="lb">ราคาคลอด</span></button>
-        <button class="quick" id="t-menu"><span class="ic">🍱</span><span class="lb">เมนูอาหาร</span></button>
-        <button class="quick" id="t-gear"><span class="ic">🧳</span><span class="lb">ของเตรียมคลอด</span></button>
-        <button class="quick" id="t-tips"><span class="ic">📚</span><span class="lb">บทความ</span></button>
+      <div class="section-title">💼 เครื่องมือติดตามน้อง</div>
+      <div class="quick-grid tools">
+        <button class="quick sky"   id="t-weight"><span class="ic">⚖️</span><span class="lb">น้ำหนัก/BMI</span><span class="tchev">›</span></button>
+        <button class="quick lilac" id="t-kick"><span class="ic">👣</span><span class="lb">นับลูกดิ้น</span><span class="tchev">›</span></button>
+        <button class="quick mint"  id="t-contr"><span class="ic">⏱️</span><span class="lb">จับเวลาหดตัว</span><span class="tchev">›</span></button>
+        <button class="quick peach" id="t-cost"><span class="ic">💰</span><span class="lb">ราคาคลอด</span><span class="tchev">›</span></button>
+        <button class="quick rose"  id="t-menu"><span class="ic">🍱</span><span class="lb">เมนูอาหาร</span><span class="tchev">›</span></button>
+        <button class="quick peach" id="t-gear"><span class="ic">🧳</span><span class="lb">ของเตรียมคลอด</span><span class="tchev">›</span></button>
+        <button class="quick sky"   id="t-tips"><span class="ic">📚</span><span class="lb">บทความ</span><span class="tchev">›</span></button>
       </div>
 
       <div class="section-title">⚖️ น้ำหนักของคุณแม่</div>
