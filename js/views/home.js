@@ -86,31 +86,28 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
     // ---------- ออนบอร์ดดิ้ง ----------
     if (!child && !preg.active) {
+      const chev = `<svg viewBox="0 0 24 24" fill="none" width="17" height="17"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      const onbCard = (id, cls, art, title, sub) => `
+        <div class="onb-card ${cls}" id="${id}">
+          <div class="ic">${art}</div>
+          <div class="tx"><div class="t">${title}</div><div class="s">${sub}</div></div>
+          <div class="go">${chev}</div>
+        </div>`;
       root.innerHTML = `
-        <div style="text-align:center;padding:24px 8px 8px">
-          <div style="font-size:64px">👣</div>
-          <h2 style="margin:8px 0 4px;color:var(--brown-deep)">ยินดีต้อนรับสู่ ตัวจิ๋ว</h2>
-          <p class="muted" style="margin:0 0 22px">ผู้ช่วยดูแลคุณแม่และลูกน้อย<br/>ตั้งแต่ในครรภ์จนถึงวัยเตาะแตะ</p>
+        <div class="onb">
+          <div class="onb-head">
+            <div class="onb-logo"><img src="icons/logo.png" alt="ตัวจิ๋ว"/></div>
+            <h2 class="onb-title">ยินดีต้อนรับสู่ ตัวจิ๋ว<span class="hb">💗</span></h2>
+            <p class="onb-sub">ผู้ช่วยดูแลคุณแม่และลูกน้อย<br/>ตั้งแต่ในครรภ์จนถึงวัยเตาะแตะ</p>
+          </div>
+          ${onbCard('start-plan', 'rose', MB.artTulip ? MB.artTulip() : '🌷', 'วางแผนมีลูก', 'คำนวณวันไข่ตก &amp; ช่วงมีบุตรง่าย')}
+          ${onbCard('start-preg', 'lilac', MB.artPregMom ? MB.artPregMom() : '🤰', 'กำลังตั้งครรภ์', 'ติดตามครรภ์รายสัปดาห์ เทียบขนาดลูก นับลูกดิ้น')}
+          ${onbCard('start-baby', 'peach', MB.artBabyFace ? MB.artBabyFace() : '👶', 'มีลูกแล้ว', 'บันทึกประจำวัน วัคซีน กราฟเติบโต พัฒนาการ')}
+          <div class="onb-note">
+            <svg class="sh" viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 3l7 3v5.5c0 4.4-3 8.2-7 9.5-4-1.3-7-5.1-7-9.5V6l7-3z" fill="currentColor" opacity=".22"/><path d="M12 3l7 3v5.5c0 4.4-3 8.2-7 9.5-4-1.3-7-5.1-7-9.5V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>ข้อมูลทั้งหมดเก็บในเครื่องของคุณ ใช้งานออฟไลน์ได้ 100%<br/>และเป็นความรู้ทั่วไป ไม่ใช่คำวินิจฉัยทางการแพทย์</div>
+          </div>
         </div>
-        <div class="card tint onboard" id="start-plan" style="display:flex;align-items:center;gap:14px">
-          <div style="font-size:40px">🌷</div>
-          <div style="flex:1"><div style="font-weight:800;font-size:17px">วางแผนมีลูก</div>
-          <div class="muted" style="font-size:13px">คำนวณวันไข่ตก & ช่วงมีบุตรง่าย</div></div>
-          <div style="font-size:22px;color:var(--pink-deep)">›</div>
-        </div>
-        <div class="card tint onboard" id="start-preg" style="display:flex;align-items:center;gap:14px">
-          <div style="font-size:40px">🤰</div>
-          <div style="flex:1"><div style="font-weight:800;font-size:17px">กำลังตั้งครรภ์</div>
-          <div class="muted" style="font-size:13px">ติดตามครรภ์รายสัปดาห์ เทียบขนาดลูก นับลูกดิ้น</div></div>
-          <div style="font-size:22px;color:var(--pink-deep)">›</div>
-        </div>
-        <div class="card tint onboard" id="start-baby" style="display:flex;align-items:center;gap:14px">
-          <div style="font-size:40px">👶</div>
-          <div style="flex:1"><div style="font-weight:800;font-size:17px">มีลูกแล้ว</div>
-          <div class="muted" style="font-size:13px">บันทึกประจำวัน วัคซีน กราฟเติบโต พัฒนาการ</div></div>
-          <div style="font-size:22px;color:var(--pink-deep)">›</div>
-        </div>
-        <div class="disclaimer" style="margin-top:18px">ข้อมูลทั้งหมดเก็บในเครื่องของคุณ ใช้งานออฟไลน์ได้ 100% และเป็นความรู้ทั่วไป ไม่ใช่คำวินิจฉัยทางการแพทย์</div>
       `;
       root.querySelector('#start-plan').onclick = () => MB.go('plan');
       root.querySelector('#start-preg').onclick = () => MB.go('preg');

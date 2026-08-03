@@ -155,6 +155,77 @@ a { color: var(--pink-deep); }
 .card.tint { background: linear-gradient(135deg, #FFF8F3, #FCEEE6); }
 .card.onboard { border: 1.5px solid var(--brown); }
 
+/* ===== หน้าต้อนรับ (ออนบอร์ดดิ้ง) ===== */
+.onb { position: relative; padding: 4px 0 2px; }
+.onb::before {                     /* ฉากหลังอบอุ่น + ก้อนเมฆจาง ๆ */
+  content: ""; position: absolute; left: -16px; right: -16px; top: -18px; height: 360px; z-index: 0;
+  background:
+    radial-gradient(62px 30px at 13% 13%, rgba(202,172,152,.22), transparent 72%),
+    radial-gradient(84px 38px at 89% 19%, rgba(202,172,152,.20), transparent 72%),
+    radial-gradient(54px 26px at 78% 6%,  rgba(202,172,152,.14), transparent 72%),
+    linear-gradient(180deg, #F7E9DF 0%, rgba(251,242,235,0) 78%);
+  pointer-events: none;
+}
+.onb > * { position: relative; z-index: 1; }
+.onb-head { text-align: center; padding: 14px 8px 22px; }
+.onb-logo {
+  width: 100px; height: 100px; border-radius: 50%; background: #fff; margin: 0 auto 16px;
+  padding: 5px; position: relative;
+  box-shadow: 0 10px 26px rgba(150, 112, 92, .18);
+}
+.onb-logo { overflow: hidden; }
+/* ซูมนิดหน่อยเพื่อดันขอบสี่เหลี่ยมของไฟล์โลโก้ออกนอกวงกลม (เห็นแค่รอยเท้า) */
+.onb-logo img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; transform: scale(1.16); }
+.onb-logo::after {                 /* หัวใจน้อย ๆ ลอยข้างโลโก้ */
+  content: "💗"; position: absolute; right: -10px; top: 4px; font-size: 19px;
+  filter: drop-shadow(0 2px 4px rgba(150, 112, 92, .18));
+}
+.onb-title {
+  margin: 0 0 8px; font-size: 26px; font-weight: 800; letter-spacing: -.3px;
+  color: var(--brown-deep); line-height: 1.35;
+}
+.onb-title .hb { font-size: 15px; vertical-align: super; margin-left: 2px; }
+.onb-sub { margin: 0; color: #9C8375; font-size: 15px; line-height: 1.6; }
+
+.onb-card {
+  display: flex; align-items: center; gap: 14px; padding: 14px;
+  border-radius: 24px; margin-bottom: 14px; background: #fff;
+  border: 1.5px solid var(--line); box-shadow: 0 8px 22px rgba(170, 140, 130, .13);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.onb-card:active { transform: scale(.985); box-shadow: 0 4px 14px rgba(170, 140, 130, .16); }
+.onb-card .ic { width: 66px; height: 66px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; }
+.onb-card .ic svg { width: 48px; height: 48px; display: block; }
+.onb-card .tx { flex: 1; min-width: 0; }
+.onb-card .t { font-weight: 800; font-size: 19px; color: var(--brown-deep); line-height: 1.3; }
+.onb-card .s { color: var(--muted); font-size: 13.5px; line-height: 1.45; margin-top: 3px; }
+.onb-card .go { width: 34px; height: 34px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; }
+
+.onb-card.rose  { background: linear-gradient(150deg, #FFFCFD, #FDF1F5); border-color: #F6D3DC; }
+.onb-card.rose  .ic { background: var(--rose-bg); }
+.onb-card.rose  .go { background: #FADDE5; color: var(--rose-ink); }
+.onb-card.lilac { background: linear-gradient(150deg, #FDFCFF, #F5F1FD); border-color: #E3D9F6; }
+.onb-card.lilac .ic { background: var(--lilac-bg); }
+.onb-card.lilac .go { background: #E6DCFA; color: var(--lilac-ink); }
+.onb-card.peach { background: linear-gradient(150deg, #FFFDFA, #FDF4EA); border-color: #F5DFC6; }
+.onb-card.peach .ic { background: var(--peach-bg); }
+.onb-card.peach .go { background: #FBE5CF; color: var(--peach-ink); }
+
+.onb-note {
+  display: flex; align-items: flex-start; gap: 12px; margin-top: 18px; padding: 14px;
+  background: rgba(240, 226, 214, .5); border: 1px solid var(--line); border-radius: 18px;
+  color: #8C7566; font-size: 12.5px; line-height: 1.6;
+}
+.onb-note .sh { flex: 0 0 auto; color: var(--brown); opacity: .6; margin-top: 1px; }
+
+@media (max-width: 360px) {
+  .onb-title { font-size: 23px; }
+  .onb-card { padding: 12px; gap: 11px; }
+  .onb-card .ic { width: 58px; height: 58px; }
+  .onb-card .ic svg { width: 42px; height: 42px; }
+  .onb-card .t { font-size: 17.5px; }
+}
+
 /* Hero / banner */
 .hero {
   background: linear-gradient(135deg, #FEF4EC 0%, #FCEAF0 52%, #F4ECFC 100%);

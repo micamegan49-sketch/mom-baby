@@ -39,6 +39,54 @@ MB.babyHeroSVG = function () {
   </svg>`;
 };
 
+/* ===== ภาพประกอบการ์ดหน้าต้อนรับ (ออนบอร์ดดิ้ง) — วาด SVG ล้วน โทนพาสเทล ===== */
+
+/* 🌷 วางแผนมีลูก — ดอกทิวลิป */
+MB.artTulip = function () {
+  return `<svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <path d="M32 33v20" stroke="#6BBF8E" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M31 50c-7-1-12-6-13-13 8-1 13 4 13 13Z" fill="#7FCB9B"/>
+    <path d="M33 44c5-1 9-5 10-11-6 0-10 4-10 11Z" fill="#5FB183"/>
+    <path d="M32 7c-5 3-8 9-8 16 0 8 3 14 8 16 5-2 8-8 8-16 0-7-3-13-8-16Z" fill="#F6B7C6"/>
+    <path d="M23 12c-4 4-6 10-5 16 1 6 4 10 7 12-3-8-4-19-2-28Z" fill="#EA92A8"/>
+    <path d="M41 12c4 4 6 10 5 16-1 6-4 10-7 12 3-8 4-19 2-28Z" fill="#EA92A8"/>
+    <path d="M30 10c1.4-.6 2.6-.6 4 0 1 7 1 15 0 22-1.4.6-2.6.6-4 0-1-7-1-15 0-22Z" fill="#FBD2DC" opacity=".75"/>
+  </svg>`;
+};
+
+/* 🤰 กำลังตั้งครรภ์ — คุณแม่ท้องโอบพุง */
+MB.artPregMom = function () {
+  return `<svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <path d="M20 22c0-9 5-14 12-14s12 5 12 14c0 5-1 8-2 10-1-7-4-10-10-10s-9 3-10 10c-1-2-2-5-2-10Z" fill="#6E4B3A"/>
+    <circle cx="32" cy="21" r="9" fill="#F8CDA9"/>
+    <path d="M23 19c1-7 5-10 9-10s8 3 9 10c-3-4-6-5-9-5s-6 1-9 5Z" fill="#6E4B3A"/>
+    <path d="M27 61V44c0-9 5-14 11-14s12 6 12 15v16H27Z" fill="#B79BE0"/>
+    <ellipse cx="41" cy="45" rx="12" ry="11" fill="#C9B1EB"/>
+    <path d="M26 29c-6 3-9 9-9 17v15h11V44c0-6 2-11 6-14-3-1-6-1-8-1Z" fill="#A98BD8"/>
+    <path d="M22 36c-3 7 1 14 9 17" stroke="#F8CDA9" stroke-width="5" stroke-linecap="round"/>
+    <path d="M13 44c0-3 4.4-3.6 4.4.4 0-4 4.4-3.4 4.4-.4 0 3.4-4.4 6-4.4 6s-4.4-2.6-4.4-6Z" fill="#EE93A8"/>
+  </svg>`;
+};
+
+/* 👶 มีลูกแล้ว — หน้าเด็กยิ้ม */
+MB.artBabyFace = function () {
+  return `<svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <circle cx="12.5" cy="34" r="4.2" fill="#F3BE96"/>
+    <circle cx="51.5" cy="34" r="4.2" fill="#F3BE96"/>
+    <circle cx="32" cy="34" r="19" fill="#F8CDA9"/>
+    <path d="M30 13.5c1.2-5.4 8-4.8 7.6 1.2" stroke="#7A5240" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="21" cy="39.5" r="4.2" fill="#F3A0AB" opacity=".55"/>
+    <circle cx="43" cy="39.5" r="4.2" fill="#F3A0AB" opacity=".55"/>
+    <circle cx="25.5" cy="32" r="2.9" fill="#5A463C"/>
+    <circle cx="38.5" cy="32" r="2.9" fill="#5A463C"/>
+    <circle cx="26.6" cy="30.9" r="1" fill="#fff"/>
+    <circle cx="39.6" cy="30.9" r="1" fill="#fff"/>
+    <path d="M27.5 41.5q4.5 3.8 9 0" stroke="#5A463C" stroke-width="2.1" stroke-linecap="round"/>
+    <path d="M10 48.5l1.2 2.8 2.8 1.2-2.8 1.2L10 56.5l-1.2-2.8L6 52.5l2.8-1.2z" fill="#F2C86E"/>
+    <path d="M53 15l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" fill="#F3B6C6"/>
+  </svg>`;
+};
+
 /* ภาพประกอบ "ฝันหวาน" สำหรับการ์ดหลักหน้าตั้งครรภ์ (พระจันทร์ ดาว เมฆ หัวใจ) */
 MB.pregHeroSVG = function () {
   return `<svg class="hero-deco" viewBox="0 0 140 120" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
