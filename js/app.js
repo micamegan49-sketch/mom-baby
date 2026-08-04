@@ -226,6 +226,48 @@ window.MB = window.MB || {};
       view.innerHTML = '<div class="empty"><div class="em">⚠️</div><p>หน้านี้ขัดข้องชั่วคราว<br/>ลองแตะเมนูอื่นด้านล่าง หรือปิด-เปิดแอปใหม่</p></div>';
       try { console.error('view render error:', e); } catch (_) {}
     }
+    if (current === 'home') mountGetApp(view);
+  }
+
+  /* ============ ชวนโหลดแอปจากสโตร์ (เฉพาะตอนเปิดบนเว็บ — ในแอปเนทีฟไม่ต้องโชว์) ============ */
+  const STORE_LINKS = {
+    ios: 'https://apps.apple.com/app/id6783621193',
+    android: 'https://play.google.com/store/apps/details?id=app.tuajiw.mombaby'
+  };
+  const GETAPP_HIDE = 'tuajiw_getapp_hide';
+  function isNativeApp() {
+    const c = window.Capacitor;
+    return !!(c && c.isNativePlatform && c.isNativePlatform());
+  }
+  // เรียงปุ่มตามเครื่องที่เปิด: แพลตฟอร์มของผู้ใช้ขึ้นก่อน
+  function storeButtons(cls) {
+    const btn = (k, em, label) =>
+      `<a class="${cls} ${k}" href="${STORE_LINKS[k]}" target="_blank" rel="noopener noreferrer">${em} ${label}</a>`;
+    return /Android/i.test(navigator.userAgent || '')
+      ? btn('android', '🤖', 'Google Play') + btn('ios', '🍎', 'App Store')
+      : btn('ios', '🍎', 'App Store') + btn('android', '🤖', 'Google Play');
+  }
+  function mountGetApp(view) {
+    if (isNativeApp()) return;
+    try { if (localStorage.getItem(GETAPP_HIDE) === '1') return; } catch (e) {}
+    view.insertAdjacentHTML('beforeend', `
+      <div class="getapp" id="getapp">
+        <button class="x" id="getapp-x" aria-label="ปิด">✕</button>
+        <div class="ga-top">
+          <span class="ga-ic"><img src="icons/logo.png" alt="ตัวจิ๋ว"></span>
+          <div class="ga-tx">
+            <div class="t">โหลดแอปตัวจิ๋ว — ฟรี</div>
+            <div class="s">เปิดไวกว่า ใช้ออฟไลน์ได้ และเตือนวัคซีน/นัดหมายบนมือถือ</div>
+          </div>
+        </div>
+        <div class="ga-btns">${storeButtons('ga-btn')}</div>
+      </div>`);
+    const x = view.querySelector('#getapp-x');
+    if (x) x.onclick = () => {
+      try { localStorage.setItem(GETAPP_HIDE, '1'); } catch (e) {}
+      const box = view.querySelector('#getapp');
+      if (box) box.remove();
+    };
   }
 
   /* ============ แจ้งเตือน (รวมศูนย์) ============ */
@@ -261,6 +303,9 @@ window.MB = window.MB || {};
   MB.rerender = function (params) { render(params); };   // เรนเดอร์ซ้ำหน้าเดิมโดยไม่เลื่อนจอขึ้นบน
   MB.openChildSwitcher = openChildSwitcher;
   MB.openNotifications = openNotifications;
+  MB.isNativeApp = isNativeApp;
+  MB.STORE_LINKS = STORE_LINKS;
+  MB.storeButtons = storeButtons;
 
   /* ============ เริ่มต้น ============ */
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); MB._installPrompt = e; });

@@ -101,6 +101,25 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div class="meta">แก้ไข ›</div></div>`;
     }).join('') : '<p class="muted center" style="padding:10px">ยังไม่มีโปรไฟล์ลูก</p>';
 
+    /* ดาวน์โหลดแอป — โชว์เฉพาะตอนเปิดบนเว็บ (ในแอปเนทีฟติดตั้งอยู่แล้ว) */
+    const L = MB.STORE_LINKS || {};
+    const storeCard = (MB.isNativeApp && MB.isNativeApp()) ? '' : `
+      <div class="section-title">📱 ดาวน์โหลดแอป</div>
+      <div class="card">
+        <p class="muted" style="font-size:13px;margin:0 0 4px">ตัวจิ๋วมีเป็นแอปแล้วทั้ง iPhone และ Android — เปิดไวกว่า ใช้ออฟไลน์ได้ และเตือนวัคซีน/นัดหมายบนมือถือ ฟรี ไม่มีโฆษณา</p>
+        <a class="list-item" href="${L.ios}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
+          <div class="ic" style="background:var(--sky-bg)">🍎</div>
+          <div class="body"><div class="t">App Store</div><div class="s">สำหรับ iPhone / iPad</div></div>
+          <div class="meta">›</div>
+        </a>
+        <a class="list-item" href="${L.android}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit">
+          <div class="ic" style="background:var(--mint-bg)">🤖</div>
+          <div class="body"><div class="t">Google Play</div><div class="s">สำหรับ Android</div></div>
+          <div class="meta">›</div>
+        </a>
+        <button class="btn ghost" id="share-app" style="margin-top:12px">🔗 แชร์แอปให้เพื่อน</button>
+      </div>`;
+
     root.innerHTML = `
       <div class="section-title">👶 ลูกของฉัน</div>
       <div class="card">${kidRows}
@@ -137,6 +156,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <button class="btn ghost" id="install" style="margin-top:12px;display:none">📲 ติดตั้งแอพลงเครื่อง</button>
       </div>
 
+      ${storeCard}
+
       <div class="section-title">☁️ บัญชี & ซิงค์ข้ามเครื่อง</div>
       <div class="card" id="cloud-card"></div>
 
@@ -148,7 +169,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
       <div class="section-title">ℹ️ เกี่ยวกับ</div>
       <div class="card">
-        <p style="margin:0 0 8px;font-weight:700">ตัวจิ๋ว 👣 v1.0</p>
+        <p style="margin:0 0 8px;font-weight:700">ตัวจิ๋ว 👣 v1.0.6</p>
         <p class="muted" style="font-size:13px;margin:0">แอพดูแลคุณแม่และลูกน้อย ทำงานบนเครื่องของคุณ ข้อมูลเก็บในเครื่องนี้เท่านั้น ใช้งานออฟไลน์ได้ — ไม่จำเป็นต้องสมัครบัญชี (การซิงค์คลาวด์เป็นทางเลือก)</p>
         <div class="disclaimer" style="margin-top:12px">⚠️ <b>ข้อมูลเพื่อความรู้ทั่วไป ไม่ใช่คำแนะนำทางการแพทย์</b> — ข้อมูลในแอพ (วัคซีน เกณฑ์เติบโต พัฒนาการ การตั้งครรภ์ บทความ) เป็นข้อมูลอ้างอิงทั่วไป ไม่ใช่คำวินิจฉัยหรือคำแนะนำเฉพาะบุคคล กรุณายึดสมุดสุขภาพเด็กและคำแนะนำของแพทย์เป็นหลักเสมอ ดูแหล่งอ้างอิงด้านบน</div>
         <a href="https://micamegan49-sketch.github.io/mom-baby/support.html" target="_blank" rel="noopener noreferrer"
@@ -175,6 +196,20 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     root.querySelector('#go-preg').onclick = () => MB.go('preg');
     root.querySelector('#go-appt').onclick = () => MB.go('appt');
     root.querySelector('#go-diary').onclick = () => MB.go('diary');
+
+    // แชร์ลิงก์ดาวน์โหลด (หน้า /get จะเลือกสโตร์ตามเครื่องของคนที่กดให้เอง)
+    const shareBtn = root.querySelector('#share-app');
+    if (shareBtn) shareBtn.onclick = () => {
+      const url = 'https://tuajiw.com/get/';
+      const text = 'ตัวจิ๋ว — แอปดูแลแม่และลูกน้อย ตั้งครรภ์ · วัคซีน · พัฒนาการ · บันทึกประจำวัน (ฟรี)';
+      if (navigator.share) {
+        navigator.share({ title: 'ตัวจิ๋ว', text, url }).catch(() => {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text + ' ' + url)
+          .then(() => MB.toast('คัดลอกลิงก์แล้ว 📋'))
+          .catch(() => MB.toast(url));
+      } else { MB.toast(url); }
+    };
 
     // สวิตช์แจ้งเตือนบนมือถือ
     const nt = root.querySelector('#notif-toggle'), nsub = root.querySelector('#notif-sub');
