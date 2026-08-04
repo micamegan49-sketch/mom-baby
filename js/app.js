@@ -236,8 +236,10 @@ window.MB = window.MB || {};
   };
   const GETAPP_HIDE = 'tuajiw_getapp_hide';
   function isNativeApp() {
+    // window.Capacitor ถูกฉีดโดยรันไทม์เนทีฟเท่านั้น (index.html บนเว็บไม่ได้โหลด capacitor.js)
     const c = window.Capacitor;
-    return !!(c && c.isNativePlatform && c.isNativePlatform());
+    if (c) return c.isNativePlatform ? c.isNativePlatform() !== false : true;
+    return location.protocol === 'capacitor:' || location.protocol === 'file:';
   }
   // เรียงปุ่มตามเครื่องที่เปิด: แพลตฟอร์มของผู้ใช้ขึ้นก่อน
   function storeButtons(cls) {

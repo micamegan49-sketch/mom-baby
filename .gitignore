@@ -45,3 +45,6 @@ AuthKey_*.p8
 .env
 .env.*
 signing/
+
+# เครื่องมือส่งสโตร์ (มีรหัสบัญชีเดโม/คีย์ ID — ห้ามขึ้น repo สาธารณะ)
+scratchpad/
