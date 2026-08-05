@@ -3,96 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ร่วมกิจกรรม รับกระเป๋าคุณแม่ฟรี – ตัวจิ๋ว</title>
+  <title>ดาวน์โหลดแอปตัวจิ๋ว</title>
+  <link rel="icon" type="image/png" href="icons/favicon.png" />
+  <!-- แคมเปญ "กระเป๋าคุณแม่ฟรี" จบแล้ว — หน้านี้กลายเป็นหน้าดาวน์โหลดแทน
+       (ยังเก็บ path เดิมไว้ เพราะมีลิงก์เก่าในริชเมนู LINE / โพสต์เก่าชี้มาที่นี่) -->
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,"Sukhumvit Set","Noto Sans Thai",sans-serif;color:#3d2e26;
       background:linear-gradient(165deg,#FBF2EB,#F7E9E0 55%,#F3DCE0);min-height:100vh;
-      padding:18px 14px 40px;max-width:600px;margin:0 auto;text-align:center}
-    h1{color:#8B5E4B;font-size:22px;margin:8px 0 4px}
-    .sub{color:#a07a66;font-size:14px;margin-bottom:14px}
-    img.poster{width:100%;border-radius:18px;box-shadow:0 10px 28px rgba(139,94,75,.18);margin:10px 0}
-    .card{background:#fff;border-radius:20px;padding:20px 18px;box-shadow:0 10px 28px rgba(139,94,75,.16);
-      margin:16px 0;text-align:left}
-    .card h2{font-size:18px;color:#C0566A;margin-bottom:4px;text-align:center}
-    .card .hint{font-size:13px;color:#8a7466;text-align:center;margin-bottom:14px}
-    label{display:block;font-size:13.5px;font-weight:700;color:#8B5E4B;margin:10px 0 5px}
-    input{width:100%;padding:13px;border:1.5px solid #E7D5C8;border-radius:12px;font-size:16px;background:#FBF7F3}
-    input:focus{outline:none;border-color:#D2667A}
-    button.go{width:100%;background:linear-gradient(135deg,#D2667A,#C0566A);color:#fff;border:none;
-      font-weight:700;font-size:17px;padding:15px;border-radius:14px;margin-top:16px;cursor:pointer}
-    button.go:disabled{opacity:.6}
-    .msg{font-size:13px;color:#C0566A;text-align:center;margin-top:10px;min-height:18px}
-    .ok{display:none;background:#EAF5EC;border:1.5px solid #BFE3C6;border-radius:16px;padding:22px 18px;margin:16px 0}
-    .ok .big{font-size:20px;font-weight:700;color:#2e7d4f}
-    .ok p{font-size:14px;color:#3d2e26;margin-top:8px;line-height:1.6}
-    .priv{font-size:11px;color:#a08877;margin-top:12px;text-align:center}
-    a.btn{display:block;text-decoration:none;font-weight:700;font-size:17px;padding:15px;border-radius:14px;margin:10px 0;
-      box-shadow:0 8px 20px rgba(0,0,0,.12)}
-    a.line{background:#06C755;color:#fff}
-    a.app{background:#8B5E4B;color:#fff}
+      padding:34px 18px 44px;max-width:520px;margin:0 auto;text-align:center}
+    .logo{width:104px;height:104px;border-radius:28px;object-fit:cover;
+      box-shadow:0 10px 28px rgba(139,94,75,.20)}
+    h1{color:#8B5E4B;font-size:26px;margin:16px 0 6px}
+    .sub{color:#a07a66;font-size:15px;line-height:1.6;margin-bottom:26px}
+    a.btn{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;
+      font-weight:700;font-size:16.5px;padding:15px;border-radius:15px;margin:11px 0;
+      background:#fff;color:#8B5E4B;box-shadow:0 6px 18px rgba(139,94,75,.15)}
+    a.btn.ghost{background:rgba(255,255,255,.45);box-shadow:none;border:1.5px solid #E7D5C8}
+    a.btn.line{background:#06C755;color:#fff}
+    .note{font-size:12.5px;color:#a08877;margin-top:20px;line-height:1.7}
+    .note a{color:#8B5E4B}
   </style>
 </head>
 <body>
-  <h1>🎁 ร่วมกิจกรรม รับกระเป๋าคุณแม่ฟรี</h1>
-  <div class="sub">แอปตัวจิ๋ว 👣 · ผู้โชคดี 12 ท่านแรกที่ใช้ครบ 14 วัน</div>
+  <img class="logo" src="icons/icon-192.png" alt="ตัวจิ๋ว" />
+  <h1>ตัวจิ๋ว</h1>
+  <div class="sub">แอปดูแลคุณแม่และลูกน้อย ฝีมือคนไทย<br />
+    ตั้งครรภ์ · วัคซีน · พัฒนาการ · บันทึกประจำวัน<br />
+    <b>ฟรี ไม่มีโฆษณา ไม่ต้องสมัครสมาชิก</b></div>
 
-  <img class="poster" src="promo/activity.jpg" alt="เงื่อนไขกิจกรรม" />
-  <img class="poster" src="promo/howto.jpg" alt="วิธีร่วมกิจกรรม" />
+  <a class="btn" id="ios" href="https://apps.apple.com/app/id6783621193">🍎 ดาวน์โหลดบน App Store</a>
+  <a class="btn" id="android" href="https://play.google.com/store/apps/details?id=app.tuajiw.mombaby">🤖 ดาวน์โหลดบน Google Play</a>
+  <a class="btn ghost" href="https://tuajiw.com/">🌐 ใช้บนเว็บเลย (ไม่ต้องติดตั้ง)</a>
+  <a class="btn line" href="https://line.me/R/ti/p/@777ssxzo">💬 แอดไลน์ ตัวจิ๋ว</a>
 
-  <!-- ฟอร์มลงทะเบียน -->
-  <div class="card" id="formCard">
-    <h2>📝 ลงทะเบียนร่วมกิจกรรม</h2>
-    <div class="hint">กรอกชื่อ + Gmail (ที่ใช้ใน Play Store บน Android) แล้วเราจะส่งลิงก์เชิญให้ค่ะ</div>
-    <form id="signupForm">
-      <label for="su-name">ชื่อ-เล่น / ชื่อที่ให้เรียก</label>
-      <input id="su-name" type="text" placeholder="เช่น คุณแม่น้องปูเป้" autocomplete="name" />
-      <label for="su-email">Gmail (บนมือถือ Android)</label>
-      <input id="su-email" type="email" placeholder="you@gmail.com" autocomplete="email" inputmode="email" />
-      <button class="go" type="submit">ลงทะเบียนร่วมกิจกรรม 🍀</button>
-      <div class="msg" id="su-msg"></div>
-    </form>
-    <div class="priv">🔒 ข้อมูลใช้สำหรับติดต่อร่วมกิจกรรมเท่านั้น ไม่เปิดเผยต่อบุคคลอื่น</div>
+  <div class="note">
+    ข้อมูลทั้งหมดเก็บอยู่ในเครื่องของคุณแม่เอง 🔒<br />
+    <a href="privacy.html">ความเป็นส่วนตัว</a> · <a href="support.html">ช่วยเหลือ</a>
   </div>
-
-  <!-- สถานะสำเร็จ -->
-  <div class="ok" id="okCard">
-    <div class="big">✅ ลงทะเบียนเรียบร้อย!</div>
-    <p>ขอบคุณค่ะ 💕 เราจะเพิ่มชื่อคุณเป็นผู้ทดสอบแล้วส่งลิงก์เชิญให้ทางอีเมล/ไลน์<br>
-    เพื่อความรวดเร็ว แอดไลน์มาทักได้เลยน้า 👇</p>
-  </div>
-
-  <a class="btn line" href="https://line.me/R/ti/p/@777ssxzo">💬 แอดไลน์ ตัวจิ๋ว (@777ssxzo)</a>
-  <a class="btn app" href="https://micamegan49-sketch.github.io/mom-baby/">📲 เปิดใช้แอปเลย</a>
-  <div class="priv">หรือพิมพ์ "สนใจ Android" ในแชทไลน์ตัวจิ๋ว</div>
 
   <script>
-    var SUPA = 'https://gmjbpenvncesgbglcolb.supabase.co';
-    var KEY = 'sb_publishable_RFB2fNLfZiDhP8Ojb7Thqg_L3TT4ZT0';
-    var form = document.getElementById('signupForm');
-    var msg = document.getElementById('su-msg');
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var name = document.getElementById('su-name').value.trim();
-      var email = document.getElementById('su-email').value.trim();
-      if (!name) { msg.textContent = 'กรอกชื่อก่อนนะคะ'; return; }
-      if (!email || email.indexOf('@') < 0) { msg.textContent = 'กรอกอีเมลให้ถูกต้องนะคะ'; return; }
-      var btn = form.querySelector('button');
-      btn.disabled = true; btn.textContent = 'กำลังส่ง…'; msg.textContent = '';
-      fetch(SUPA + '/rest/v1/signups', {
-        method: 'POST',
-        headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ name: name, email: email, note: 'promo-android' })
-      }).then(function (r) {
-        if (!r.ok) throw new Error('fail');
-        document.getElementById('formCard').style.display = 'none';
-        document.getElementById('okCard').style.display = 'block';
-        window.scrollTo({ top: document.getElementById('okCard').offsetTop - 20, behavior: 'smooth' });
-      }).catch(function () {
-        btn.disabled = false; btn.textContent = 'ลงทะเบียนร่วมกิจกรรม 🍀';
-        msg.textContent = 'ส่งไม่สำเร็จ ลองใหม่ หรือแอดไลน์มาได้เลยค่ะ 🙏';
-      });
-    });
+    // เครื่อง Android ให้ปุ่ม Play ขึ้นก่อน
+    if (/Android/i.test(navigator.userAgent || '')) {
+      var a = document.getElementById('android');
+      a.parentNode.insertBefore(a, document.getElementById('ios'));
+    }
   </script>
 </body>
 </html>
