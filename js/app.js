@@ -206,7 +206,7 @@ window.MB = window.MB || {};
     // ค่าวัคซีน → ไฮไลต์ "วัคซีน" · ค่าคลอด → อยู่ใต้ตั้งครรภ์ (ไฮไลต์ "หน้าหลัก") · ที่เหลืออยู่ใต้ "ความรู้"
     const activeTab = (current === 'prices' && currentParams.tab === 'vaccine') ? 'vax'
       : (current === 'prices' && currentParams.tab === 'delivery') ? 'home'
-      : ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups'].includes(current) ? 'develop' : current;
+      : ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups', 'emotions'].includes(current) ? 'develop' : current;
     tb.innerHTML = TABS.map(t =>
       `<button data-tab="${t.id}" class="${activeTab === t.id ? 'active' : ''}"><span class="ic">${t.ic}</span>${t.label}</button>`
     ).join('');

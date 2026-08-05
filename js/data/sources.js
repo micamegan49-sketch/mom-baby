@@ -37,9 +37,19 @@ MB.SOURCES = {
       { name: 'Infant and young child feeding — WHO', url: 'https://www.who.int/health-topics/breastfeeding' },
       { name: 'อาหารตามวัยสำหรับทารกและเด็กเล็ก — กรมอนามัย', url: 'https://multimedia.anamai.moph.go.th/' }
     ]
+  },
+  emotion: {
+    title: '😊 อารมณ์และพัฒนาการด้านสังคม-อารมณ์',
+    items: [
+      { name: 'Social/Emotional Milestones (Learn the Signs. Act Early.) — CDC', url: 'https://www.cdc.gov/ncbddd/actearly/milestones/index.html' },
+      { name: 'Ages & Stages — American Academy of Pediatrics (HealthyChildren.org)', url: 'https://www.healthychildren.org/English/ages-stages/Pages/default.aspx' },
+      { name: 'Social & Emotional Development — ZERO TO THREE', url: 'https://www.zerotothree.org/' },
+      { name: 'Baby and toddler behaviour — NHS (UK)', url: 'https://www.nhs.uk/conditions/baby/babys-development/behaviour/' },
+      { name: 'สุขภาพจิตเด็กและวัยรุ่น — กรมสุขภาพจิต กระทรวงสาธารณสุข', url: 'https://dmh.go.th/' }
+    ]
   }
 };
-MB.SOURCE_KEYS = ['vaccine', 'growth', 'pregnancy', 'develop', 'feeding'];
+MB.SOURCE_KEYS = ['vaccine', 'growth', 'pregnancy', 'develop', 'feeding', 'emotion'];
 
 /* แสดงบล็อก "แหล่งอ้างอิง" พร้อมลิงก์ที่กดได้ (เปิดในเบราว์เซอร์) ใช้ท้ายหน้าข้อมูลการแพทย์
    key = vaccine | growth | pregnancy | develop | feeding */
