@@ -193,8 +193,19 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       (groups[key] || (groups[key] = [])).push(l);
     });
 
+    const mkPlan = S.milkPlan ? S.milkPlan() : { feed: {}, pump: {} };
+    const mkOn = [mkPlan.feed.on ? 'ป้อนนม' : null, mkPlan.pump.on ? 'ปั๊มนม' : null].filter(Boolean);
+
     root.innerHTML = `
       ${timerCardHtml(child)}
+      <div class="card" data-go="milk" style="display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:14px">
+        <div class="ic" style="width:44px;height:44px;border-radius:14px;flex:0 0 auto;display:grid;place-items:center;font-size:22px;background:var(--peach-bg)">⏰</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14.5px">ตารางรอบนม</div>
+          <div class="muted" style="font-size:12.5px">${mkOn.length ? 'เปิดเตือน: ' + mkOn.join(' · ') : 'ตั้งรอบป้อนนม–ปั๊มนม ให้แอปเตือนตามเวลา'}</div>
+        </div>
+        <div style="color:var(--pink-deep);font-size:20px">›</div>
+      </div>
       <div class="section-title">เพิ่มบันทึก</div>
       <div class="quick-grid">
         ${Object.keys(TYPE).map(t => `<button class="quick" data-q="${t}"><span class="ic">${TYPE[t].em}</span><span class="lb">${TYPE[t].label}</span></button>`).join('')}
@@ -235,6 +246,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       drawBars(root.querySelector('#tr-sleep'), days7.map(d => d.sleepH), days7.map(d => d.label), '#8B5E4B');
     }
     root.querySelectorAll('[data-q]').forEach(b => { if (b.dataset.q) b.onclick = () => MB.views.quickLog(b.dataset.q); });
+    root.querySelectorAll('[data-go]').forEach(n => n.onclick = () => MB.go(n.dataset.go));
     root.querySelectorAll('[data-del]').forEach(n => n.onclick = () => {
       if (confirm('ลบบันทึกนี้?')) { S.removeLog(child.id, n.dataset.del); MB.render(); }
     });

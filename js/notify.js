@@ -8,6 +8,8 @@ window.MB = window.MB || {};
   const PREF_KEY = 'tuajiw.notify.enabled';
   const NUDGE_HOUR = 19;   // เตือนบันทึกประจำวันตอนเย็น
   const MAX = 58;          // iOS จำกัด local notification ที่ตั้งไว้ล่วงหน้า ~64 รายการ
+  const MILK_DAYS = 2;     // รอบนมตั้งล่วงหน้ากี่วัน (ตั้งใหม่ทุกครั้งที่เปิดแอพ)
+  const MILK_MAX = 28;     // โควตาสูงสุดของรอบนม — ที่เหลือกันไว้ให้วัคซีน/นัดหมาย
 
   const BABY_MSGS = [
     'อย่าลืมบันทึกพัฒนาการและกิจวัตรของลูกวันนี้นะคะ 👶',
@@ -106,9 +108,39 @@ window.MB = window.MB || {};
       }
     } catch (e) {}
 
+    // 5) รอบป้อนนม / ปั๊มนม (ตารางรอบนม) — เก็บแยกไว้ก่อน เพราะมีจำนวนมาก
+    //    ถ้าโยนรวมกับข้างบนตรง ๆ จะไปเบียดคิววัคซีน/นัดหมายจนหลุดลิมิตของ iOS
+    const milkItems = [];
+    try {
+      const mp = S.milkPlan ? S.milkPlan() : null;
+      if (mp && child) {
+        const KIND = {
+          feed: { title: 'ถึงรอบป้อนนมแล้ว 🍼', body: 'ได้เวลามื้อนมของ' },
+          pump: { title: 'ถึงรอบปั๊มนมแล้ว 🫗', body: 'อย่าปล่อยให้คัดนะคะ ปั๊มรอบนี้เพื่อ' }
+        };
+        ['feed', 'pump'].forEach(k => {
+          const p = mp[k];
+          if (!p || !p.on) return;
+          const times = MB.milkTimes ? MB.milkTimes(p.start, p.every, p.count) : [];
+          for (let d = 0; d < MILK_DAYS; d++) {
+            const iso = U.addDays(todayISO, d);
+            times.forEach(t => {
+              const [hh, mm] = t.split(':').map(Number);
+              const at = atLocal(iso, hh, mm);
+              if (at > now) milkItems.push({ title: KIND[k].title, body: KIND[k].body + ' ' + child.name, at, extra: { go: 'milk' } });
+            });
+          }
+        });
+      }
+    } catch (e) {}
+
     // จัดเรียงตามเวลา เอาที่ใกล้ที่สุดก่อน แล้วตัดไม่ให้เกินลิมิต
     items.sort((a, b) => a.at - b.at);
-    return items.slice(0, MAX).map((it, i) => ({
+    milkItems.sort((a, b) => a.at - b.at);
+    // กันโควตาให้การเตือนสำคัญ (วัคซีน/นัดหมาย/ครรภ์/บันทึก) ไว้เสมอ
+    const milkQuota = Math.min(milkItems.length, MILK_MAX, Math.max(0, MAX - Math.min(items.length, MAX - MILK_MAX)));
+    const merged = items.slice(0, MAX - milkQuota).concat(milkItems.slice(0, milkQuota)).sort((a, b) => a.at - b.at);
+    return merged.slice(0, MAX).map((it, i) => ({
       id: 1001 + i,
       title: it.title,
       body: it.body,
@@ -202,6 +234,7 @@ window.MB = window.MB || {};
     init, enable, disable, reschedule, rescheduleSoon,
     isEnabled: prefEnabled,
     supported: function () { return isNative() || ('Notification' in window); },
-    isNative: isNative
+    isNative: isNative,
+    preview: buildSchedule      // ใช้ตรวจสอบ/ดีบักว่าคิวแจ้งเตือนออกมาหน้าตายังไง
   };
 })();

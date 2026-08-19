@@ -21,7 +21,11 @@ window.MB = window.MB || {};
     logsByChild: {},        // id -> [ {id,ts,type,...} ]
     measByChild: {},        // id -> [ {id,date,weight,height,head} ]
     vaxByChild: {},         // id -> { vid: {done,date} }
-    msByChild: {}           // id -> { mid: {done,date} }
+    msByChild: {},          // id -> { mid: {done,date} }
+    milkPlan: {             // ตารางรอบป้อนนม/ปั๊มนม + แจ้งเตือน
+      feed: { on: false, start: '06:00', every: 3, count: 8 },
+      pump: { on: false, start: '06:00', every: 3, count: 8 }
+    }
   };
 
   let state = load();
@@ -154,6 +158,21 @@ window.MB = window.MB || {};
     vaxPricePkgs() { return state.vaxPricePkgs; },
     addVaxPricePkg(p) { state.vaxPricePkgs.push(Object.assign({ id: uid(), userAdded: true }, p)); save(); },
     removeVaxPricePkg(id) { state.vaxPricePkgs = state.vaxPricePkgs.filter(x => x.id !== id); save(); },
+
+    // ---------- ตารางรอบนม (ป้อนนม/ปั๊มนม) ----------
+    milkPlan() {
+      if (!state.milkPlan) state.milkPlan = structuredClone(DEFAULT.milkPlan);
+      // เผื่อสเตตเก่าที่มีแค่ครึ่งเดียว
+      ['feed', 'pump'].forEach(k => {
+        if (!state.milkPlan[k]) state.milkPlan[k] = structuredClone(DEFAULT.milkPlan[k]);
+      });
+      return state.milkPlan;
+    },
+    setMilkPlan(kind, patch) {
+      const p = store.milkPlan();
+      Object.assign(p[kind], patch);
+      save();
+    },
 
     // ---------- ตั้งครรภ์ ----------
     preg() { return state.pregnancy; },

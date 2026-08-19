@@ -655,3 +655,41 @@ canvas { width: 100%; display: block; }
 .emo-sec ul { margin: 0; padding-left: 19px; }
 .emo-sec li { font-size: 13.3px; line-height: 1.65; margin-bottom: 5px; }
 .emo-sec li::marker { color: var(--pink); }
+
+/* ตารางรอบนม (ป้อนนม/ปั๊มนม) */
+.mk-head { display: flex; align-items: center; gap: 12px; }
+.mk-head .ic {
+  width: 46px; height: 46px; border-radius: 14px; flex: 0 0 auto;
+  display: grid; place-items: center; font-size: 22px;
+}
+.mk-head .body { flex: 1; min-width: 0; }
+.mk-head .body .t { font-weight: 700; font-size: 15px; }
+.mk-head .body .s { font-size: 12.5px; color: var(--muted); }
+.mk-next {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  margin-top: 12px; padding: 10px 14px; border-radius: 14px; font-size: 14px;
+}
+.mk-next span { font-size: 12.5px; opacity: .85; }
+.mk-fields { display: flex; gap: 9px; margin-top: 12px; }
+.mk-fields .field { flex: 1; min-width: 0; margin: 0; }
+.mk-fields label { display: block; font-size: 11.5px; color: var(--muted); margin-bottom: 4px; }
+.mk-fields input {
+  width: 100%; padding: 9px 8px; border: 1.5px solid var(--line); border-radius: 11px;
+  font-size: 15px; background: var(--cream); font-family: var(--font); color: var(--brown-deep);
+}
+.mk-times { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 13px; }
+.mk-time {
+  font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 999px;
+  background: var(--cream-2); color: var(--brown);
+}
+.mk-time.past { opacity: .45; }
+.mk-time.next { background: var(--pink-deep); color: #fff; }
+.mk-rec .r { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.mk-rec .r:last-child { border-bottom: none; }
+.mk-rec .r .em { font-size: 22px; flex: 0 0 auto; }
+.mk-rec .r b { font-size: 13.8px; }
+.mk-rec .r .s { font-size: 12.5px; color: var(--pink-deep); font-weight: 600; margin-top: 1px; }
+.mk-rec .r .n { font-size: 12.5px; color: var(--muted); line-height: 1.6; margin-top: 3px; }
+.mk-tips { margin: 0; padding-left: 18px; }
+.mk-tips li { font-size: 13.2px; line-height: 1.7; margin-bottom: 7px; }
+.mk-tips li::marker { color: var(--pink); }
