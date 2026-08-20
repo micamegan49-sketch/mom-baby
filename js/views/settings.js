@@ -169,7 +169,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
 
       <div class="section-title">ℹ️ เกี่ยวกับ</div>
       <div class="card">
-        <p style="margin:0 0 8px;font-weight:700">ตัวจิ๋ว 👣 v1.0.7</p>
+        <p style="margin:0 0 8px;font-weight:700">ตัวจิ๋ว 👣 v1.0.8</p>
         <p class="muted" style="font-size:13px;margin:0">แอพดูแลคุณแม่และลูกน้อย ทำงานบนเครื่องของคุณ ข้อมูลเก็บในเครื่องนี้เท่านั้น ใช้งานออฟไลน์ได้ — ไม่จำเป็นต้องสมัครบัญชี (การซิงค์คลาวด์เป็นทางเลือก)</p>
         <div class="disclaimer" style="margin-top:12px">⚠️ <b>ข้อมูลเพื่อความรู้ทั่วไป ไม่ใช่คำแนะนำทางการแพทย์</b> — ข้อมูลในแอพ (วัคซีน เกณฑ์เติบโต พัฒนาการ การตั้งครรภ์ บทความ) เป็นข้อมูลอ้างอิงทั่วไป ไม่ใช่คำวินิจฉัยหรือคำแนะนำเฉพาะบุคคล กรุณายึดสมุดสุขภาพเด็กและคำแนะนำของแพทย์เป็นหลักเสมอ ดูแหล่งอ้างอิงด้านบน</div>
         <a href="https://micamegan49-sketch.github.io/mom-baby/support.html" target="_blank" rel="noopener noreferrer"
