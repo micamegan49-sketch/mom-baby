@@ -76,11 +76,11 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
      ตัวเลขเป็นค่าประมาณการ (รวมค่ากิน-อยู่-เรียน) อิงช่วงที่พบบ่อยในไทย ปี 2568 — ปรับได้ตามไลฟ์สไตล์ */
   const RAISE = {
     tiers: [
-      { k: 'low',  label: 'ประหยัด', sub: 'ร.ร.รัฐ · ใช้สิทธิบัตรทอง/ประกันสังคม', once: 30000,  m: [4000, 4000, 5000, 5000, 6000, 7000, 9000] },
-      { k: 'mid',  label: 'ปานกลาง', sub: 'ร.ร.เอกชนทั่วไป',                       once: 80000,  m: [8000, 8000, 12000, 13000, 15000, 16000, 18000] },
-      { k: 'high', label: 'พรีเมียม', sub: 'ร.ร.เอกชนชั้นนำ / สองภาษา',            once: 150000, m: [15000, 18000, 35000, 50000, 60000, 70000, 60000] },
+      { k: 'low',  em: '🌱', ink: '#3E8E5F', label: 'ประหยัด', sub: 'ร.ร.รัฐ · ใช้สิทธิบัตรทอง/ประกันสังคม', once: 30000,  m: [4000, 4000, 5000, 5000, 6000, 7000, 9000] },
+      { k: 'mid',  em: '🍃', ink: '#4A87B8', label: 'ปานกลาง', sub: 'ร.ร.เอกชนทั่วไป',                       once: 80000,  m: [8000, 8000, 12000, 13000, 15000, 16000, 18000] },
+      { k: 'high', em: '👑', ink: '#C79217', label: 'พรีเมียม', sub: 'ร.ร.เอกชนชั้นนำ / สองภาษา',            once: 150000, m: [15000, 18000, 35000, 50000, 60000, 70000, 60000] },
       {
-        k: 'inter', label: 'อินเตอร์', sub: 'ร.ร.นานาชาติ · ค่าเทอมราว 7 แสน/ปี',
+        k: 'inter', em: '✈️', ink: '#D8628A', label: 'อินเตอร์', sub: 'ร.ร.นานาชาติ · ค่าเทอมราว 7 แสน/ปี',
         once: 300000, m: [25000, 40000, 78000, 97000, 108000, 118000, 75000],
         // ระดับนี้ค่าเทอมกินสัดส่วนใหญ่กว่าระดับอื่นมาก จึงมีการแจกแจงของตัวเอง
         breakdown: [
@@ -118,6 +118,23 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       [{ l: 'ค่าเทอม', w: 48 }, { l: 'ที่พัก/หอ', w: 18 }, { l: 'อาหาร', w: 17 }, { l: 'เดินทาง', w: 7 }, { l: 'หนังสือ/อุปกรณ์', w: 5 }, { l: 'เบ็ดเตล็ด', w: 5 }]
     ]
   };
+  /* กราฟแท่งค่าใช้จ่ายรวมของแต่ละช่วงวัย — สีตามระดับที่เลือก */
+  function stageChart(rows, tier) {
+    const max = Math.max(1, ...rows.map(r => r.sub));
+    const fmtM = v => v >= 1000000 ? (v / 1000000).toFixed(1) + ' ล.' : Math.round(v / 1000) + 'ก.';
+    return `<div class="card raise-chart tier-${tier.k}">
+      <div class="hd">💸 ค่าใช้จ่ายรวมของแต่ละช่วงวัย</div>
+      <div class="bars">
+        ${rows.map(r => `<div class="b">
+          <span class="v">${fmtM(r.sub)}</span>
+          <i style="height:${Math.max(4, r.sub / max * 100).toFixed(1)}%"></i>
+          <span class="x">${U.esc(r.s.label.replace(' ปี', ''))}</span>
+          <span class="y">${U.esc(r.s.sub.split(' ')[0])}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
   function renderRaising(root, params) {
     const tier = RAISE.tiers.find(t => t.k === ((params && params.tier) || 'mid')) || RAISE.tiers[1];
     const fmt = n => Math.round(n).toLocaleString('en-US');
@@ -148,19 +165,20 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         <div style="flex:1"><h2 style="font-size:18px">ค่าเลี้ยงลูก 1 คน</h2><p>ประมาณการแรกเกิด → จบปริญญาตรี</p></div></div>
 
       <div class="chips" style="margin:2px 0 12px">
-        ${RAISE.tiers.map(t => `<div class="chip ${t.k === tier.k ? 'active' : ''}" data-tier="${t.k}">${t.label}</div>`).join('')}
+        ${RAISE.tiers.map(t => `<div class="chip tier-${t.k} ${t.k === tier.k ? 'active' : ''}" data-tier="${t.k}">${t.em} ${t.label}</div>`).join('')}
       </div>
 
-      <div class="card tint" style="text-align:center;padding:18px 16px">
-        <div class="muted" style="font-size:12.5px">${U.esc(tier.label)} · ${U.esc(tier.sub)}</div>
-        <div style="font-size:30px;font-weight:800;color:var(--brown);margin:4px 0">≈ ${millions} ล้านบาท</div>
-        <div class="muted" style="font-size:12.5px">ตั้งแต่แรกเกิดจนจบ ป.ตรี (~22 ปี)</div>
+      <div class="card raise-total tier-${tier.k}" style="text-align:center;padding:18px 16px">
+        <div class="sub">${tier.em} ${U.esc(tier.label)} · ${U.esc(tier.sub)}</div>
+        <div class="big">≈ ${millions} ล้านบาท</div>
+        <div class="sub">ตั้งแต่แรกเกิดจนจบ ป.ตรี (~22 ปี)</div>
         <div class="divider"></div>
         <div style="display:flex;justify-content:center;gap:24px">
-          <div><div style="font-size:18px;font-weight:800;color:var(--pink-deep)">${fmt(avgMonth)}</div><div class="muted" style="font-size:11.5px">บาท/เดือน (เฉลี่ย)</div></div>
-          <div><div style="font-size:18px;font-weight:800;color:var(--pink-deep)">${fmt(total)}</div><div class="muted" style="font-size:11.5px">บาท (รวมทั้งหมด)</div></div>
+          <div><div class="mini">${fmt(avgMonth)}</div><div class="sub">บาท/เดือน (เฉลี่ย)</div></div>
+          <div><div class="mini">${fmt(total)}</div><div class="sub">บาท (รวมทั้งหมด)</div></div>
         </div>
       </div>
+      ${stageChart(rows, tier)}
 
       <div class="section-title">📋 แยกตามช่วงวัย <span class="more">แตะดูค่าใช้จ่ายพื้นฐาน</span></div>
       <div class="card" style="padding:6px 14px">

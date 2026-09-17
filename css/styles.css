@@ -798,3 +798,35 @@ canvas { width: 100%; display: block; }
 }
 .st-method .pro { background: #EAF6F0; color: #3E7A63; }
 .st-method .con { background: #FDF0EE; color: #A9705F; }
+
+/* ค่าเลี้ยงลูก — สีประจำแต่ละระดับ (ประหยัด เขียว · ปานกลาง ฟ้า · พรีเมียม ทอง · อินเตอร์ ชมพู) */
+.chip.tier-low.active   { background: linear-gradient(135deg,#E6F5EC,#D6EEE0); border-color:#A9DCBF; color:#3E8E5F; box-shadow:0 3px 11px rgba(62,142,95,.20); }
+.chip.tier-mid.active   { background: linear-gradient(135deg,#E6F1FB,#D6E8F8); border-color:#A9CCEA; color:#4A87B8; box-shadow:0 3px 11px rgba(74,135,184,.20); }
+.chip.tier-high.active  { background: linear-gradient(135deg,#FBF1DC,#F7E6C4); border-color:#EBD09A; color:#B5840F; box-shadow:0 3px 11px rgba(199,146,23,.22); }
+.chip.tier-inter.active { background: linear-gradient(135deg,#FDE8F0,#FBD9E6); border-color:#F3B3CC; color:#D8628A; box-shadow:0 3px 11px rgba(216,98,138,.22); }
+
+.raise-total { border-width: 1.5px; }
+.raise-total .big { font-size: 31px; font-weight: 800; margin: 4px 0; line-height: 1.2; }
+.raise-total .mini { font-size: 18px; font-weight: 800; }
+.raise-total .sub { font-size: 12.5px; color: var(--muted); }
+.raise-total.tier-low   { background: linear-gradient(150deg,#F2FAF5,#E4F4EB); border-color:#C9E8D6; }
+.raise-total.tier-low   .big, .raise-total.tier-low   .mini { color:#3E8E5F; }
+.raise-total.tier-mid   { background: linear-gradient(150deg,#F2F8FD,#E3EFFA); border-color:#C8DFF2; }
+.raise-total.tier-mid   .big, .raise-total.tier-mid   .mini { color:#4A87B8; }
+.raise-total.tier-high  { background: linear-gradient(150deg,#FDF8EC,#F8EED6); border-color:#EEDCAF; }
+.raise-total.tier-high  .big, .raise-total.tier-high  .mini { color:#B5840F; }
+.raise-total.tier-inter { background: linear-gradient(150deg,#FDF1F6,#FBE2EC); border-color:#F5C8DA; }
+.raise-total.tier-inter .big, .raise-total.tier-inter .mini { color:#D8628A; }
+
+.raise-chart { padding: 14px 12px 10px; }
+.raise-chart .hd { font-size: 13.5px; font-weight: 800; color: var(--brown-dark); margin: 0 4px 12px; }
+.raise-chart .bars { display: flex; align-items: flex-end; gap: 5px; height: 152px; }
+.raise-chart .b { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+.raise-chart .b i { display: block; width: 100%; border-radius: 7px 7px 3px 3px; background: var(--pink); }
+.raise-chart .b .v { font-size: 9.5px; font-weight: 700; color: var(--brown); margin-bottom: 3px; white-space: nowrap; }
+.raise-chart .b .x { font-size: 9.5px; color: var(--brown-dark); margin-top: 5px; white-space: nowrap; font-weight: 600; }
+.raise-chart .b .y { font-size: 8.5px; color: var(--muted); white-space: nowrap; }
+.raise-chart.tier-low   .b i { background: linear-gradient(180deg,#7FCBA2,#4FA97B); }
+.raise-chart.tier-mid   .b i { background: linear-gradient(180deg,#8FC0E4,#5C93C4); }
+.raise-chart.tier-high  .b i { background: linear-gradient(180deg,#F2D48C,#DCAE3E); }
+.raise-chart.tier-inter .b i { background: linear-gradient(180deg,#F5A7C5,#E2719B); }
