@@ -141,7 +141,7 @@ window.MB = window.MB || {};
     { id: 'home',    label: 'หน้าหลัก',  ic: svg('<path d="M15 21v-7a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v7"/><path d="M3 10.2a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6a2 2 0 0 1 .7 1.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>') },
     { id: 'log',     label: 'บันทึก',    ic: svg('<path d="M2 6h4M2 10h4M2 14h4M2 18h4"/><rect x="4" y="2.5" width="16" height="19" rx="2.6"/><path d="M9.5 8h5M9.5 12H16M9.5 16H14"/>') },
     { id: 'vax',     label: 'วัคซีน',    ic: svg('<path d="m18 2 4 4M17 7l3-3"/><path d="M18.5 8.5 8.2 18.8c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L14.5 4.5"/><path d="m9 11 4 4M5 19l-3 3M14 4l6 6"/>') },
-    { id: 'growth',  label: 'เติบโต',    ic: svg('<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>') },
+    { id: 'milk',    label: 'รอบนม',     ic: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3.1 2.1"/>') },
     { id: 'develop', label: 'ความรู้',   ic: svg('<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>') }
   ];
   let current = 'home';
@@ -206,7 +206,9 @@ window.MB = window.MB || {};
     // ค่าวัคซีน → ไฮไลต์ "วัคซีน" · ค่าคลอด → อยู่ใต้ตั้งครรภ์ (ไฮไลต์ "หน้าหลัก") · ที่เหลืออยู่ใต้ "ความรู้"
     const activeTab = (current === 'prices' && currentParams.tab === 'vaccine') ? 'vax'
       : (current === 'prices' && currentParams.tab === 'delivery') ? 'home'
-      : ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups', 'emotions', 'sleeptrain'].includes(current) ? 'develop' : current;
+      : ['prices', 'insurance', 'pump', 'diaper', 'formula', 'groups', 'emotions', 'sleeptrain'].includes(current) ? 'develop'
+      : current === 'growth' ? 'home'
+      : current === 'sleep' ? 'log' : current;
     tb.innerHTML = TABS.map(t =>
       `<button data-tab="${t.id}" class="${activeTab === t.id ? 'active' : ''}"><span class="ic">${t.ic}</span>${t.label}</button>`
     ).join('');

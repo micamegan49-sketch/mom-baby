@@ -136,6 +136,15 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         </div>
       </div>
 
+      <div class="section-title">📈 การเจริญเติบโต</div>
+      <div class="card">
+        <div class="list-item" id="go-growth">
+          <div class="ic">📈</div>
+          <div class="body"><div class="t">กราฟน้ำหนัก–ส่วนสูง</div><div class="s">บันทึกการวัดและเทียบเกณฑ์ WHO</div></div>
+          <div class="meta">›</div>
+        </div>
+      </div>
+
       <div class="section-title">🔔 อื่น ๆ</div>
       <div class="card">
         <div class="list-item" id="notif-row" style="cursor:default">
@@ -204,6 +213,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       MB.views.editChild(kids.find(k => k.id === n.dataset.edit));
     });
     root.querySelector('#go-preg').onclick = () => MB.go('preg');
+    root.querySelector('#go-growth').onclick = () => MB.go('growth');
     root.querySelector('#go-milk').onclick = () => MB.go('milk');
     root.querySelector('#go-sleep').onclick = () => MB.go('sleep');
     root.querySelector('#go-appt').onclick = () => MB.go('appt');
