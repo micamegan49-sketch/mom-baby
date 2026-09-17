@@ -49,7 +49,16 @@ MB.SOURCES = {
     ]
   }
 };
-MB.SOURCE_KEYS = ['vaccine', 'growth', 'pregnancy', 'develop', 'feeding', 'emotion'];
+MB.SOURCES.sleep = {
+  title: '😴 การนอนของลูกและการฝึกนอน',
+  items: [
+    { name: 'Healthy Sleep Habits & Safe Sleep — American Academy of Pediatrics (HealthyChildren.org)', url: 'https://www.healthychildren.org/English/ages-stages/baby/sleep/Pages/default.aspx' },
+    { name: 'Helping your baby to sleep — NHS (UK)', url: 'https://www.nhs.uk/conditions/baby/caring-for-a-newborn/helping-your-baby-to-sleep/' },
+    { name: 'Guidelines on physical activity, sedentary behaviour and sleep for children under 5 — WHO', url: 'https://www.who.int/publications/i/item/9789241550536' },
+    { name: 'สุขภาพจิตเด็กและวัยรุ่น — กรมสุขภาพจิต กระทรวงสาธารณสุข', url: 'https://dmh.go.th/' }
+  ]
+};
+MB.SOURCE_KEYS = ['vaccine', 'growth', 'pregnancy', 'develop', 'feeding', 'emotion', 'sleep'];
 
 /* แสดงบล็อก "แหล่งอ้างอิง" พร้อมลิงก์ที่กดได้ (เปิดในเบราว์เซอร์) ใช้ท้ายหน้าข้อมูลการแพทย์
    key = vaccine | growth | pregnancy | develop | feeding */

@@ -206,6 +206,14 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
         </div>
         <div style="color:var(--pink-deep);font-size:20px">›</div>
       </div>
+      <div class="card" data-go="sleep" style="display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:14px">
+        <div class="ic" style="width:44px;height:44px;border-radius:14px;flex:0 0 auto;display:grid;place-items:center;font-size:22px;background:var(--lilac-bg)">😴</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14.5px">สรุปการนอน</div>
+          <div class="muted" style="font-size:12.5px">${tSleep ? 'วันนี้นอนไปแล้ว ' + (Math.round(tSleep / 6) / 10) + ' ชม.' : 'ดูเวลานอนรายวัน–สัปดาห์–เดือน + วิธีฝึกนอนยาว'}</div>
+        </div>
+        <div style="color:var(--pink-deep);font-size:20px">›</div>
+      </div>
       <div class="section-title">เพิ่มบันทึก</div>
       <div class="quick-grid">
         ${Object.keys(TYPE).map(t => `<button class="quick" data-q="${t}"><span class="ic">${TYPE[t].em}</span><span class="lb">${TYPE[t].label}</span></button>`).join('')}

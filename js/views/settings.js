@@ -143,6 +143,16 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
           <div class="body"><div class="t">แจ้งเตือนบนมือถือ</div><div class="s" id="notif-sub">เตือนวัคซีน นัดหมาย และบันทึกประจำวันให้อัตโนมัติ</div></div>
           <label class="switch"><input type="checkbox" id="notif-toggle"><span class="slider"></span></label>
         </div>
+        <div class="list-item" id="go-milk">
+          <div class="ic">⏰</div>
+          <div class="body"><div class="t">ตารางรอบนม & เตือนปั๊มนม</div><div class="s">ตั้งเวลาเตือนป้อนนม–ปั๊มนม กำหนดเองได้ทุกรอบ</div></div>
+          <div class="meta">›</div>
+        </div>
+        <div class="list-item" id="go-sleep">
+          <div class="ic">😴</div>
+          <div class="body"><div class="t">สรุปการนอน & ฝึกนอนยาว</div><div class="s">ดูเวลานอนรายวัน–สัปดาห์–เดือน และวิธีฝึก</div></div>
+          <div class="meta">›</div>
+        </div>
         <div class="list-item" id="go-appt">
           <div class="ic">🔔</div>
           <div class="body"><div class="t">นัดหมาย & การเตือน</div><div class="s">ฝากครรภ์ วัคซีน หมอเด็ก</div></div>
@@ -194,6 +204,8 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       MB.views.editChild(kids.find(k => k.id === n.dataset.edit));
     });
     root.querySelector('#go-preg').onclick = () => MB.go('preg');
+    root.querySelector('#go-milk').onclick = () => MB.go('milk');
+    root.querySelector('#go-sleep').onclick = () => MB.go('sleep');
     root.querySelector('#go-appt').onclick = () => MB.go('appt');
     root.querySelector('#go-diary').onclick = () => MB.go('diary');
 

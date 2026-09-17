@@ -23,8 +23,9 @@ window.MB = window.MB || {};
     vaxByChild: {},         // id -> { vid: {done,date} }
     msByChild: {},          // id -> { mid: {done,date} }
     milkPlan: {             // ตารางรอบป้อนนม/ปั๊มนม + แจ้งเตือน
-      feed: { on: false, start: '06:00', every: 3, count: 8 },
-      pump: { on: false, start: '06:00', every: 3, count: 8 }
+      // mode: 'auto' = ทุก N ชม. · 'custom' = กำหนดเวลาเองทีละรอบ (times)
+      feed: { on: false, mode: 'auto', start: '06:00', every: 3, count: 8, times: [] },
+      pump: { on: false, mode: 'auto', start: '06:00', every: 3, count: 8, times: [] }
     }
   };
 

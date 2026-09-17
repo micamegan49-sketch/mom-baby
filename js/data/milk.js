@@ -54,6 +54,18 @@ MB.pumpPlanFor = function (months) {
   return MB.PUMP_PLAN[2];
 };
 
+/* เวลารอบที่ใช้จริงของแผนหนึ่ง ๆ — โหมด custom ใช้เวลาที่ผู้ใช้กำหนดเอง, โหมด auto คำนวณจากระยะห่าง */
+MB.milkPlanTimes = function (p) {
+  if (!p) return [];
+  if (p.mode === 'custom') {
+    const seen = {};
+    return (p.times || [])
+      .filter(t => /^\d{2}:\d{2}$/.test(t) && !seen[t] && (seen[t] = 1))
+      .sort();
+  }
+  return MB.milkTimes(p.start, p.every, p.count);
+};
+
 /* สร้างเวลารอบทั้งวันจาก เวลาเริ่ม (HH:MM) + ระยะห่าง (ชม.) + จำนวนรอบ
    คืน ['06:00','09:00',...] เรียงตามเวลาในหนึ่งวัน (วนข้ามเที่ยงคืนได้) */
 MB.milkTimes = function (start, everyHours, count) {

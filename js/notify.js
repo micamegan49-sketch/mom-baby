@@ -121,7 +121,7 @@ window.MB = window.MB || {};
         ['feed', 'pump'].forEach(k => {
           const p = mp[k];
           if (!p || !p.on) return;
-          const times = MB.milkTimes ? MB.milkTimes(p.start, p.every, p.count) : [];
+          const times = MB.milkPlanTimes ? MB.milkPlanTimes(p) : [];
           for (let d = 0; d < MILK_DAYS; d++) {
             const iso = U.addDays(todayISO, d);
             times.forEach(t => {

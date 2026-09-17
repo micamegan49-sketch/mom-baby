@@ -693,3 +693,108 @@ canvas { width: 100%; display: block; }
 .mk-tips { margin: 0; padding-left: 18px; }
 .mk-tips li { font-size: 13.2px; line-height: 1.7; margin-bottom: 7px; }
 .mk-tips li::marker { color: var(--pink); }
+
+/* ตารางรอบนม — โหมดกำหนดเวลาเอง + เครื่องคำนวณปริมาณนม */
+.mk-list { margin-top: 12px; }
+.mk-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; }
+.mk-row .n {
+  width: 24px; height: 24px; flex: 0 0 auto; border-radius: 50%;
+  background: var(--cream-2); color: var(--muted);
+  font-size: 11.5px; font-weight: 700; display: grid; place-items: center;
+}
+.mk-row input[type="time"] {
+  flex: 1; padding: 9px 10px; border: 1.5px solid var(--line); border-radius: 11px;
+  font-size: 15px; background: var(--cream); font-family: var(--font); color: var(--brown-deep);
+}
+.mk-row .del {
+  width: 32px; height: 32px; flex: 0 0 auto; border: none; border-radius: 10px;
+  background: #FCEEF0; color: var(--danger); font-size: 13px; cursor: pointer;
+}
+.mk-actions { display: flex; gap: 8px; margin-top: 10px; }
+.mk-actions .btn { flex: 1; width: auto; }
+.mk-calc { display: flex; gap: 9px; }
+.mk-calc .c {
+  flex: 1; text-align: center; padding: 12px 6px; border-radius: 15px;
+  background: var(--rose-bg); color: var(--rose-ink);
+}
+.mk-calc .c:nth-child(2) { background: var(--sky-bg); color: var(--sky-ink); }
+.mk-calc .c:nth-child(3) { background: var(--mint-bg); color: var(--mint-ink); }
+.mk-calc .v { font-size: 22px; font-weight: 800; line-height: 1.15; }
+.mk-calc .l { font-size: 11.5px; margin-top: 2px; opacity: .9; }
+.mk-note {
+  margin-top: 12px; padding: 10px 13px; border-radius: 13px;
+  background: var(--cream); border: 1px solid var(--line);
+  font-size: 12.8px; line-height: 1.7;
+}
+
+/* หน้าการนอน */
+.sl-seg {
+  display: flex; gap: 4px; padding: 4px; margin-bottom: 12px;
+  background: var(--cream-2); border-radius: 999px;
+}
+.sl-seg button {
+  flex: 1; border: none; background: transparent; cursor: pointer;
+  padding: 9px 4px; border-radius: 999px; font-family: var(--font);
+  font-size: 13.5px; font-weight: 700; color: var(--muted);
+}
+.sl-seg button.active { background: #fff; color: var(--pink-deep); box-shadow: 0 2px 8px rgba(170,140,130,.16); }
+.sl-date { text-align: center; font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+.sl-hero {
+  display: flex; align-items: center; gap: 10px; padding: 16px 18px;
+  border-radius: var(--radius); margin-bottom: 12px;
+  background: linear-gradient(135deg, #F4EEFD 0%, #EFE6FB 55%, #FDEEF2 100%);
+  border: 1px solid #E8DEF8; box-shadow: var(--shadow-soft);
+}
+.sl-hero .art { width: 96px; flex: 0 0 auto; }
+.sl-hero .art svg { width: 100%; height: auto; display: block; }
+.sl-hero .tx { flex: 1; min-width: 0; text-align: right; }
+.sl-hero .lb { font-size: 12.5px; color: #8B72C4; font-weight: 600; }
+.sl-hero .big { font-size: 27px; font-weight: 800; color: #5C4694; line-height: 1.2; }
+.sl-split { display: flex; gap: 10px; margin-bottom: 14px; }
+.sl-split .c {
+  flex: 1; display: flex; align-items: center; gap: 9px;
+  padding: 12px 13px; border-radius: 16px;
+}
+.sl-split .c.night { background: var(--lilac-bg); color: var(--lilac-ink); }
+.sl-split .c.nap { background: var(--peach-bg); color: var(--peach-ink); }
+.sl-split .em { font-size: 21px; }
+.sl-split .l { font-size: 11.5px; opacity: .9; }
+.sl-split .v { font-size: 14.5px; font-weight: 800; line-height: 1.25; }
+.sl-tl .r {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 2px; border-bottom: 1px solid var(--line);
+}
+.sl-tl .r:last-child { border-bottom: none; }
+.sl-tl .em {
+  width: 34px; height: 34px; flex: 0 0 auto; border-radius: 11px;
+  display: grid; place-items: center; font-size: 17px;
+}
+.sl-tl .em.night { background: var(--lilac-bg); }
+.sl-tl .em.nap { background: var(--peach-bg); }
+.sl-tl .t { font-size: 14px; font-weight: 700; color: var(--brown-deep); flex: 0 0 auto; }
+.sl-tl .d { flex: 1; text-align: right; font-size: 12.5px; color: var(--muted); }
+.sl-tl .x { width: 24px; text-align: center; color: #D8C3B8; font-size: 12px; cursor: pointer; flex: 0 0 auto; }
+.sl-days .r { display: flex; align-items: center; gap: 9px; padding: 7px 0; }
+.sl-days .d { width: 54px; flex: 0 0 auto; font-size: 12px; color: var(--muted); }
+.sl-days .bar { flex: 1; display: flex; height: 13px; border-radius: 999px; background: var(--cream-2); overflow: hidden; }
+.sl-days .bar i { display: block; height: 100%; }
+.sl-days .bar i.n { background: #9B7ED0; }
+.sl-days .bar i.p { background: #E8B37A; }
+.sl-days .v { width: 78px; flex: 0 0 auto; text-align: right; font-size: 12px; font-weight: 700; color: var(--brown); }
+.sl-legend { display: flex; gap: 16px; justify-content: center; margin: -4px 0 14px; font-size: 11.5px; color: var(--muted); }
+.sl-legend span { display: flex; align-items: center; gap: 5px; }
+.sl-legend i { width: 10px; height: 10px; border-radius: 3px; display: block; }
+.sl-legend i.n { background: #9B7ED0; }
+.sl-legend i.p { background: #E8B37A; }
+
+/* วิธีฝึกนอน — การ์ดวิธีต่าง ๆ */
+.st-method .h { display: flex; align-items: center; gap: 11px; }
+.st-method .em { font-size: 26px; }
+.st-method .n { font-weight: 700; font-size: 15px; }
+.st-method .sub { font-size: 11.5px; color: var(--muted); letter-spacing: .2px; }
+.st-method .how { margin: 10px 0 0; font-size: 13.3px; line-height: 1.7; }
+.st-method .pro, .st-method .con {
+  margin-top: 8px; padding: 8px 11px; border-radius: 11px; font-size: 12.7px; line-height: 1.6;
+}
+.st-method .pro { background: #EAF6F0; color: #3E7A63; }
+.st-method .con { background: #FDF0EE; color: #A9705F; }

@@ -9,6 +9,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const items = [
       { k: 'ms',        em: '🌱', label: 'พัฒนาการ' },
       { k: 'emo',       em: '😊', label: 'อารมณ์ลูก' },
+      { k: 'sleep',     em: '😴', label: 'ฝึกนอน' },
       { k: 'articles',  em: '📖', label: 'บทความ' },
       { k: 'faq',       em: '💬', label: 'ถาม-ตอบ' },
       { k: 'cost',      em: '💰', label: 'ค่าใช้จ่าย' },
@@ -24,6 +25,7 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
       if (k === 'cost') MB.go('prices', { tab: 'raising' });
       else if (k === 'groups') MB.go('groups');
       else if (k === 'emo') MB.go('emotions');
+      else if (k === 'sleep') MB.go('sleeptrain');
       else MB.go('develop', { tab: k });
     });
   };
