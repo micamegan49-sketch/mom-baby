@@ -830,3 +830,4 @@ canvas { width: 100%; display: block; }
 .raise-chart.tier-mid   .b i { background: linear-gradient(180deg,#8FC0E4,#5C93C4); }
 .raise-chart.tier-high  .b i { background: linear-gradient(180deg,#F2D48C,#DCAE3E); }
 .raise-chart.tier-inter .b i { background: linear-gradient(180deg,#F5A7C5,#E2719B); }
+.mk-vary { margin: 0 0 10px; font-size: 12.5px; line-height: 1.7; color: var(--brown-dark); background: var(--rose-bg); padding: 9px 12px; border-radius: 12px; }

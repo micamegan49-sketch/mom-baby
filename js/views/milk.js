@@ -154,12 +154,13 @@ window.MB = window.MB || {}; MB.views = MB.views || {};
     const guide = `<div class="card" style="background:var(--cream-2);border-color:var(--line)">
         <b style="font-size:14.5px">📋 รอบที่แนะนำ${child ? 'สำหรับ ' + U.esc(child.name) : 'ตามวัย'}</b>
         ${child ? `<p class="muted" style="margin:4px 0 10px;font-size:12.5px">${U.ageInfo(child.birthDate).label}</p>` : '<p class="muted" style="margin:4px 0 10px;font-size:12.5px">ยังไม่มีข้อมูลลูก — แสดงค่าเริ่มต้นของทารกแรกเกิด</p>'}
+        <p class="mk-vary">ระยะห่างของแต่ละบ้านต่างกันได้มาก — ขึ้นกับวัย น้ำหนักลูก และกินนมแม่ล้วนหรือนมผสม ถ้ารอบไม่ตรงตารางนี้ก็ไม่ได้แปลว่าผิดค่ะ 💗</p>
         <div class="mk-rec">
           <div class="r"><span class="em">${fp.em}</span>
-            <div><b>ป้อนนม · ${fp.label}</b><div class="s">ทุก ~${fp.every} ชม. · ${fp.perDay}</div>
+            <div><b>ป้อนนม · ${fp.label}</b><div class="s">ทุก ${fp.range || '~' + fp.every + ' ชม.'} · ${fp.perDay}</div>
             <div class="n">${U.esc(fp.note)}</div></div></div>
           <div class="r"><span class="em">${pp.em}</span>
-            <div><b>ปั๊มนม · ${pp.label}</b><div class="s">ทุก ~${pp.every} ชม. · ${pp.perDay}</div>
+            <div><b>ปั๊มนม · ${pp.label}</b><div class="s">ทุก ${pp.range || '~' + pp.every + ' ชม.'} · ${pp.perDay}</div>
             <div class="n">${U.esc(pp.note)}</div></div></div>
         </div>
       </div>`;
